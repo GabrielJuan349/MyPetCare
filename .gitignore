@@ -64,3 +64,6 @@ deno.lock
 lock.json
 import_map.json
 node_modules/
+
+# secret files
+MyPetCare-api\firebaseconfig\secret.ts
