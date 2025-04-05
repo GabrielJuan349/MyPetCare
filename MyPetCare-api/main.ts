@@ -2,6 +2,9 @@ import { Application, Router } from 'oak';
 import {oakCors} from 'cors';
 import { load } from 'dotenv';
 
+import {getClinics, getClinic} from './api-functions/clinic-request.ts';
+import { getVetsByClinicId } from './api-functions/vet-request.ts';
+
 
 await load({ export: true });
 
@@ -17,8 +20,68 @@ app.use(oakCors({
 }));
 
 router
-  .post('/api/endpoint', (ctx) => {
+  .post('/bloked/{date}/{id}', (ctx) => {
+    const date = ctx.params.date;
+    if (date === 'month') {
+      const id = ctx.params.id;
+      if (id) {
+        console.log('month', id);
+      } else {
+        ctx.response.status = 400;
+        ctx.response.body = { error: 'Invalid clinic identificator' };
+      }
+    } else if (date === 'day') {
+      const id = ctx.params.id;
+      if (id) {
+        console.log('day', id);
+      } else {
+        ctx.response.status = 400;
+        ctx.response.body = { error: 'Invalid vet identificator' };
+      }
+    } else{
+      ctx.response.status = 400;
+      ctx.response.body = { error: 'Invalid identificator' };
+    }
+    return ctx.response;
+  })
+  .post('/clinic/list', (ctx) => {
+    const clinics = getClinics();
+    ctx.response.body = clinics;
+    ctx.response.status = 200;
+    ctx.response.headers.set("Content-Type", "application/json");
+    return ctx.response;
+  })
+  .post('/clinic/{id}', (ctx) => {
+    const id = ctx.params.id;
+    if (id) {
+      const clinic = getClinic(Number(id));
+      if (clinic) {
+        ctx.response.body = clinic;
+        ctx.response.status = 200;
+      } else {
+        ctx.response.status = 404;
+        ctx.response.body = { error: 'Clinic not found' };
+      }
+    } else {
+      ctx.response.status = 400;
+      ctx.response.body = { error: 'Invalid ID' };
+    }
+
+  })
+  .post('/category/{id}', (ctx) => {
     console.log(ctx.request.body({ type: 'json' }));
+  })
+  .post('/vet/list/{id_clinica}', (ctx) => {
+    const id = ctx.params.id_clinica;
+    if (id) {
+      const vets = getVetsByClinicId(id);
+      ctx.response.body = vets;
+      ctx.response.status = 200;
+    }
+    else {
+      ctx.response.status = 400;
+      ctx.response.body = { error: 'Invalid ID' };
+    }
   })
 
 app.use(router.routes());
