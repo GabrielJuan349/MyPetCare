@@ -108,7 +108,6 @@ export async function updateSurName(userId: string, newSurName: string) {
 // }
 
 // Test the functions
-console.log("Now from functions:")
 console.log("Get all pets", await getAllPets())
 console.log("Get all users", await getAllUsers())
 
