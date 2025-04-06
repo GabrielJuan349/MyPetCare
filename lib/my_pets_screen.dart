@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lis_project/pet_num_screen.dart';
+import 'dart:io';
 
 class MyPetsScreen extends StatefulWidget {
   @override
@@ -21,21 +23,34 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
             },
           ),
           actions: [
-            IconButton(onPressed: () {}, icon: Icon(Icons.account_circle))
+            IconButton(onPressed: () {
+
+            }, icon: Icon(Icons.account_circle))
           ],
         ),
         body: ListView.builder(
           itemCount: pets.length,
           itemBuilder: (context, index) {
             return ListTile(
-              leading: Icon(Icons.image, size: 40),
+              leading: CircleAvatar(foregroundImage: FileImage(File("assets/img/bone.jpg"))),
               title: Text(pets[index]),
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PetNumScreen(petName: pets[index]),
+                  ),
+                );
+              },
             );
           },
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            String newPetName = "New Pet";
+            pets.add(newPetName);
+            setState(() {});
+          },
           child: Icon(Icons.add),
           backgroundColor: Colors.blue,
         )
