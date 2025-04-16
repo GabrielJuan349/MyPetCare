@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lis_project/pet_num_screen.dart';
+import 'package:lis_project/pet.dart';
 import 'dart:io';
 
 class MyPetsScreen extends StatefulWidget {
@@ -8,7 +9,11 @@ class MyPetsScreen extends StatefulWidget {
 }
 
 class _MyPetsScreenState extends State<MyPetsScreen> {
-  final List<String> pets = ["Pet 1", "Pet 2", "Pet 3"];
+  final List<Pet> pets = [
+    Pet("Test Cat", "Male", "4", "cat", "assets/pets/cat.jpg", 3, 5),
+    Pet("Test Dog", "Female", "6", "dog", "assets/pets/dog.jpg", 4, 3),
+    Pet("Test Hamster", "Male", "2", "hamster", "assets/pets/hamster.jpg", 5, 0)
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +46,7 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
         itemBuilder: (context, index) {
           return ListTile(
             leading: CircleAvatar(foregroundImage: FileImage(File("assets/img/bone.jpg"))),
-            title: Text(pets[index]),
+            title: Text(pets[index].name),
             onTap: () {
               Navigator.push(
                 context,
