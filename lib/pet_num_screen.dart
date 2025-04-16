@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:lis_project/pet.dart';
+import 'package:lis_project/pet_details.dart';
 
 class PetNumScreen extends StatefulWidget {
-  final String petName;
+  Pet myPet;
 
-  PetNumScreen({super.key, required this.petName});
+  PetNumScreen({super.key, required this.myPet});
 
   @override
   State<PetNumScreen> createState() => _PetNumScreenState();
 }
 
 class _PetNumScreenState extends State<PetNumScreen> {
-  late String petName;
+  late Pet myPet;
 
   @override
   void initState() {
     super.initState();
-    petName = widget.petName;
+    myPet = widget.myPet;
   }
 
   @override
@@ -27,7 +29,7 @@ class _PetNumScreenState extends State<PetNumScreen> {
         backgroundColor: appBarColor,
         iconTheme: IconThemeData(color: Colors.white),
         title: Text(
-          petName,
+          myPet.name,
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
@@ -71,7 +73,15 @@ class _PetNumScreenState extends State<PetNumScreen> {
       padding: EdgeInsets.all(16),
       child: InkWell(
         onTap: () {
-
+          if (label == "Pet details") {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (context) => PetDetails(myPet: myPet),
+              ),
+            ).then((_) {
+              setState(() {});
+            });
+          }
         },
         borderRadius: BorderRadius.circular(10),
         child: Center(
