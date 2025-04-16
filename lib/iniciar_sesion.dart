@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lis_project/register_screen.dart';
+import 'package:lis_project/home_screen.dart';
+
 class IniciarSesion extends StatelessWidget {
+
   const IniciarSesion({super.key});
 
   @override
@@ -62,7 +65,9 @@ class IniciarSesion extends StatelessWidget {
                       const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () {
-                          // Acción al presionar "Iniciar Sesión"
+                          Navigator.push(
+                              context, MaterialPageRoute(builder: (context) => HomeScreen())
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF627ECB),
@@ -77,12 +82,10 @@ class IniciarSesion extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 10),
-
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
                           onPressed: () {
-                            // Acción al presionar "Forgot password?"
                           },
                           style: TextButton.styleFrom(
                             foregroundColor: const Color(0xFF627ECB),

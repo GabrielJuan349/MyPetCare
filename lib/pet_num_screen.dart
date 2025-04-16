@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class PetNumScreen extends StatefulWidget {
-  String petName;
+  final String petName;
 
   PetNumScreen({super.key, required this.petName});
 
@@ -15,18 +15,22 @@ class _PetNumScreenState extends State<PetNumScreen> {
   @override
   void initState() {
     super.initState();
-    petName = widget.petName;  // Inicializa petName con el valor del widget padre
+    petName = widget.petName;
   }
-
-  _PetNumScreenState();
 
   @override
   Widget build(BuildContext context) {
+    final appBarColor = Color(0xfff59249);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(petName),
+        backgroundColor: appBarColor,
+        iconTheme: IconThemeData(color: Colors.white),
+        title: Text(
+          petName,
+          style: TextStyle(color: Colors.white),
+        ),
         centerTitle: true,
-        backgroundColor: Color(0xfff59249),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
@@ -34,19 +38,24 @@ class _PetNumScreenState extends State<PetNumScreen> {
           },
         ),
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.account_circle))
+          IconButton(
+            icon: Icon(Icons.person, color: Colors.white),
+            onPressed: () {
+              Navigator.pushNamed(context, '/profile');
+            },
+          ),
         ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: GridView.count(
-          crossAxisCount: 2, // Dos columnas
+          crossAxisCount: 2,
           crossAxisSpacing: 16.0,
           mainAxisSpacing: 16.0,
           children: [
             _buildGridItem(context, Icons.info_outline, 'Pet details'),
             _buildGridItem(context, Icons.receipt_long_outlined, 'Reports'),
-            _buildGridItem(context, Icons.medical_services_outlined, 'Medical prescriptions')
+            _buildGridItem(context, Icons.medical_services_outlined, 'Medical prescriptions'),
           ],
         ),
       ),
@@ -54,33 +63,39 @@ class _PetNumScreenState extends State<PetNumScreen> {
   }
 
   Widget _buildGridItem(BuildContext context, IconData icon, String label) {
-    return GestureDetector(
-      /*
-      onTap: () => Navigator.of(context)
-          .push(MaterialPageRoute<void>(
-          builder: (context) => destinationPage),
-      ).then((_) {
-        setState(() {});
-      }),*/
-      child: Container(
-        decoration: BoxDecoration(
-          color: Color(0xFFECF1FF),
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: Color(0xFF627ECB), size: 40),
-            const SizedBox(height: 8.0),
-            Text(
-              label,
-              style: const TextStyle(
+    return Container(
+      decoration: BoxDecoration(
+        color: Color(0xFFE9EFFF),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      padding: EdgeInsets.all(16),
+      child: InkWell(
+        onTap: () {
+
+        },
+        borderRadius: BorderRadius.circular(10),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
                 color: Color(0xFF627ECB),
-                fontSize: 16.0,
-                fontWeight: FontWeight.bold,
+                size: 60,
               ),
-            ),
-          ],
+              SizedBox(height: 10),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xFF627ECB),
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

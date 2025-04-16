@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lis_project/init_screen.dart';
-
+import 'package:lis_project/home_screen.dart';
+import 'package:lis_project/profile_screen.dart';
+import 'package:lis_project/reminders_screen.dart';
+import 'package:lis_project/my_pets_screen.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -11,7 +14,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const InitScreen(),
+      debugShowCheckedModeBanner: false,
+      initialRoute: '/init',
+      routes: {
+        '/init': (context) => const InitScreen(),
+        '/home': (context) => HomeScreen(),
+        '/profile': (context) => ProfileScreen(),
+        '/reminders': (context) => const RemindersScreen(),
+        '/pets': (context)=> MyPetsScreen(),
+      },
     );
   }
 }

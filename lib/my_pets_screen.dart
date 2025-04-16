@@ -9,51 +9,59 @@ class MyPetsScreen extends StatefulWidget {
 
 class _MyPetsScreenState extends State<MyPetsScreen> {
   final List<String> pets = ["Pet 1", "Pet 2", "Pet 3"];
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text("My Pets"),
-          centerTitle: true,
-          backgroundColor: Color(0xfff59249),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          actions: [
-            IconButton(onPressed: () {
+    final appBarColor = Color(0xfff59249);
 
-            }, icon: Icon(Icons.account_circle))
-          ],
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: appBarColor,
+        iconTheme: IconThemeData(color: Colors.white),
+        title: Text(
+          "My Pets",
+          style: TextStyle(color: Colors.white),
         ),
-        body: ListView.builder(
-          itemCount: pets.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              leading: CircleAvatar(foregroundImage: FileImage(File("assets/img/bone.jpg"))),
-              title: Text(pets[index]),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PetNumScreen(petName: pets[index]),
-                  ),
-                );
-              },
-            );
-          },
-        ),
-        floatingActionButton: FloatingActionButton(
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            String newPetName = "New Pet";
-            pets.add(newPetName);
-            setState(() {});
+            Navigator.pop(context);
           },
-          child: Icon(Icons.add),
-          backgroundColor: Colors.blue,
-        )
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.person, color: Colors.white),
+            onPressed: () {},
+          ),
+        ],
+      ),
+      body: ListView.builder(
+        itemCount: pets.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            leading: CircleAvatar(foregroundImage: FileImage(File("assets/img/bone.jpg"))),
+            title: Text(pets[index]),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PetNumScreen(petName: pets[index]),
+                ),
+              );
+            },
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          String newPetName = "New Pet";
+          pets.add(newPetName);
+          setState(() {});
+        },
+        child: Icon(Icons.add),
+        backgroundColor: Colors.blue,
+      ),
     );
   }
 }

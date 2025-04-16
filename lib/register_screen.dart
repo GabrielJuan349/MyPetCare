@@ -17,8 +17,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            // Acción al presionar el botón de retroceso
-            Navigator.pop(context); // Regresar a la pantalla anterior
+
+            Navigator.pop(context);
           },
         ),
         title: Text(
@@ -123,7 +123,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             obscureText: obscureText,
             decoration: InputDecoration(
               filled: true,
-              fillColor: Color(0xFFE9EFFF), // Color de fondo del campo de texto
+              fillColor: Color(0xFFE9EFFF),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(5),
                 borderSide: BorderSide.none,
