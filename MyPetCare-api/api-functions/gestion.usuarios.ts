@@ -1,4 +1,4 @@
-import {fs, db} from "./firebaseconfig/firebase.ts"
+import {fs, db} from "../firebaseconfig/firebase.ts"
 
 /*
 Read functions
@@ -64,57 +64,74 @@ export async function getUserById(userId: string) {
 }
 
 /*
-User management functions
+Update user data
 */
-export async function updatePhoneNumber(userId: string, newPhoneNumber: string) {
+export async function updateUser(userId:string, fields) {
+    const userRef = fs.doc(db, "users", userId);
+
     try{
-        const userRef = fs.doc(db, "users", userId);
-        await fs.updateDoc(userRef, {
-            phone: newPhoneNumber
-        });
-        console.log("Phone number updated successfully!");
-    }catch (error) {
-        console.error("Error updating phone number:", error);
+        const docSnap = await fs.getDoc(userRef);
+        if(!docSnap.exists()){
+            return{//User doesn't exist
+                status: 404,
+                message: "User not found",
+            };
+        }
+        if(Object.keys(fields).length==0){
+            return{//No fields passed to update
+                status: 400,
+                message: "Error in the submitted data"
+            }
+        }
+
+        await fs.updateDoc(userRef, fields);
+
+        return{//Success
+            status: 200,
+            message: "User data updated successfully"
+        }
+
+    }catch(e){
+        console.error("User update error: ", e);
+        return{
+            status: 500,
+            message: "Internal server error",
+        };
     }
 }
 
-export async function updateFirstName(userId: string, newFirstName: string) {
+/*
+Delete user
+*/
+export async function deleteUser(userId: string) {
     try{
         const userRef = fs.doc(db, "users", userId);
-        await fs.updateDoc(userRef, {
-            firstName: newFirstName
-        });
-        console.log("Firstname updated successfully!");
-    }catch (error) {
-        console.error("Error updating first name:", error);
+        const docSnap = await fs.getDoc(userRef);
+        if(!docSnap.exists()){
+            return{
+                status: 404,
+                message: "User not found",
+            };
+        }
+
+        await fs.deleteDoc(userRef);
+
+        return{
+            status: 200,
+            message: "User deleted successfully"
+        };
+
+    }catch(e){
+        console.log("User delete error:", e);
+        return{
+            status:400,
+            message: "Request error"
+        };
     }
 }
-
-export async function updateSurName(userId: string, newSurName: string) {
-    try{
-        const userRef = fs.doc(db, "users", userId);
-        await fs.updateDoc(userRef, {
-            surName: newSurName
-        });
-        console.log("Surname updated successfully!");
-    }catch (error) {
-        console.error("Error updating surname:", error);
-    }
-}
-
-// export async function deleteUser(userId: string) {
-//     const userRef = fs.doc(db, "users", userId);
-//     await fs.deleteDoc(userRef);
-// }
 
 // Test the functions
-console.log("Get all pets", await getAllPets())
-console.log("Get all users", await getAllUsers())
+// console.log("Get all pets", await getAllPets())
+// console.log("Get all users", await getAllUsers())
 
-console.log("Get user by id", await getUserById("bj1NKBFjux4joPrtq5qq"))
-await updatePhoneNumber("bj1NKBFjux4joPrtq5qq", "+34622898909")
-await updateFirstName("bj1NKBFjux4joPrtq5qq", "Jorge")
-await updateSurName("bj1NKBFjux4joPrtq5qq", "Gonzalez")
-
-//Close deno process to exit
-Deno.exit(0)
+// console.log("Get user by id", await getUserById("bj1NKBFjux4joPrtq5qq"))
