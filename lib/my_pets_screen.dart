@@ -51,7 +51,7 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => PetNumScreen(petName: pets[index]),
+                  builder: (context) => PetNumScreen(myPet: pets[index]),
                 ),
               );
             },
@@ -61,7 +61,7 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           String newPetName = "New Pet";
-          pets.add(newPetName);
+          pets.add(Pet(newPetName, "Male", "2", "hamster", "assets/pets/hamster.jpg", 5, 0));
           setState(() {});
         },
         child: Icon(Icons.add),

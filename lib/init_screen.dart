@@ -29,7 +29,7 @@ class InitScreen extends StatelessWidget {
         ),
         child: const Center(
           child: Image(
-            image: AssetImage("logo/nombreLogoSinFondo.png"),
+            image: AssetImage("assets/logo/nombreLogoSinFondo.png"),
             width: 300,
             height: 300,
           ),

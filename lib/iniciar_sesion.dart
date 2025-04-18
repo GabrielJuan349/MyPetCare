@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lis_project/register_screen.dart';
 import 'package:lis_project/home_screen.dart';
+import 'package:lis_project/test.dart';
 
 class IniciarSesion extends StatelessWidget {
 
@@ -33,7 +34,7 @@ class IniciarSesion extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Image(
-                        image: AssetImage("logo/LogoSinFondo.png"),
+                        image: AssetImage("assets/logo/LogoSinFondo.png"),
                         width: 100,
                         height: 100,
                       ),
@@ -66,7 +67,8 @@ class IniciarSesion extends StatelessWidget {
                       ElevatedButton(
                         onPressed: () {
                           Navigator.push(
-                              context, MaterialPageRoute(builder: (context) => HomeScreen())
+                              //context, MaterialPageRoute(builder: (context) => HomeScreen())
+                              context, MaterialPageRoute(builder: (context) => const Test())
                           );
                         },
                         style: ElevatedButton.styleFrom(
