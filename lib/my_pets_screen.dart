@@ -4,6 +4,7 @@ import 'package:lis_project/pet.dart';
 import 'dart:io';
 
 class MyPetsScreen extends StatefulWidget {
+
   @override
   _MyPetsScreenState createState() => _MyPetsScreenState();
 }
@@ -51,7 +52,7 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => PetNumScreen(petName: pets[index]),
+                  builder: (context) => PetNumScreen(myPet: pets[index]),
                 ),
               );
             },
@@ -61,7 +62,7 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           String newPetName = "New Pet";
-          pets.add(newPetName);
+          pets.add(newPetName as Pet);
           setState(() {});
         },
         child: Icon(Icons.add),

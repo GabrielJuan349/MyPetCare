@@ -24,6 +24,7 @@ class _InboxState extends State<Inbox> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Inbox"),
+        foregroundColor: Colors.white,
         centerTitle: true,
         backgroundColor: Color(0xfff59249),
         leading: IconButton(
@@ -32,9 +33,14 @@ class _InboxState extends State<Inbox> {
             Navigator.pop(context);
           },
         ),
-        actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.account_circle))
-        ],
+          actions: [
+            IconButton(
+              icon: Icon(Icons.person, color: Colors.white),
+              onPressed: () {
+                Navigator.pushNamed(context, '/profile');
+              },
+            ),
+          ],
       ),
       body: ListView.builder(
         itemCount: myMessages.length,
@@ -43,7 +49,7 @@ class _InboxState extends State<Inbox> {
             margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.blue[50],
+              color: Color(0xFFE9EFFF),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
