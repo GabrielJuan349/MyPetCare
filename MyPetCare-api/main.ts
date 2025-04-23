@@ -1,7 +1,8 @@
-import { Application, Router } from 'oak';
+import { Application, Router} from 'oak';
 import {oakCors} from 'cors';
 import { load } from 'dotenv';
 
+import {updateUser, deleteUser} from "./api-functions/gestion.usuarios.ts"
 
 await load({ export: true });
 
@@ -16,10 +17,22 @@ app.use(oakCors({
   optionsSuccessStatus: 204
 }));
 
-router
-  .post('/api/endpoint', (ctx) => {
-    console.log(ctx.request.body({ type: 'json' }));
-  })
+//UPDATE user info
+router.put("/user/:user_id", async (ctx)=>{
+  const userId = ctx.params.user_id; //Get id from the endpoint
+  const fields = await ctx.request.body({type: "json"}).value;
+  const res = await updateUser(userId, fields);
+  ctx.response.status = res.status;
+  ctx.response.body = res.message;
+})
+
+//DELETE user by id
+router.delete("/user/:user_id", async (ctx)=>{
+  const userId = ctx.params.user_id;
+  const res = await deleteUser(userId);
+  ctx.response.status = res.status;
+  ctx.response.body = res.message;
+})
 
 app.use(router.routes());
 app.use(router.allowedMethods());
