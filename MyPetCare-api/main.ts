@@ -1,6 +1,9 @@
 import { Application, Router} from 'oak';
 import {oakCors} from 'cors';
 import { load } from 'dotenv';
+import { authenticate } from "./api-functions/authenticate.ts";
+import { validateToken } from './api-functions/validateToken.ts';
+import { registerUser } from './api-functions/registerUser.ts';
 
 import {updateUser, deleteUser} from "./api-functions/gestion.usuarios.ts"
 
@@ -17,8 +20,15 @@ app.use(oakCors({
   optionsSuccessStatus: 204
 }));
 
+router
+  .post("/api/authenticate", authenticate)
+
+  // Ruta para validar el token
+  .post("/api/validateToken", validateToken)
+
+  .post("/api/registerUser", registerUser); 
 //UPDATE user info
-router.put("/user/:user_id", async (ctx)=>{
+  .put("/user/:user_id", async (ctx)=>{
   const userId = ctx.params.user_id; //Get id from the endpoint
   const fields = await ctx.request.body({type: "json"}).value;
   const res = await updateUser(userId, fields);
@@ -27,7 +37,7 @@ router.put("/user/:user_id", async (ctx)=>{
 })
 
 //DELETE user by id
-router.delete("/user/:user_id", async (ctx)=>{
+  .delete("/user/:user_id", async (ctx)=>{
   const userId = ctx.params.user_id;
   const res = await deleteUser(userId);
   ctx.response.status = res.status;
@@ -37,6 +47,7 @@ router.delete("/user/:user_id", async (ctx)=>{
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-const port = Number(Deno.env.get("API_PORT"));
+const port = Number(Deno.env.get("API_PORT")) || 8000; 
 app.listen({ port });
+console.log('PORT:', port);
 console.log(`Server running at http://localhost:${port}`);

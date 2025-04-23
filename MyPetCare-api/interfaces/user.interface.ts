@@ -1,13 +1,16 @@
+export interface User {
+    email: string;
+    password: string;
+    userId: string;
+    accountType: AccountType;
+    firstName: string;
+    lastName: string;
+    phone: string;
+    clinicInfo: string;
+  }
 export enum AccountType {
     owner,
     vet,
     clinic,
 }
 
-export interface User {
-    id: string;
-    name: string;
-    email: string;
-    accountType: AccountType;
-    phone: string;
-}
