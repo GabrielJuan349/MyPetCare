@@ -4,11 +4,12 @@ import {User} from "../interfaces/user.interface.ts";
 
 
 // Obtén la clave de la API desde las variables de entorno
-const FIREBASE_API_KEY = Deno.env.get("FIREBASE_PROJECT_ID"); // Asegúrate de que sea la API Key de Firebase
+const FIREBASE_API_KEY = Deno.env.get("FIREBASE_API_KEY"); // Asegúrate de que sea la API Key de Firebase
+const FIREBASE_PRIVATE_KEY = Deno.env.get("FIREBASE_PRIVATE_KEY"); // Asegúrate de que sea el ID del proyecto de Firebase
 
 // URL de registro de Firebase
 const signUpUrl = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${FIREBASE_API_KEY}`;
-const FireStoreUrl = `https://firestore.googleapis.com/v1/projects/mypetcare-1ca5a/databases/(default)/documents/users`;
+const FireStoreUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PRIVATE_KEY}/databases/(default)/documents/users`;
 
 
 // 👉 Función que registra en Firebase Auth

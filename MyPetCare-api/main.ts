@@ -32,4 +32,5 @@ app.use(router.allowedMethods());
 
 const port = Number(Deno.env.get("API_PORT")) || 8000; 
 app.listen({ port });
+console.log('PORT:', port);
 console.log(`Server running at http://localhost:${port}`);
