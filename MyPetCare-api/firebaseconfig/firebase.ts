@@ -1,15 +1,24 @@
-//https://www.youtube.com/watch?v=dEQj7x574kU
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
-import * as fs from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
-export {fs};
+import * as fb from "firebase-admin";
+// import * as fs from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
 
-/*
-Using env didn't work, so I created a file name secrets.ts 
-with the config values of firebase
-*/
-import {firebaseConfig} from "./secret.ts"
+let db: fb.firestore.Firestore;
+try {
 
-//Inicialize Firebase
-const app = initializeApp(firebaseConfig)
-//Get firestore as the database instance
-export const db = fs.getFirestore(app)
+    const serviceAccount =Deno.readTextFileSync("../"+Deno.env.get("FIREBASE_CREDENTIALS_NAME")!);
+    console.log(serviceAccount)
+    fb.initializeApp({
+        credential: fb.credential.cert(serviceAccount),
+    })
+    console.log("Firebase Admin SDK inicializado.");
+  
+    // Obtén la instancia de Firestore del SDK de ADMIN
+    db = fb.firestore();
+    console.log("Instancia de Firestore (Admin) obtenida.");
+  
+  } catch (error) {
+    console.error("Error inicializando Firebase Admin:", error);
+    // Podrías querer lanzar el error o manejarlo de otra forma
+    throw error;
+  }
+
+  export { db };

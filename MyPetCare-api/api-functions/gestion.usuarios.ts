@@ -1,38 +1,55 @@
-import {fs, db} from "../firebaseconfig/firebase.ts"
+import {db} from "../firebaseconfig/firebase.ts"
+
 
 /*
 Read functions
 */
 export async function getAllPets() {
-    const pets_collection = fs.query(fs.collection(db, "pets"))
-    const querySnapshot = await fs.getDocs(pets_collection)
+    // Use Admin SDK collection and get methods
+    const pets_collection = db.collection("pets");
+    const querySnapshot = await pets_collection.get();
     const pets = querySnapshot.docs.map(doc => {
         const data = doc.data();
-        
+
         // Process the data to convert Firestore timestamp to a human-readable date
         const lastUpdate = data.lastUpdate;
-        const lastUpdateDate = new Date(lastUpdate.seconds * 1000 + lastUpdate.nanoseconds / 1000000); // Convert to milliseconds
-        
-        return {
-            id: doc.id,
-            name: data.name,
-            type: data.type,
-            breed: data.breed,
-            weight: data.weight,
-            age: data.age,
-            lastUpdate: lastUpdateDate.toLocaleString(), // Human-readable date
-            photoUrls: data.photoUrls
+        // Check if lastUpdate is a Firestore Timestamp object
+        if (lastUpdate && typeof lastUpdate.toDate === 'function') {
+            const lastUpdateDate = lastUpdate.toDate(); // Use the toDate() method
+            return {
+                id: doc.id,
+                name: data.name,
+                type: data.type,
+                breed: data.breed,
+                weight: data.weight,
+                age: data.age,
+                lastUpdate: lastUpdateDate.toLocaleString(), // Human-readable date
+                photoUrls: data.photoUrls
+            };
+        } else {
+             // Handle cases where lastUpdate might not be a Timestamp or is missing
+             return {
+                id: doc.id,
+                name: data.name,
+                type: data.type,
+                breed: data.breed,
+                weight: data.weight,
+                age: data.age,
+                lastUpdate: 'N/A', // Or some other placeholder
+                photoUrls: data.photoUrls
+            };
         }
-    })
-    return pets
+    });
+    return pets;
 }
 
 export async function getAllUsers() {
-    const users_collection = fs.query(fs.collection(db, "users"))
-    const querySnapshot = await fs.getDocs(users_collection)
+    // Use Admin SDK collection and get methods
+    const users_collection = db.collection("users");
+    const querySnapshot = await users_collection.get();
     const users = querySnapshot.docs.map(doc => {
         const data = doc.data();
-        
+
         return {
             id: doc.id,
             name: data.firstName + " " + data.surName,
@@ -41,15 +58,16 @@ export async function getAllUsers() {
             phone: data.phone,
         }
     });
-    return users
+    return users;
 }
 
 export async function getUserById(userId: string) {
-    const userRef = fs.doc(db, "users", userId);
-    const docSnap = await fs.getDoc(userRef);
-    if (docSnap.exists()) {
-        const data = docSnap.data();
-        
+    // Use Admin SDK collection, doc and get methods
+    const userRef = db.collection("users").doc(userId);
+    const docSnap = await userRef.get();
+    if (docSnap.exists) { // Check exists property directly
+        const data = docSnap.data()!; // Use non-null assertion if sure data exists
+
         return {
             id: docSnap.id,
             name: data.firstName + " " + data.surName,
@@ -66,12 +84,13 @@ export async function getUserById(userId: string) {
 /*
 Update user data
 */
-export async function updateUser(userId:string, fields) {
-    const userRef = fs.doc(db, "users", userId);
+export async function updateUser(userId:string, fields: Record<string, any>) { // Add type for fields
+    // Use Admin SDK collection and doc methods
+    const userRef = db.collection("users").doc(userId);
 
     try{
-        const docSnap = await fs.getDoc(userRef);
-        if(!docSnap.exists()){
+        const docSnap = await userRef.get(); // Use Admin SDK get method
+        if(!docSnap.exists){ // Check exists property directly
             return{//User doesn't exist
                 status: 404,
                 message: "User not found",
@@ -84,7 +103,8 @@ export async function updateUser(userId:string, fields) {
             }
         }
 
-        await fs.updateDoc(userRef, fields);
+        // Use Admin SDK update method
+        await userRef.update(fields);
 
         return{//Success
             status: 200,
@@ -105,16 +125,18 @@ Delete user
 */
 export async function deleteUser(userId: string) {
     try{
-        const userRef = fs.doc(db, "users", userId);
-        const docSnap = await fs.getDoc(userRef);
-        if(!docSnap.exists()){
+        // Use Admin SDK collection and doc methods
+        const userRef = db.collection("users").doc(userId);
+        const docSnap = await userRef.get(); // Use Admin SDK get method
+        if(!docSnap.exists){ // Check exists property directly
             return{
                 status: 404,
                 message: "User not found",
             };
         }
 
-        await fs.deleteDoc(userRef);
+        // Use Admin SDK delete method
+        await userRef.delete();
 
         return{
             status: 200,

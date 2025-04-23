@@ -26,7 +26,7 @@ router
   // Ruta para validar el token
   .post("/api/validateToken", validateToken)
 
-  .post("/api/registerUser", registerUser); 
+  .post("/api/registerUser", registerUser)
 //UPDATE user info
   .put("/user/:user_id", async (ctx)=>{
   const userId = ctx.params.user_id; //Get id from the endpoint
