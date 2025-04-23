@@ -1,10 +1,11 @@
-import { Application, Router } from 'oak';
+import { Application, Router} from 'oak';
 import {oakCors} from 'cors';
 import { load } from 'dotenv';
 import { authenticate } from "./api-functions/authenticate.ts";
 import { validateToken } from './api-functions/validateToken.ts';
 import { registerUser } from './api-functions/registerUser.ts';
 
+import {updateUser, deleteUser} from "./api-functions/gestion.usuarios.ts"
 
 await load({ export: true });
 
@@ -26,6 +27,22 @@ router
   .post("/api/validateToken", validateToken)
 
   .post("/api/registerUser", registerUser); 
+//UPDATE user info
+  .put("/user/:user_id", async (ctx)=>{
+  const userId = ctx.params.user_id; //Get id from the endpoint
+  const fields = await ctx.request.body({type: "json"}).value;
+  const res = await updateUser(userId, fields);
+  ctx.response.status = res.status;
+  ctx.response.body = res.message;
+})
+
+//DELETE user by id
+  .delete("/user/:user_id", async (ctx)=>{
+  const userId = ctx.params.user_id;
+  const res = await deleteUser(userId);
+  ctx.response.status = res.status;
+  ctx.response.body = res.message;
+})
 
 app.use(router.routes());
 app.use(router.allowedMethods());
