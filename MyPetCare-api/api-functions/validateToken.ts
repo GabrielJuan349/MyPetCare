@@ -30,7 +30,7 @@ export async function validateToken(ctx: RouterContext<"/api/validateToken">) {
     // Si el token es válido, responde con 200 OK y la información del usuario
     ctx.response.status = 200;
     ctx.response.body = {
-      message: "El token no es correcto",
+      message: "El token es correcto",
       userData: data.users[0], // Retorna la información del usuario autenticado
     };
   } catch (error) {
