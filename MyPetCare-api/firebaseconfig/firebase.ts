@@ -1,18 +1,18 @@
-import * as fb from "firebase-admin";
+import firebaseAdmin from "firebase-admin";
 // import * as fs from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
 
-let db: fb.firestore.Firestore;
+let db: firebaseAdmin.firestore.Firestore;
 try {
 
-    const serviceAccount =Deno.readTextFileSync("../"+Deno.env.get("FIREBASE_CREDENTIALS_NAME")!);
+    const serviceAccount =JSON.parse(Deno.readTextFileSync("../"+Deno.env.get("FIREBASE_CREDENTIALS_NAME")!));
     console.log(serviceAccount)
-    fb.initializeApp({
-        credential: fb.credential.cert(serviceAccount),
+    firebaseAdmin.initializeApp({
+        credential: firebaseAdmin.credential.cert(serviceAccount),
     })
     console.log("Firebase Admin SDK inicializado.");
   
     // Obtén la instancia de Firestore del SDK de ADMIN
-    db = fb.firestore();
+    db = firebaseAdmin.firestore();
     console.log("Instancia de Firestore (Admin) obtenida.");
   
   } catch (error) {
