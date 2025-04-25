@@ -3,10 +3,11 @@ import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
 import "https://deno.land/std@0.213.0/dotenv/load.ts";
 
 
-const FIREBASE_API_KEY = Deno.env.get("FIREBASE_PROJECT_ID");
+const FIREBASE_API_KEY = Deno.env.get("FIREBASE_API_KEY");
 
 export const authenticate = async (ctx: RouterContext<"/api/authenticate">) => {
   const { value } = await ctx.request.body({ type: "json" });
+  console.log(value);
   const { email, password } = await value;
 
   try {

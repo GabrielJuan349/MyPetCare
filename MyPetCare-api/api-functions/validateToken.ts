@@ -3,7 +3,7 @@ import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
 import "https://deno.land/std@0.213.0/dotenv/load.ts";
 
 // Obtén la clave de la API desde las variables de entorno
-const FIREBASE_API_KEY = Deno.env.get("FIREBASE_PROJECT_ID");
+const FIREBASE_API_KEY = Deno.env.get("FIREBASE_API_KEY"); // Asegúrate de que sea la API Key de Firebase
 
 
 export async function validateToken(ctx: RouterContext<"/api/validateToken">) {

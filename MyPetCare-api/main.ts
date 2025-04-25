@@ -1,5 +1,6 @@
-import { Application, Router} from 'oak';
-import {oakCors} from 'cors';
+import { Application, Router} from "https://deno.land/x/oak@v12.6.1/mod.ts";
+
+import { oakCors } from "https://deno.land/x/cors@v1.2.2/mod.ts";
 import { load } from 'dotenv';
 import { authenticate } from "./api-functions/authenticate.ts";
 import { validateToken } from './api-functions/validateToken.ts';
