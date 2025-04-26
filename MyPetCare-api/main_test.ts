@@ -1,6 +1,10 @@
-import { assertEquals } from "@std/assert";
-import { add } from "./main.ts";
+import { db } from "./api-functions/firebase.ts";
 
-Deno.test(function addTest() {
-  assertEquals(add(2, 3), 5);
-});
+console.log("📡 Probando conexión con Firestore…");
+
+try {
+  const snapshot = await db.collection("pets").limit(1).get();
+  console.log(`✅ Conectado. Se encontraron ${snapshot.size} documento(s).`);
+} catch (err) {
+  console.error("❌ Error conectando con Firestore:", err);
+}
