@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:lis_project/pet_num_screen.dart';
 import 'package:lis_project/pet.dart';
+import 'package:lis_project/new_pet.dart';
 import 'dart:io';
 
 class MyPetsScreen extends StatefulWidget {
+
   @override
   _MyPetsScreenState createState() => _MyPetsScreenState();
 }
@@ -60,12 +62,15 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          String newPetName = "New Pet";
-          pets.add(Pet(newPetName, "Male", "2", "hamster", "assets/pets/hamster.jpg", 5, 0));
-          setState(() {});
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => NewPetScreen(), // ← Tu nueva pantalla
+            ),
+          );
         },
-        child: Icon(Icons.add),
-        backgroundColor: Colors.blue,
+        child: Icon(Icons.add, color: Colors.white),
+        backgroundColor: Color(0xFF627ECB),
       ),
     );
   }

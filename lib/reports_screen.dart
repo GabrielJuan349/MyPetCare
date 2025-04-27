@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:lis_project/inbox_message.dart';
+import 'package:lis_project/report.dart';
 
-class Inbox extends StatefulWidget {
+class PetReports extends StatefulWidget {
+   List<ReportMessage>? petReports;
+
+   PetReports({super.key, this.petReports});
+
    @override
-   State<Inbox> createState() => _InboxState();
+   State<PetReports> createState() => _PetReportsState();
 }
 
-class _InboxState extends State<Inbox> {
-  List<InboxMessage> myMessages = [
-    InboxMessage("Welcome to MyPetCare", "Thanks for choosing us"),
-    InboxMessage("Medication added", "A new Medication has been added to your pet"),
+
+class _PetReportsState extends State<PetReports> {
+  List<ReportMessage> petReportsList = [
+    ReportMessage("Laboratory results", "This is a long text that is going to resume what you'll find on the particular report"),
+    ReportMessage("Vaccination calendar", "This is a long text that is going to resume what you'll find on the particular report"),
+    ReportMessage("Illness diagnosis", "This is a long text that is going to resume what you'll find on the particular report"),
   ];
 
   @override
@@ -17,13 +23,13 @@ class _InboxState extends State<Inbox> {
     super.initState();
   }
 
-  _InboxState();
+  _PetReportsState();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Inbox"),
+        title: Text("Reports"),
         foregroundColor: Colors.white,
         centerTitle: true,
         backgroundColor: Color(0xfff59249),
@@ -43,7 +49,7 @@ class _InboxState extends State<Inbox> {
           ],
       ),
       body: ListView.builder(
-        itemCount: myMessages.length,
+        itemCount: petReportsList.length,
         itemBuilder: (context, index) {
           return Container(
             margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -59,20 +65,19 @@ class _InboxState extends State<Inbox> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        myMessages[index].title,
+                        petReportsList[index].reportName,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       SizedBox(height: 4),
                       Text(
-                        myMessages[index].message,
+                        petReportsList[index].message,
                         style: TextStyle(color: Colors.black54),
                       ),
                     ],
                   ),
                 ),
-                Icon(Icons.notifications_none),
               ],
             ),
           );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lis_project/pet.dart';
 import 'package:lis_project/pet_details.dart';
+import 'package:lis_project/reports_screen.dart';
 
 class PetNumScreen extends StatefulWidget {
   Pet myPet;
@@ -77,6 +78,15 @@ class _PetNumScreenState extends State<PetNumScreen> {
             Navigator.of(context).push(
               MaterialPageRoute<void>(
                 builder: (context) => PetDetails(myPet: myPet),
+              ),
+            ).then((_) {
+              setState(() {});
+            });
+          }
+          if(label == "Reports"){
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (context) => PetReports(),
               ),
             ).then((_) {
               setState(() {});
