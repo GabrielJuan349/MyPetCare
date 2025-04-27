@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 // Change to the url of your actual backend
-const String BASE_URL = "http://localhost:8080";
+const String BASE_URL = "http://localhost:6055";
 
 Future<String> sendRequest(Uri uri, String action, {Map<String, dynamic>? req_body}) async{
   late final http.Response response;

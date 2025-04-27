@@ -18,8 +18,8 @@ class _TestState extends State<Test> {
     super.initState();
     userId = "bj1NKBFjux4joPrtq5qq";
     body = {
-      'firstName':'Joel',
-      'surName': 'García'
+      'firstName':'Manel',
+      'lastName': 'García'
     };
   }
 

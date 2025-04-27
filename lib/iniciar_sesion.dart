@@ -68,7 +68,7 @@ class IniciarSesion extends StatelessWidget {
                         onPressed: () {
                           Navigator.push(
                               //context, MaterialPageRoute(builder: (context) => HomeScreen())
-                              context, MaterialPageRoute(builder: (context) => const Test())
+                              context, MaterialPageRoute(builder: (context) => HomeScreen())
                           );
                         },
                         style: ElevatedButton.styleFrom(
