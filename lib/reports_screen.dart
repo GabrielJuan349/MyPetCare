@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lis_project/report.dart';
+import 'package:lis_project/report_detail_screen.dart';
 
 class PetReports extends StatefulWidget {
    List<ReportMessage>? petReports;
@@ -51,38 +52,48 @@ class _PetReportsState extends State<PetReports> {
       body: ListView.builder(
         itemCount: petReportsList.length,
         itemBuilder: (context, index) {
-          return Container(
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Color(0xFFE9EFFF),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        petReportsList[index].reportName,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        petReportsList[index].message,
-                        style: TextStyle(color: Colors.black54),
-                      ),
-                    ],
-                  ),
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ReportDetailScreen(report: petReportsList[index]),
                 ),
-              ],
+              );
+            },
+            child: Container(
+              margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Color(0xFFE9EFFF),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          petReportsList[index].reportName,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          petReportsList[index].message,
+                          style: TextStyle(color: Colors.black54),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         },
       ),
-    );
+    );  
   }
 }
