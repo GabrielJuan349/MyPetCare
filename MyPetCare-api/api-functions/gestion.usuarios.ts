@@ -1,159 +1,103 @@
-import {db} from "../firebaseconfig/firebase.ts"
+import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
+// Obtén la clave de la API desde las variables de entorno
+const FIREBASE_PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID"); // Asegúrate de que sea el ID del proyecto de Firebase
+
+// URL de registro de Firebase
+const FireStoreUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/users`;
 
 
-/*
-Read functions
-*/
-export async function getAllPets() {
-    // Use Admin SDK collection and get methods
-    const pets_collection = db.collection("pets");
-    const querySnapshot = await pets_collection.get();
-    const pets = querySnapshot.docs.map(doc => {
-        const data = doc.data();
+function formatToFirestore(fields: Record<string, any>) {
+    const formattedFields: Record<string, any> = {};
 
-        // Process the data to convert Firestore timestamp to a human-readable date
-        const lastUpdate = data.lastUpdate;
-        // Check if lastUpdate is a Firestore Timestamp object
-        if (lastUpdate && typeof lastUpdate.toDate === 'function') {
-            const lastUpdateDate = lastUpdate.toDate(); // Use the toDate() method
-            return {
-                id: doc.id,
-                name: data.name,
-                type: data.type,
-                breed: data.breed,
-                weight: data.weight,
-                age: data.age,
-                lastUpdate: lastUpdateDate.toLocaleString(), // Human-readable date
-                photoUrls: data.photoUrls
-            };
+    for (const key in fields) {
+        if (typeof fields[key] === 'string') {
+            formattedFields[key] = { stringValue: fields[key] };
+        } else if (typeof fields[key] === 'number') {
+            formattedFields[key] = { integerValue: fields[key] };
         } else {
-             // Handle cases where lastUpdate might not be a Timestamp or is missing
-             return {
-                id: doc.id,
-                name: data.name,
-                type: data.type,
-                breed: data.breed,
-                weight: data.weight,
-                age: data.age,
-                lastUpdate: 'N/A', // Or some other placeholder
-                photoUrls: data.photoUrls
-            };
+            formattedFields[key] = { stringValue: String(fields[key]) };
         }
-    });
-    return pets;
-}
-
-export async function getAllUsers() {
-    // Use Admin SDK collection and get methods
-    const users_collection = db.collection("users");
-    const querySnapshot = await users_collection.get();
-    const users = querySnapshot.docs.map(doc => {
-        const data = doc.data();
-
-        return {
-            id: doc.id,
-            name: data.firstName + " " + data.surName,
-            email: data.email,
-            accountType: data.accountType,
-            phone: data.phone,
-        }
-    });
-    return users;
-}
-
-export async function getUserById(userId: string) {
-    // Use Admin SDK collection, doc and get methods
-    const userRef = db.collection("users").doc(userId);
-    const docSnap = await userRef.get();
-    if (docSnap.exists) { // Check exists property directly
-        const data = docSnap.data()!; // Use non-null assertion if sure data exists
-
-        return {
-            id: docSnap.id,
-            name: data.firstName + " " + data.surName,
-            email: data.email,
-            accountType: data.accountType,
-            phone: data.phone,
-        }
-    } else {
-        console.log("No such document!");
-        return null;
     }
+    return formattedFields;
+}
+
+// Firebase Update rquest must use this format ?updateMask.fieldPaths=firstName&updateMask.fieldPaths=lastName
+function buildUpdateMask(fields: Record<string, any>) {
+    const fieldPaths = Object.keys(fields)
+        .map(key => `updateMask.fieldPaths=${encodeURIComponent(key)}`)
+        .join('&');
+    return fieldPaths;
 }
 
 /*
-Update user data
+Update user data - REST API version
 */
-export async function updateUser(userId:string, fields: Record<string, any>) { // Add type for fields
-    // Use Admin SDK collection and doc methods
-    const userRef = db.collection("users").doc(userId);
+export async function updateUser(ctx: RouterContext<"/user/:user_id">) {
+    try {
+        const userId = ctx.params.user_id;
+        const body = ctx.request.body();
+        const fields = await body.value;
+        console.log('Parsed fields:', fields);
+        const formattedFields = formatToFirestore(fields); // Convert to Firestore format
+        const updateMask = buildUpdateMask(fields); // Build updateMask fieldPaths
 
-    try{
-        const docSnap = await userRef.get(); // Use Admin SDK get method
-        if(!docSnap.exists){ // Check exists property directly
-            return{//User doesn't exist
-                status: 404,
-                message: "User not found",
-            };
-        }
-        if(Object.keys(fields).length==0){
-            return{//No fields passed to update
-                status: 400,
-                message: "Error in the submitted data"
-            }
-        }
+        // Build the final endpoint with the updateMask
+        const endpoint = `${FireStoreUrl}/${userId}?${updateMask}`;
 
-        // Use Admin SDK update method
-        await userRef.update(fields);
+        // Make the PATCH request
+        const response = await fetch(endpoint, {
+            method: "PATCH",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ fields: formattedFields }),
+        });
 
-        return{//Success
-            status: 200,
-            message: "User data updated successfully"
+        if (!response.ok) {
+            throw new Error(`Firebase request failed: ${response.status}`);
         }
 
-    }catch(e){
-        console.error("User update error: ", e);
-        return{
-            status: 500,
-            message: "Internal server error",
-        };
+        ctx.response.status = 200;
+        ctx.response.body = 'User updated successfully!';
+    } catch (e) {
+        ctx.response.status = 400;
+        ctx.response.body = `Error: ${e}`;
     }
 }
+
 
 /*
-Delete user
+Delete user - REST API version
 */
-export async function deleteUser(userId: string) {
-    try{
-        // Use Admin SDK collection and doc methods
-        const userRef = db.collection("users").doc(userId);
-        const docSnap = await userRef.get(); // Use Admin SDK get method
-        if(!docSnap.exists){ // Check exists property directly
-            return{
-                status: 404,
-                message: "User not found",
-            };
+export async function deleteUser(ctx: RouterContext<"/user/:user_id">) {
+    try {
+        const userId = ctx.params.user_id;
+        // Check if the user exists by making a GET request
+        const response = await fetch(`${FireStoreUrl}/${userId}`);
+        if (!response.ok) {
+            // If the user does not exist, Firebase will return a 404 status
+            ctx.response.status = 404;
+            ctx.response.body = "User not found";
         }
 
-        // Use Admin SDK delete method
-        await userRef.delete();
+        // Proceed with deleting the user
+        const deleteResponse = await fetch(`${FireStoreUrl}/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
 
-        return{
-            status: 200,
-            message: "User deleted successfully"
-        };
+        if (!deleteResponse.ok) {
+            throw new Error(`Delete failed: ${deleteResponse.status}`);
+        }
 
-    }catch(e){
-        console.log("User delete error:", e);
-        return{
-            status:400,
-            message: "Request error"
-        };
+        ctx.response.status = 200;
+        ctx.response.body = "User deleted successfully";
+
+    } catch (error) {
+        console.error("User delete error:", error);
+        ctx.response.status = 400;
+        ctx.response.body = "Request error";
     }
 }
-
-// Test the functions
-// console.log("Get all pets", await getAllPets())
-// console.log("Get all users", await getAllUsers())
-
-// console.log("Get user by id", await getUserById("bj1NKBFjux4joPrtq5qq"))
