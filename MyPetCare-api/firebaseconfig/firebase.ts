@@ -1,4 +1,4 @@
-/*
+
 import firebaseAdmin from "firebase-admin";
 // import * as fs from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
 
@@ -23,22 +23,6 @@ try {
   }
 
   export { db };
-*/
 
 
-// firebase.ts
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "mypetcare-1ca5a.firebaseapp.com",
-  projectId: "mypetcare-1ca5a",
-  storageBucket: "mypetcare-1ca5a.appspot.com",
-  messagingSenderId: "TU_MESSAGING_SENDER_ID",
-  appId: "TU_APP_ID",
-};
-
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
 
