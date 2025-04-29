@@ -1,38 +1,14 @@
 import { db } from "../firebaseconfig/firebase.ts";
 import { Pet } from "../interfaces/pet.interface.ts";
 import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
-import {
-  collection,
-  addDoc,
-  doc,
-  Timestamp,
-  query,
-  where,
-  getDoc,
-  getDocs,
-  updateDoc,
-  deleteDoc
-} from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
 
 // Obtén la clave de la API desde las variables de entorno
-const FIREBASE_API_KEY = Deno.env.get("FIREBASE_API_KEY"); // Asegúrate de que sea la API Key de Firebase
+
 const FIREBASE_PRIVATE_KEY = Deno.env.get("FIREBASE_PROJECT_ID"); // Asegúrate de que sea el ID del proyecto de Firebase
 
 // URL de registro de Firebase
-const signUpUrl = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${FIREBASE_API_KEY}`;
 const FireStoreUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PRIVATE_KEY}/databases/(default)/documents/pets`;
 
-
-function calculateAgeFromBirthDate(birthDate: string): number {
-  const birth = new Date(birthDate);
-  const today = new Date();
-  let age = today.getFullYear() - birth.getFullYear();
-  const m = today.getMonth() - birth.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
-    age--;
-  }
-  return age;
-}
 
 export async function createPet(ctx: RouterContext<"/api/pet">) {
   console.log("🐶 createPet endpoint called");
