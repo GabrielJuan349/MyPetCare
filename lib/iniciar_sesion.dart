@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lis_project/register_screen.dart';
 import 'package:lis_project/home_screen.dart';
 import 'package:lis_project/test.dart';
+import 'package:lis_project/data.dart';
 
 class IniciarSesion extends StatelessWidget {
 
@@ -68,7 +69,10 @@ class IniciarSesion extends StatelessWidget {
                         onPressed: () {
                           Navigator.push(
                               //context, MaterialPageRoute(builder: (context) => HomeScreen())
-                              context, MaterialPageRoute(builder: (context) => HomeScreen())
+                            //TODO: Change this to make it dynamic
+                            //TODO: When log in make pull of all info of the user.
+                            //TODO: Init the user
+                              context, MaterialPageRoute(builder: (context) => HomeScreen(user: defaultUser))
                           );
                         },
                         style: ElevatedButton.styleFrom(

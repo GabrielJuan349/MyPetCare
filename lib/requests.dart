@@ -45,3 +45,9 @@ Future<String> updateUserInfo(String userId, Map<String, dynamic>? body) async{
   final String responseBody = await sendRequest(uri, "PUT", req_body: body);
   return responseBody;
 }
+
+Future deleteUser(String userId) async{
+  Uri uri = Uri.parse("$BASE_URL/user/$userId");
+  final String responseBody = await sendRequest(uri, "DELETE");
+  return responseBody;
+}

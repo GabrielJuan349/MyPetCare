@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:lis_project/the_drawer.dart';
+import 'package:lis_project/data.dart';
 
 
 class HomeScreen extends StatefulWidget {
+  final User user;
+  const HomeScreen({super.key, required this.user});
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -27,7 +30,11 @@ class _HomeScreenState extends State<HomeScreen> {
             IconButton(
               icon: Icon(Icons.person, color: Colors.white),
               onPressed: () {
-                Navigator.pushNamed(context, '/profile');
+                Navigator.pushNamed(
+                    context,
+                    '/profile',
+                  arguments: widget.user,
+                );
               },
             ),
           ],

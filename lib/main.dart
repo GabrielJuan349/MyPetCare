@@ -5,6 +5,7 @@ import 'package:lis_project/profile_screen.dart';
 import 'package:lis_project/reminders_screen.dart';
 import 'package:lis_project/my_pets_screen.dart';
 import 'package:lis_project/inbox.dart';
+import 'package:lis_project/data.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/init',
       routes: {
         '/init': (context) => const InitScreen(),
-        '/home': (context) => HomeScreen(),
+        '/home': (context) => HomeScreen(user: defaultUser),
         '/profile': (context) => ProfileScreen(),
         '/reminders': (context) => const RemindersScreen(),
         '/pets': (context)=> MyPetsScreen(),
