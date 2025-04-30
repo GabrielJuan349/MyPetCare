@@ -43,6 +43,7 @@ class _PetDetailsState extends State<PetDetails> {
       appBar: AppBar(
         backgroundColor: Color(0xfff59249),
         title: Text("Pet details"),
+        foregroundColor: Colors.white,
         centerTitle: true,
         elevation: 0,
         leading: IconButton(

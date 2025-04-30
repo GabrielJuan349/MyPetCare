@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lis_project/pet.dart';
 import 'package:file_picker/file_picker.dart';
 
 class NewPetScreen extends StatefulWidget {
