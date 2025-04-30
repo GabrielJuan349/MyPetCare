@@ -4,7 +4,8 @@ import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
 
 // Obtén la clave de la API desde las variables de entorno
 
-const FIREBASE_PRIVATE_KEY = Deno.env.get("FIREBASE_PROJECT_ID"); // Asegúrate de que sea el ID del proyecto de Firebase
+const FIREBASE_PRIVATE_KEY = Deno.env.get("FIREBASE_PROJECT_ID");
+const FIREBASE_PROJECT_ID = Deno.env.get("FIREBASE_APP_ID") // Asegúrate de que sea el ID del proyecto de Firebase
 
 // URL de registro de Firebase
 const FireStoreUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PRIVATE_KEY}/databases/(default)/documents/pets`;
@@ -12,6 +13,8 @@ const FireStoreUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PR
 //Create
 export async function createPet(ctx: RouterContext<"/api/pet">) {
   console.log("🐶 createPet endpoint called");
+  console.log(FireStoreUrl);
+  console.log(FIREBASE_PROJECT_ID);
 
   const { value } = await ctx.request.body({ type: "json" });
   console.log(value);
@@ -51,7 +54,7 @@ export async function createPet(ctx: RouterContext<"/api/pet">) {
 //Delete
 export async function deletePet(ctx: RouterContext<"/api/pet/:id">) {
   const id = ctx.params.id;
-  const deleteUrl = `${FireStorePetsURL}/${id}`;
+  const deleteUrl = `${FireStoreUrl}/${id}`;
   const response = await fetch(deleteUrl, { method: "DELETE" });
 
   if (!response.ok) {
@@ -63,45 +66,76 @@ export async function deletePet(ctx: RouterContext<"/api/pet/:id">) {
   }
 }
 
-//Update
+// Update
 export async function updatePet(ctx: RouterContext<"/api/pet/:id">) {
   const id = ctx.params.id;
+  if (!id) {
+    ctx.response.status = 400;
+    ctx.response.body = { error: "ID de mascota no proporcionado" };
+    return;
+  }
+
   const { value } = await ctx.request.body({ type: "json" });
   const pet = await value;
 
-  const updateUrl = `${FireStorePetsURL}/${id}?updateMask.fieldPaths=name&updateMask.fieldPaths=type&updateMask.fieldPaths=breed&updateMask.fieldPaths=birthDate&updateMask.fieldPaths=weight&updateMask.fieldPaths=owner&updateMask.fieldPaths=age&updateMask.fieldPaths=photoUrls`;
+  const fields: any = {
+    age: { integerValue: pet.age },
+    birthDate: { stringValue: pet.birthDate },
+    breed: { stringValue: pet.breed },
+    name: { stringValue: pet.name },
+    owner: { stringValue: pet.owner },
+    type: { stringValue: pet.type },
+    weight: { doubleValue: pet.weight }
+  };
+
+  const updateMask = [
+    "age", "birthDate", "breed", "name", "owner", "type", "weight"
+  ];
+
+  if (pet.photoUrls && Array.isArray(pet.photoUrls)) {
+    fields.photoUrls = {
+      arrayValue: {
+        values: pet.photoUrls.map((url: string) => ({ stringValue: url }))
+      }
+    };
+    updateMask.push("photoUrls");
+  }
+
+  const updateUrl = `${FireStoreUrl}/${id}?` +
+    updateMask.map((field) => `updateMask.fieldPaths=${field}`).join("&");
 
   const response = await fetch(updateUrl, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      fields: {
-        age: { integerValue: pet.age },
-        birthDate: { stringValue: pet.birthDate },
-        breed: { stringValue: pet.breed },
-        name: { stringValue: pet.name },
-        owner: { stringValue: pet.owner },
-        type: { stringValue: pet.type },
-        weight: { doubleValue: pet.weight },
-        photoUrls: { arrayValue: { values: pet.photoUrls.map((url: string) => ({ stringValue: url })) } }
-      }
-    })
+    body: JSON.stringify({ fields })
   });
 
-  const result = await response.json();
+  const rawText = await response.text();
+  let result;
+  try {
+    result = JSON.parse(rawText);
+  } catch {
+    result = { raw: rawText };
+  }
+
   if (!response.ok) {
     ctx.response.status = 500;
-    ctx.response.body = { error: result.error?.message || "Error actualizando mascota" };
-  } else {
-    ctx.response.status = 200;
-    ctx.response.body = result;
+    ctx.response.body = {
+      error: "Error actualizando la mascota",
+      details: result
+    };
+    return;
   }
+
+  ctx.response.status = 200;
+  ctx.response.body = { success: true, updated: result };
 }
+
 
 //GetPetById
 export async function getPetById(ctx: RouterContext<"/api/pet/:id">) {
   const id = ctx.params.id;
-  const getUrl = `${FireStorePetsURL}/${id}`;
+  const getUrl = `${FireStoreUrl}/${id}`;
 
   const response = await fetch(getUrl);
   const result = await response.json();
@@ -109,45 +143,69 @@ export async function getPetById(ctx: RouterContext<"/api/pet/:id">) {
   if (!response.ok || result.error) {
     ctx.response.status = 404;
     ctx.response.body = { error: "Pet not found" };
-  } else {
-    ctx.response.status = 200;
-    ctx.response.body = result;
+    return;
   }
+
+  // Extraer campos limpios
+  const fields = result.fields || {};
+  const pet = {
+    id,
+    ...Object.fromEntries(
+      Object.entries(fields).map(([key, value]) => [key, Object.values(value as { [key: string]: any })[0]])
+    )    
+  };
+
+  ctx.response.status = 200;
+  ctx.response.body = pet;
 }
 
+/*
 //GetPetsByOwner
-export async function getPetsByOwner(ctx: RouterContext<"/api/getPets">) {
+export async function getPetsByOwner(ctx: RouterContext<"/api/pet/owner">) {
   const { value } = await ctx.request.body({ type: "json" });
   const { ownerId } = await value;
 
-  const structuredQuery = {
-    structuredQuery: {
-      from: [{ collectionId: "pets" }],
-      where: {
-        fieldFilter: {
-          field: { fieldPath: "owner" },
-          op: "EQUAL",
-          value: { stringValue: ownerId }
-        }
-      }
-    }
-  };
+  if (!ownerId) {
+    ctx.response.status = 400;
+    ctx.response.body = { error: "ownerId no proporcionado" };
+    return;
+  }
 
-  const queryUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents:runQuery`;
-  const response = await fetch(queryUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(structuredQuery)
+  const ownerPath = `/users/${ownerId}`;
+  const url = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/pets`;
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    }
   });
 
   const result = await response.json();
-  const pets = result
-    .filter((entry: any) => entry.document)
-    .map((entry: any) => ({
-      id: entry.document.name.split("/").pop(),
-      ...Object.fromEntries(Object.entries(entry.document.fields).map(([k, v]) => [k, Object.values(v)[0]]))
-    }));
+
+  if (result.error) {
+    ctx.response.status = 500;
+    ctx.response.body = {
+      error: "Error al obtener mascotas",
+      details: result.error
+    };
+    return;
+  }
+
+  const pets = (result.documents || [])
+    .map((doc: any) => {
+      const data = doc.fields;
+      return {
+        id: doc.name.split("/").pop(),
+        ...Object.fromEntries(
+          Object.entries(data).map(
+            ([k, v]) => [k, Object.values(v as { [key: string]: any })[0]]
+          )
+        )
+      };
+    })
+    .filter((pet) => pet.owner === ownerPath);
 
   ctx.response.status = 200;
   ctx.response.body = pets;
-}
+}*/

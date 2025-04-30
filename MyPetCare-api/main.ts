@@ -50,7 +50,7 @@ router
   .get("/api/pet/:id", getPetById)
 
   // GETPETBYOWNER pet info
-  .post("/api/pet/owner", getPetsByOwner);
+  //.post("/api/pet/owner", getPetsByOwner);
 
 
 app.use(router.routes());
