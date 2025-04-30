@@ -22,7 +22,7 @@ try {
     throw error;
   }
 
-  export { db };
+  export { db, firebaseAdmin };
 
 
 
