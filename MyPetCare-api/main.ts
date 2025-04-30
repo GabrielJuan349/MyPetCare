@@ -6,10 +6,9 @@ import { load } from 'dotenv';
 import { authenticate } from "./api-functions/authenticate.ts";
 import { validateToken } from './api-functions/validateToken.ts';
 import { registerUser } from './api-functions/registerUser.ts';
-import { createPet, getPetsByOwner } from "./api-functions/pet-request.ts"; // <-- tu parte
 
 import { updateUser, deleteUser } from "./api-functions/gestion.usuarios.ts";
-// import { createPet, deletePet, getPetById, getPetsByOwner, updatePet } from "./api-functions/pet-request.ts"; // <-- tu parte
+import { createPet, deletePet, getPetById, getPetsByOwner, updatePet } from "./api-functions/pet-request.ts";
 
 await load({ export: true });
 
@@ -36,9 +35,22 @@ router
   // DELETE user by id
   .delete("/user/:user_id", deleteUser)
 
-  .post("/api/pet", createPet);
+// ---- Endpoints de PETS ----
 
+  // CREATE pet info
+  .post("/api/pet", createPet)
 
+  // DELETE pet info
+  .delete("/api/pet/:id", deletePet)
+
+  // UPDATE pet info
+  .put("/api/pet/:id", updatePet)
+
+  // GETPETBYID pet info
+  .get("/api/pet/:id", getPetById)
+
+  // GETPETBYOWNER pet info
+  //.post("/api/pet/owner", getPetsByOwner);
 
 
 app.use(router.routes());
