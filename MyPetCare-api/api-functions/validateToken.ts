@@ -1,41 +1,31 @@
 // validateToken.ts
 import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
 import "https://deno.land/std@0.213.0/dotenv/load.ts";
+import {firebaseAdmin} from "../firebaseconfig/firebase.ts";
 
-// Obtén la clave de la API desde las variables de entorno
-const FIREBASE_API_KEY = Deno.env.get("FIREBASE_API_KEY"); // Asegúrate de que sea la API Key de Firebase
+// Asegúrate de que sea la API Key de Firebase
 
 
 export async function validateToken(ctx: RouterContext<"/api/validateToken">) {
-  const url = `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${FIREBASE_API_KEY}`;
   const { value } = await ctx.request.body({ type: "json" });
   const { idToken } = await value;
 
   try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ idToken }),
-    });
+    // Verify the token using Firebase Admin
+    const decodedToken = await firebaseAdmin.auth().verifyIdToken(idToken);
+    // getAuth().verifyIdToken(idToken);
+    
+    // Get user details
+    const userRecord = await firebaseAdmin.auth().getUser(decodedToken.uid);
 
-    const data = await response.json();
-
-    if (data.error) {
-      // Si hay un error, responde con 401 Unauthorized
-      ctx.response.status = 401;
-      ctx.response.body = { message: "El token es incorrecto" };
-      return;
-    }
-
-    // Si el token es válido, responde con 200 OK y la información del usuario
     ctx.response.status = 200;
     ctx.response.body = {
       message: "El token es correcto",
-      userData: data.users[0], // Retorna la información del usuario autenticado
+      userData: userRecord,
     };
   } catch (error) {
     console.error("Error al validar el token:", error);
-    ctx.response.status = 500;
-    ctx.response.body = { message: "Error interno del servidor" };
+    ctx.response.status = 401;
+    ctx.response.body = { message: "El token es incorrecto" };
   }
 }

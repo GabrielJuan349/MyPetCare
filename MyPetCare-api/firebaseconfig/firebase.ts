@@ -1,3 +1,4 @@
+
 import firebaseAdmin from "firebase-admin";
 // import * as fs from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
 
@@ -21,4 +22,7 @@ try {
     throw error;
   }
 
-  export { db };
+  export { db, firebaseAdmin };
+
+
+
