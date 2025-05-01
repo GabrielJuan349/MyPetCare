@@ -1,94 +1,65 @@
 import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
 import "https://deno.land/std@0.213.0/dotenv/load.ts";
-import { User } from "../interfaces/user.interface.ts";
-import { db } from "../firebaseconfig/firebase.ts"; // Asegúrate que db se inicializa correctamente aquí
+import {User} from "../interfaces/user.interface.ts";
 
-// 👉 Función que guarda datos en Firestore
-async function saveUserToFirestore(user: User) {
-  // 👇 Log para verificar los datos que llegan a la función
-  console.log("📄 Datos recibidos para guardar:", JSON.stringify(user, null, 2));
+ // Asegúrate de que sea la API Key de Firebase
+const FIREBASE_PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID"); // Asegúrate de que sea el ID del proyecto de Firebase
 
-  // 👇 Validar datos básicos (opcional pero recomendado)
-  if (!user || !user.email || !user.firstName || !user.lastName) {
-      console.error("❌ Datos de usuario incompletos o inválidos.");
-      return null;
+const FireStoreUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/users`;
+
+async function saveUserToFirestore(user: any) {
+  const firestoreData = {
+    fields: {
+      userId: { stringValue: user.userId },
+      email: { stringValue: user.email },
+      firstName: { stringValue: user.firstName },
+      lastName: { stringValue: user.lastName },
+      phone: { stringValue: user.phone },
+      accountType: { stringValue: user.accountType },
+      clinicInfo: user.clinicInfo 
+        ? { stringValue: user.clinicInfo } 
+        : { nullValue: null },
+    },
+  };
+
+  const response = await fetch(FireStoreUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(firestoreData),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.error?.message || "Error al guardar datos en Firestore");
   }
 
-  try {
-    const usersRef = db.collection("users");
-    console.log("🔥 Intentando añadir documento a la colección 'users'...");
-
-    // Crear un nuevo documento con ID automático
-    const userDataToSave = {
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      phone: user.phone,
-      accountType: user.accountType,
-      clinicInfo: user.clinicInfo ?? null, // Asegura que clinicInfo sea null si no se proporciona
-      createdAt: new Date(),
-    };
-
-    // 👇 Log de los datos exactos que se enviarán a Firestore
-    console.log("💾 Datos a guardar:", JSON.stringify(userDataToSave, null, 2));
-
-    const newUserRef = await usersRef.add(userDataToSave);
-
-    // Si llega aquí, la operación add tuvo éxito a nivel de cliente
-    console.log("✅ Documento añadido con ID:", newUserRef.id);
-    return newUserRef.id; // Devuelve el ID del nuevo documento
-
-  } catch (error) {
-    console.error("❌ Error DETALLADO al intentar guardar en Firestore:");
-    // 👇 Loggear más detalles del error
-    if (error instanceof Error) {
-        console.error("  Mensaje:", error.message);
-        console.error("  Stack:", error.stack);
-    } else {
-        console.error("  Error (objeto completo):", error);
-    }
-    // Considera si necesitas devolver null o relanzar el error
-    return null;
-  }
+  return result;
 }
 
-// 👉 Handler principal (modificado para loggear datos de entrada)
+
+// 👉 Handler principal
 export async function registerUser(ctx: RouterContext<"/api/registerUser">) {
   try {
     const { value } = await ctx.request.body({ type: "json" });
+
     const userData: User = await value;
 
-    // 👇 Log para ver qué datos llegan desde la petición HTTP
-    console.log("📬 Datos recibidos en el handler:", JSON.stringify(userData, null, 2));
+    console.log("💾 Guardando usuario en Firestore...");
+    await saveUserToFirestore(userData);
 
-    // Llamada a la función de guardado (sin cambios aquí respecto a la versión anterior)
-    const userId = await saveUserToFirestore(userData);
-
-    // 👇 Comprueba si el guardado fue exitoso
-    if (userId) {
-      ctx.response.status = 200;
-      // 👇 Evitar duplicados en la respuesta
-      ctx.response.body = {
-        message: "✅ Usuario registrado con éxito",
-        userId: userId,
-      };
-    } else {
-      // Si userId es null, hubo un error al guardar
-      ctx.response.status = 500;
-      ctx.response.body = {
-        error: "Error interno al guardar el usuario en la base de datos",
-      };
-    }
-  } catch (error) {
-    // 👇 Comprobar si error es una instancia de Error
-    if (error instanceof Error) {
-        console.error("❌ Error en el handler registerUser:", error.message, error.stack);
-    } else {
-        console.error("❌ Error desconocido en el handler registerUser:", error);
-    }
-    ctx.response.status = 500;
+    ctx.response.status = 200;
     ctx.response.body = {
-      error: "Error interno al registrar el usuario",
+      message: "Usuario registrado con éxito en Firebase y Firestore",
+      userId: userData.userId,
+      email: userData.email,
+      phone: userData.phone,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      accountType: userData.accountType,
+      clinicInfo: userData.clinicInfo,
     };
+  } catch (error) {
+    console.error("❌ Error al registrar el usuario:", error);
+    ctx.response.status = 500;
   }
 }
