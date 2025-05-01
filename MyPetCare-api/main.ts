@@ -7,8 +7,9 @@ import { authenticate } from "./api-functions/authenticate.ts";
 import { validateToken } from './api-functions/validateToken.ts';
 import { registerUser } from './api-functions/registerUser.ts';
 
+
 import { updateUser, deleteUser } from "./api-functions/gestion.usuarios.ts";
-import { createPet, deletePet, getPetById, getPetsByOwner, updatePet } from "./api-functions/pet-request.ts";
+
 
 await load({ export: true });
 
@@ -28,6 +29,7 @@ router
   .post("/api/authenticate", authenticate)
   .post("/api/validateToken", validateToken)
   .post("/api/registerUser", registerUser)
+
 
   // UPDATE user info
   .put("/user/:user_id", updateUser)
@@ -51,6 +53,8 @@ router
 
   // GETPETBYOWNER pet info
   .get("/api/getPet/:owner", getPetsByOwner);
+
+
 
 
 app.use(router.routes());
