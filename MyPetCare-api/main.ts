@@ -6,6 +6,7 @@ import { load } from 'dotenv';
 import { authenticate } from "./api-functions/authenticate.ts";
 import { validateToken } from './api-functions/validateToken.ts';
 import { registerUser } from './api-functions/registerUser.ts';
+import { createPet, deletePet, updatePet, getPetById, getPetsByOwner } from "./api-functions/pet-request.ts";
 
 
 import { updateUser, deleteUser } from "./api-functions/gestion.usuarios.ts";
