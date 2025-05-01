@@ -4,11 +4,11 @@ import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
 
 // Obtén la clave de la API desde las variables de entorno
 
-const FIREBASE_PRIVATE_KEY = Deno.env.get("FIREBASE_PROJECT_ID");
-const FIREBASE_PROJECT_ID = Deno.env.get("FIREBASE_APP_ID") // Asegúrate de que sea el ID del proyecto de Firebase
+//const FIREBASE_PRIVATE_KEY = Deno.env.get("FIREBASE_PROJECT_ID");
+const FIREBASE_PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID") // Asegúrate de que sea el ID del proyecto de Firebase
 
 // URL de registro de Firebase
-const FireStoreUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PRIVATE_KEY}/databases/(default)/documents/pets`;
+const FireStoreUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/pets`;
 
 //Create
 export async function createPet(ctx: RouterContext<"/api/pet">) {
@@ -159,11 +159,11 @@ export async function getPetById(ctx: RouterContext<"/api/pet/:id">) {
   ctx.response.body = pet;
 }
 
-/*
 //GetPetsByOwner
-export async function getPetsByOwner(ctx: RouterContext<"/api/pet/owner">) {
-  const { value } = await ctx.request.body({ type: "json" });
-  const { ownerId } = await value;
+export async function getPetsByOwner(ctx: RouterContext<"/api/getPet/:owner">) {
+  console.log("📥 Endpoint getPetsByOwner llamado");
+  
+  const ownerId = ctx.params.owner;
 
   if (!ownerId) {
     ctx.response.status = 400;
@@ -173,6 +173,7 @@ export async function getPetsByOwner(ctx: RouterContext<"/api/pet/owner">) {
 
   const ownerPath = `/users/${ownerId}`;
   const url = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/pets`;
+  console.log("ownerpath: ", ownerPath, " y url: ", url)
 
   const response = await fetch(url, {
     method: "GET",
@@ -191,6 +192,10 @@ export async function getPetsByOwner(ctx: RouterContext<"/api/pet/owner">) {
     };
     return;
   }
+  result.documents.forEach((doc: any) => {
+    console.log(JSON.stringify(doc, null, 2));
+  });
+
 
   const pets = (result.documents || [])
     .map((doc: any) => {
@@ -204,8 +209,9 @@ export async function getPetsByOwner(ctx: RouterContext<"/api/pet/owner">) {
         )
       };
     })
-    .filter((pet) => pet.owner === ownerPath);
+    .filter((pet) => pet.owner === ownerId);
 
+  console.log(pets)
   ctx.response.status = 200;
   ctx.response.body = pets;
-}*/
+}
