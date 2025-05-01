@@ -87,6 +87,8 @@ class _NewPetScreenState extends State<NewPetScreen> {
             ElevatedButton(
               onPressed: () {
                 // Lógica guardado de datos
+                // TODO: Connect to backend to create the new pet
+                //TODO: Once added the new pet show snackbar showing success
                 Navigator.pop(context);
               },
               child: const Text("Add Pet"),

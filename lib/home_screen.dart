@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lis_project/the_drawer.dart';
 import 'package:lis_project/data.dart';
+import 'package:lis_project/requests.dart';
+import 'package:lis_project/pet.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -51,7 +53,12 @@ class _HomeScreenState extends State<HomeScreen> {
               label: 'Pets',
               color: Color(0xFFE9EFFF),
               iconColor: Color(0xFF627ECB),
-              onTap: () {Navigator.pushNamed(context, '/pets');
+              onTap: () {Navigator.pushNamed(
+                  context,
+                  '/pets',
+                  //TODO: This is hardcoded, change later to the real userId
+                  arguments: "owner123",
+              );
                 },
             ),
             _buildContainer(
