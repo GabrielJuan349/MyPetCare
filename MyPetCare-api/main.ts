@@ -6,6 +6,7 @@ import { load } from 'dotenv';
 import { authenticate } from "./api-functions/authenticate.ts";
 import { validateToken } from './api-functions/validateToken.ts';
 import { registerUser } from './api-functions/registerUser.ts';
+import { getRecipeOnce } from "./api-functions/recetas.ts";
 import { createPet, deletePet, updatePet, getPetById, getPetsByOwner } from "./api-functions/pet-request.ts";
 
 
@@ -53,7 +54,9 @@ router
   .get("/api/pet/:id", getPetById)
 
   // GETPETBYOWNER pet info
-  .get("/api/getPet/:owner", getPetsByOwner);
+  .get("/api/getPet/:owner", getPetsByOwner)
+
+  .get("/api/getprescription/:id", getRecipeOnce);
 
 
 
