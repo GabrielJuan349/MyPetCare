@@ -14,10 +14,6 @@ try {
   
     // Obtén la instancia de Firestore del SDK de ADMIN
     db = await firebaseAdmin.firestore();
-    console.log("db:", db);
-    console.log("Instancia de Firestore (Admin) obtenida.");
-
-    console.log(await db.collection("prescription").doc('eGydVPP7iDZd6DRrNKNt').get())
   
   } catch (error) {
     console.error("Error inicializando Firebase Admin:", error);

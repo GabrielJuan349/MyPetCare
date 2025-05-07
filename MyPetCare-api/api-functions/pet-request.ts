@@ -1,5 +1,4 @@
-import { db } from "../firebaseconfig/firebase.ts";
-import { Pet } from "../interfaces/pet.interface.ts";
+
 import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
 
 // Obtén la clave de la API desde las variables de entorno
