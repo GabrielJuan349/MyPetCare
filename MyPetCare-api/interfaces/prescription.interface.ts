@@ -1,5 +1,5 @@
 export interface Prescription {
-  id: string;
+  archivo: string;
   name: string;
   createdAt: Date;
   id_pet: string;

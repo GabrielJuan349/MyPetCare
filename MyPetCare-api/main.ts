@@ -68,13 +68,13 @@ router
   .post("/api/prescription", createPrescription)
 
   // Get prescription info
-  .get("/api/prescription/:id", getPrescription)
+  .get("/api/getPrescription/:id", getPrescription)
 
   // DELETE prescription info
-  .delete("/api/prescription/:id", deletePrescription)
+  .delete("/api/deletePrescription/:id", deletePrescription)
 
   // UPDATE prescription info
-  .put("/api/prescription/:id", updatePrescription);
+  .put("/api/putPrescription/:id", updatePrescription);
 
 
 app.use(router.routes());

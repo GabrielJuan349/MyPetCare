@@ -1,37 +1,35 @@
 import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
+import {Prescription} from "../interfaces/prescription.interface.ts";
 
 const FIREBASE_PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID");
 const FirestorePrescriptionURL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/prescription`;
 
-// Crear receta
+// Crear receta (funciona bien)
 export async function createPrescription(ctx: RouterContext<"/api/prescription">) {
   console.log("Creando receta");
-  const { value } = await ctx.request.body({ type: "json" });
-  const receta = await value;
-
-  console.log(FirestorePrescriptionURL)
+  const { value } = await ctx.request.body({ type: "json" }); //Guardamos el body de la petición en uan variable
+  const prescription : Prescription = await value;
 
   const response = await fetch(FirestorePrescriptionURL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       fields: {
-        name: { stringValue: receta.name },
-        archivo: { stringValue: receta.archivo },
-        id_pet: { stringValue: receta.id_pet },
-        id_vet: { stringValue: receta.id_vet },
-        createdAt: { timestampValue: receta.createdAt || new Date().toISOString() },
+        name: { stringValue: prescription.name },
+        archivo: { stringValue: prescription.archivo },
+        id_pet: { stringValue: prescription.id_pet },
+        id_vet: { stringValue: prescription.id_vet },
+        createdAt: { timestampValue: prescription.createdAt || new Date().toISOString() },
       }
     }),
-  });
-
+  }); //realizamos la petición a la API de Firestore para crear una receta
   const result = await response.json();
-  ctx.response.status = response.ok ? 200 : 500;
+  ctx.response.status = response.ok ? 200 : 500; //si la respuesta es correcta, devolvemos el estado 200, si no, devolvemos el estado 500
   ctx.response.body = result;
 }
 
-// Obtener receta por ID
-export async function getPrescription(ctx: RouterContext<"/api/prescription/:id">) {
+// Obtener receta por ID (funciona bien)
+export async function getPrescription(ctx: RouterContext<"/api/getPrescription/:id">) {
     const id = ctx.params.id;
     if (!id) {
       ctx.response.status = 400;
@@ -61,7 +59,7 @@ export async function getPrescription(ctx: RouterContext<"/api/prescription/:id"
 
 
 // Editar receta
-export async function updatePrescription(ctx: RouterContext<"/api/prescription/:id">) {
+export async function updatePrescription(ctx: RouterContext<"/api/putPrescription/:id">) {
     console.log("✏️ Actualizando receta...");
   
     const id = ctx.params.id;
@@ -130,7 +128,7 @@ export async function updatePrescription(ctx: RouterContext<"/api/prescription/:
 
 
 // Eliminar receta
-export async function deletePrescription(ctx: RouterContext<"/api/prescription/:id">) {
+export async function deletePrescription(ctx: RouterContext<"/api/deletePrescription/:id">) {
   const id = ctx.params.id;
   const deleteUrl = `${FirestorePrescriptionURL}/${id}`;
 
