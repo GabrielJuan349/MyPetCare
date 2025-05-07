@@ -6,15 +6,14 @@ let db: firebaseAdmin.firestore.Firestore;
 try {
 
     const serviceAccount =JSON.parse(Deno.readTextFileSync("../"+Deno.env.get("FIREBASE_CREDENTIALS_NAME")!));
-    console.log(serviceAccount)
+    // console.log(serviceAccount)
     firebaseAdmin.initializeApp({
         credential: firebaseAdmin.credential.cert(serviceAccount),
     })
     console.log("Firebase Admin SDK inicializado.");
   
     // Obtén la instancia de Firestore del SDK de ADMIN
-    db = firebaseAdmin.firestore();
-    console.log("Instancia de Firestore (Admin) obtenida.");
+    db = await firebaseAdmin.firestore();
   
   } catch (error) {
     console.error("Error inicializando Firebase Admin:", error);

@@ -6,7 +6,9 @@ import { load } from 'dotenv';
 import { authenticate } from "./api-functions/authenticate.ts";
 import { validateToken } from './api-functions/validateToken.ts';
 import { registerUser } from './api-functions/registerUser.ts';
+//import { getRecipeOnce } from "./api-functions/recetas.ts";
 import { createPet, deletePet, updatePet, getPetById, getPetsByOwner } from "./api-functions/pet-request.ts";
+import { createPrescription, getPrescription, updatePrescription, deletePrescription } from "./api-functions/prescription.ts"
 
 
 import { updateUser, deleteUser } from "./api-functions/gestion.usuarios.ts";
@@ -38,6 +40,7 @@ router
   // DELETE user by id
   .delete("/user/:user_id", deleteUser)
 
+
 // ---- Endpoints de PETS ----
 
   // CREATE pet info
@@ -52,10 +55,26 @@ router
   // GETPETBYID pet info
   .get("/api/pet/:id", getPetById)
 
-  // GETPETBYOWNER pet info
-  .get("/api/getPet/:owner", getPetsByOwner);
+
+// GETPETBYOWNER pet info
+  //.get("/api/getPet/:owner", getPetsByOwner)
+
+  //.get("/api/getprescription/:id", getRecipeOnce);
 
 
+// ---- Endpoints de PRESCRIPTIONS ----
+
+  // CREATE prescription info
+  .post("/api/prescription", createPrescription)
+
+  // Get prescription info
+  .get("/api/getPrescription/:id", getPrescription)
+
+  // DELETE prescription info
+  .delete("/api/deletePrescription/:id", deletePrescription)
+
+  // UPDATE prescription info
+  .put("/api/putPrescription/:id", updatePrescription);
 
 
 app.use(router.routes());
