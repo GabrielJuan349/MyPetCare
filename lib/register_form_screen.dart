@@ -42,6 +42,11 @@ class _RegisterFormScreenState extends State<RegisterFormScreen> {
     setState(() {
       _isLoading = false;
     });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Data submitted successfully!')),
+    );
+    // Navigate to home page
+    Navigator.pushNamed(context, '/home', arguments: user);
   }
 
   @override
