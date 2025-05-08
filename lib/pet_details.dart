@@ -25,7 +25,7 @@ class _PetDetailsState extends State<PetDetails> {
     return Row(
       children: [
         Text(label),
-        SizedBox(width: 8),
+        const SizedBox(width: 8),
         ...List.generate(5, (index) {
           return Icon(
             index < rating ? Icons.star : Icons.star_border,
@@ -41,12 +41,12 @@ class _PetDetailsState extends State<PetDetails> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Color(0xfff59249),
-        title: Text("Pet details"),
+        backgroundColor: const Color(0xfff59249),
+        title: const Text("Pet details"),
         centerTitle: true,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -56,12 +56,12 @@ class _PetDetailsState extends State<PetDetails> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(
           children: [
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               myPet.name,
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Container(
               height: 150,
               width: double.infinity,
@@ -74,21 +74,21 @@ class _PetDetailsState extends State<PetDetails> {
                 ),
               ),
             ),
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
             Text(
               "Breed: ${myPet.breed}"
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(
                 "Gender: ${myPet.gender}"
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
                 "Age: ${myPet.age}"
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             buildStarRow("Friendly", myPet.friendly),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             buildStarRow("Playful", myPet.playful),
           ],
         ),
@@ -96,7 +96,7 @@ class _PetDetailsState extends State<PetDetails> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.white,
         onPressed: () {},
-        child: Icon(Icons.edit, color: Colors.blue),
+        child: const Icon(Icons.edit, color: Colors.blue),
       ),
     );
   }

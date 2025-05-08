@@ -7,6 +7,7 @@ class Pet {
       required this.gender,
       required this.age,
       required this.breed,
+      required this.type,
       required this.image,
       required this.playful,
       required this.friendly
@@ -18,6 +19,7 @@ class Pet {
       gender: json['gender'] ?? "",
       age: json['age'] ?? "",
       breed: json['breed'] ?? "",
+      type: json['type'] ?? "",
       image: json['image'] ?? "",
       playful: json['playful'] ?? 0,
       friendly: json['friendly'] ?? 0,

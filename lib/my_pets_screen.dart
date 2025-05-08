@@ -6,6 +6,8 @@ import 'package:lis_project/new_pet.dart';
 import 'dart:io';
 
 class MyPetsScreen extends StatefulWidget {
+  const MyPetsScreen({super.key});
+
 
   @override
   _MyPetsScreenState createState() => _MyPetsScreenState();
@@ -40,31 +42,31 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appBarColor = Color(0xfff59249);
+    const appBarColor = Color(0xfff59249);
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: appBarColor,
-        iconTheme: IconThemeData(color: Colors.white),
-        title: Text(
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text(
           "My Pets",
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.person, color: Colors.white),
+            icon: const Icon(Icons.person, color: Colors.white),
             onPressed: () {},
           ),
         ],
       ),
-      body: isLoading ? Center(child: CircularProgressIndicator()) //Loading icon
+      body: isLoading ? const Center(child: CircularProgressIndicator()) //Loading icon
         : ListView.builder(
         itemCount: pets.length,
         itemBuilder: (context, index) {
@@ -87,12 +89,12 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => NewPetScreen(), // ← Tu nueva pantalla
+              builder: (context) => const NewPetScreen(), // ← Tu nueva pantalla
             ),
           );
         },
-        child: Icon(Icons.add, color: Colors.white),
-        backgroundColor: Color(0xFF627ECB),
+        backgroundColor: const Color(0xFF627ECB),
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }

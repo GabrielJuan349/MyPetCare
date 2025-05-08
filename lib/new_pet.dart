@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:lis_project/pet.dart';
 import 'package:file_picker/file_picker.dart';
 
 class NewPetScreen extends StatefulWidget {
-  const NewPetScreen({Key? key}) : super(key: key);
+  const NewPetScreen({super.key});
 
   @override
   State<NewPetScreen> createState() => _NewPetScreenState();
@@ -51,21 +50,21 @@ class _NewPetScreenState extends State<NewPetScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: appBarColor,
-        iconTheme: IconThemeData(color: Colors.white),
-        title: Text(
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text(
           "New Pet",
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.person, color: Colors.white),
+            icon: const Icon(Icons.person, color: Colors.white),
             onPressed: () {},
           ),
         ],
@@ -91,13 +90,13 @@ class _NewPetScreenState extends State<NewPetScreen> {
                 //TODO: Once added the new pet show snackbar showing success
                 Navigator.pop(context);
               },
-              child: const Text("Add Pet"),
               style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: 15, horizontal: 80),
-                textStyle: TextStyle(fontSize: 18),
-                backgroundColor: Color(0xFF627ECB),
+                padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 80),
+                textStyle: const TextStyle(fontSize: 18),
+                backgroundColor: const Color(0xFF627ECB),
                 foregroundColor: Colors.white,
               ),
+              child: const Text("Add Pet"),
             ),
           ],
         ),
@@ -117,7 +116,7 @@ class _NewPetScreenState extends State<NewPetScreen> {
           TextField(
             decoration: InputDecoration(
               filled: true,
-              fillColor: Color(0xFFECF1FF),
+              fillColor: const Color(0xFFECF1FF),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide.none,
@@ -140,13 +139,13 @@ class _NewPetScreenState extends State<NewPetScreen> {
           const SizedBox(height: 4),
           ElevatedButton(
             onPressed: () => pickPdfFile(label),
-            child: Text(fileName ?? "Upload PDF"),
             style: ElevatedButton.styleFrom(
-              padding: EdgeInsets.symmetric(vertical: 15, horizontal: 80),
-              textStyle: TextStyle(fontSize: 18),
-              backgroundColor: Color(0xFF627ECB),
+              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 80),
+              textStyle: const TextStyle(fontSize: 18),
+              backgroundColor: const Color(0xFF627ECB),
               foregroundColor: Colors.white,
             ),
+            child: Text(fileName ?? "Upload PDF"),
           ),
         ],
       ),
@@ -172,7 +171,7 @@ class _NewPetScreenState extends State<NewPetScreen> {
             onChanged: (value) => setState(() => selectedGender = value),
             decoration: InputDecoration(
               filled: true,
-              fillColor: Color(0xFFECF1FF),
+              fillColor: const Color(0xFFECF1FF),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide.none,
@@ -224,7 +223,7 @@ class _NewPetScreenState extends State<NewPetScreen> {
             readOnly: true,
             decoration: InputDecoration(
               filled: true,
-              fillColor: Color(0xFFECF1FF),
+              fillColor: const Color(0xFFECF1FF),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide.none,

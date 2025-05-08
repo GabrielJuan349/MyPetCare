@@ -40,9 +40,9 @@ class _TestState extends State<Test> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xfff59249),
-        iconTheme: IconThemeData(color: Colors.white),
-        title: Text(
+        backgroundColor: const Color(0xfff59249),
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text(
           'HTTP Request',
           style: TextStyle(color: Colors.white),
         ),
@@ -54,11 +54,11 @@ class _TestState extends State<Test> {
           children: [
             IconButton(
               onPressed: testRequest,
-              icon: Icon(Icons.add_circle),
+              icon: const Icon(Icons.add_circle),
               iconSize: 40,
               color: Colors.orange,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(response),
           ],
         ),

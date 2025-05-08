@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:lis_project/data.dart';
 import 'package:lis_project/pet.dart';
 
 // Change to the url of your actual backend
@@ -42,6 +41,7 @@ Future<String> sendRequest(Uri uri, String action, {Map<String, dynamic>? req_bo
   }
 }
 
+
 Future<String> updateUserInfo(String userId, Map<String, dynamic>? body) async{
   Uri uri = Uri.parse("$BASE_URL/user/$userId");
   final String responseBody = await sendRequest(uri, "PUT", req_body: body);
@@ -54,12 +54,17 @@ Future deleteUser(String userId) async{
   return responseBody;
 }
 
-Future<User> getUserInfo(String userId) async{
+Future<String> addUser(Map<String, dynamic>? body) async{
+  Uri uri = Uri.parse("$BASE_URL/api/registerUser");
+  final String responseBody = await sendRequest(uri, "POST", req_body: body);
+  return responseBody;
+}
+
+Future<void> getUserInfo(String userId) async{
   Uri uri = Uri.parse("$BASE_URL/user/$userId");
   final responseBody = await sendRequest(uri, "GET");
   print("getUserInfo result:$responseBody");
   // TODO: Implement this to match the authentication part
-  return User("a","b","c","d","e","f","g","h");
 }
 
 Future<List<Pet>> getUserPets(String userId) async{

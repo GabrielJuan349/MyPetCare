@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:lis_project/reminder_message.dart';
 
 class RemindersScreen extends StatefulWidget {
-  const RemindersScreen({Key? key}) : super(key: key);
+  const RemindersScreen({super.key});
 
   @override
   State<RemindersScreen> createState() => _RemindersScreenState();

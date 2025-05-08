@@ -23,26 +23,26 @@ class _PetNumScreenState extends State<PetNumScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appBarColor = Color(0xfff59249);
+    const appBarColor = Color(0xfff59249);
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: appBarColor,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
         title: Text(
           myPet.name,
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.person, color: Colors.white),
+            icon: const Icon(Icons.person, color: Colors.white),
             onPressed: () {
               Navigator.pushNamed(context, '/profile');
             },
@@ -68,10 +68,10 @@ class _PetNumScreenState extends State<PetNumScreen> {
   Widget _buildGridItem(BuildContext context, IconData icon, String label) {
     return Container(
       decoration: BoxDecoration(
-        color: Color(0xFFE9EFFF),
+        color: const Color(0xFFE9EFFF),
         borderRadius: BorderRadius.circular(10),
       ),
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: InkWell(
         onTap: () {
           if (label == "Pet details") {
@@ -101,14 +101,14 @@ class _PetNumScreenState extends State<PetNumScreen> {
             children: [
               Icon(
                 icon,
-                color: Color(0xFF627ECB),
+                color: const Color(0xFF627ECB),
                 size: 60,
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text(
                 label,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Color(0xFF627ECB),
                   fontSize: 18.0,
                   fontWeight: FontWeight.bold,

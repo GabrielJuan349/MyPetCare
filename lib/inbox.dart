@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lis_project/inbox_message.dart';
 
 class Inbox extends StatefulWidget {
+  const Inbox({super.key});
+
    @override
    State<Inbox> createState() => _InboxState();
 }
@@ -23,19 +25,19 @@ class _InboxState extends State<Inbox> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Inbox"),
+        title: const Text("Inbox"),
         foregroundColor: Colors.white,
         centerTitle: true,
-        backgroundColor: Color(0xfff59249),
+        backgroundColor: const Color(0xfff59249),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
           actions: [
             IconButton(
-              icon: Icon(Icons.person, color: Colors.white),
+              icon: const Icon(Icons.person, color: Colors.white),
               onPressed: () {
                 Navigator.pushNamed(context, '/profile');
               },
@@ -46,10 +48,10 @@ class _InboxState extends State<Inbox> {
         itemCount: myMessages.length,
         itemBuilder: (context, index) {
           return Container(
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            padding: EdgeInsets.all(16),
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Color(0xFFE9EFFF),
+              color: const Color(0xFFE9EFFF),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -60,19 +62,19 @@ class _InboxState extends State<Inbox> {
                     children: [
                       Text(
                         myMessages[index].title,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         myMessages[index].message,
-                        style: TextStyle(color: Colors.black54),
+                        style: const TextStyle(color: Colors.black54),
                       ),
                     ],
                   ),
                 ),
-                Icon(Icons.notifications_none),
+                const Icon(Icons.notifications_none),
               ],
             ),
           );

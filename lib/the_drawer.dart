@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class TheDrawer extends StatelessWidget {
-  const TheDrawer({Key? key}) : super(key: key);
+  const TheDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final appBarColor = Color(0xfff59249); // Naranja
+    const appBarColor = Color(0xfff59249); // Naranja
 
     return Drawer(
       child: Container(
@@ -13,13 +13,13 @@ class TheDrawer extends StatelessWidget {
         child: Column(
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: appBarColor,
               ),
               child: Align(
                 alignment: Alignment.topLeft,
                 child: IconButton(
-                  icon: Icon(Icons.menu, color: Colors.white),
+                  icon: const Icon(Icons.menu, color: Colors.white),
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -27,23 +27,23 @@ class TheDrawer extends StatelessWidget {
               ),
             ),
             ListTile(
-              leading: Icon(Icons.inbox, color: Colors.white),
-              title: Text('Inbox', style: TextStyle(color: Colors.white)),
+              leading: const Icon(Icons.inbox, color: Colors.white),
+              title: const Text('Inbox', style: TextStyle(color: Colors.white)),
               onTap: () {
                 Navigator.pushReplacementNamed(context, '/inbox');
               },
             ),
             ListTile(
-              leading: Icon(Icons.help_outline, color: Colors.white),
-              title: Text('Help', style: TextStyle(color: Colors.white)),
+              leading: const Icon(Icons.help_outline, color: Colors.white),
+              title: const Text('Help', style: TextStyle(color: Colors.white)),
               onTap: () {
                 Navigator.pushReplacementNamed(context, '/help');
               },
             ),
-            Spacer(),
+            const Spacer(),
             ListTile(
-              leading: Icon(Icons.language, color: Colors.white),
-              title: Text('Language', style: TextStyle(color: Colors.white)),
+              leading: const Icon(Icons.language, color: Colors.white),
+              title: const Text('Language', style: TextStyle(color: Colors.white)),
               onTap: () {
                 Navigator.pushReplacementNamed(context, '/language');
               },

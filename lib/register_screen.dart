@@ -1,137 +1,183 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:lis_project/iniciar_sesion.dart';
 
 class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({Key? key}) : super(key: key);
+
   @override
-  _RegisterScreenState createState() => _RegisterScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  String? _selectedValue;
-  List<String> _options = ['Pet owner', 'Vet', 'Vet clinic', 'Admin'];
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _isLoading = false;
+
+  // Before add the key: https://developers.google.com/android/guides/client-auth?hl=es-419
+  // Log in with google: https://firebase.google.com/docs/auth/flutter/federated-auth?hl=es-419
+  Future<UserCredential> signInWithGoogle() async {
+    // Trigger the authentication flow
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
+
+    // Create a new credential
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    // Once signed in, return the UserCredential
+    return await FirebaseAuth.instance.signInWithCredential(credential);
+  }
+
+  Future<void> _register() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+
+      User? firebaseuser = credential.user;
+      print("userType from firebase $firebaseuser");
+      print("UID: ${firebaseuser?.uid}");
+      print("Token: ${await firebaseuser?.getIdToken()}");
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User registered successfully')),
+      );
+
+      Navigator.pushNamed(context, '/formRegister', arguments: firebaseuser,);
+
+    } on FirebaseAuthException catch (e) {
+      String message;
+      if (e.code == 'weak-password') {
+        message = 'The password provided is too weak.';
+      } else if (e.code == 'email-already-in-use') {
+        message = 'An account already exists for that email.';
+      } else {
+        message = 'Registration failed: ${e.message}';
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred: $e')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor:Color(0xfff59249),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-
-            Navigator.pop(context);
-          },
+        appBar: AppBar(
+          backgroundColor: const Color(0xfff59249),
+          title: const Text('Register'),
+          centerTitle: true,
+          elevation: 0,
+          foregroundColor: Colors.white,
+          // Delete turn back option
+          automaticallyImplyLeading: false
         ),
-        title: Text(
-          'Register',
-          style: TextStyle(color: Colors.white),
-        ),
-        centerTitle: true,
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
+        body: Column(
+          children: [
+            Expanded(
+              child: Padding(
+                  padding: const EdgeInsets.all(35.0),
+                child: Form(
+                  key: _formKey,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildTextField('Name'),
-                      _buildTextField('Surname'),
-                      _buildTextField('Email'),
-                      _buildTextField('Password', obscureText: true),
-                      _buildTextField('Confirm Password', obscureText: true),
-                      _buildTextField('Phone Number'),
-                      _buildTextField('Locality'),
-                      _buildUserTypeSelector(),
-                      _buildButton()
+                      TextFormField(
+                        controller: _emailController,
+                        decoration: const InputDecoration(labelText: 'Email'),
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (value) => value != null && value.contains('@')
+                            ? null
+                            : 'Enter a valid email',
+                      ),
+                      TextFormField(
+                        controller: _passwordController,
+                        decoration: const InputDecoration(labelText: 'Password'),
+                        obscureText: true,
+                        validator: (value) => value != null && value.length >= 6
+                            ? null
+                            : 'Password must be at least 6 characters',
+                      ),
+                      const SizedBox(height: 20),
+                      _isLoading
+                          ? const CircularProgressIndicator()
+                          : ElevatedButton(
+                        onPressed: _register,
+                        child: const Text('Register'),
+                      ),
+                      const Text('or'),
+                      ElevatedButton(
+                          onPressed: () {
+                            signInWithGoogle();
+                          },
+                          child: Text('Sign up with google')),
                     ],
                   ),
                 ),
+              )
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              color: Colors.white,
+              width: double.infinity,
+              child: Center(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text("Have an account?"),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const IniciarSesion()),
+                        );
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFF627ECB),
+                        overlayColor: Colors.transparent,
+                      ),
+                      child: const Text(
+                        'Log in',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildButton() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: ElevatedButton(
-          onPressed: () {
-            // Acción al presionar el botón
-          },
-          child: Text('Submit'),
-          style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.symmetric(vertical: 15, horizontal: 80),
-            textStyle: TextStyle(fontSize: 18),
-            backgroundColor: Color(0xFF627ECB),
-            foregroundColor: Colors.white,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildUserTypeSelector() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Select an option:',
-              style: TextStyle(fontSize: 18),
             ),
-            const SizedBox(height: 10),
-            DropdownButton<String>(
-              value: _selectedValue,
-              hint: Text(_selectedValue ?? 'Choose an option'),
-              isExpanded: true,
-              items: _options.map((String option) {
-                return DropdownMenuItem<String>(
-                  value: option,
-                  child: Text(option),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedValue = newValue;
-                });
-              },
-            ),
-            SizedBox(height: 20),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextField(String label, {bool obscureText = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: TextStyle(fontSize: 16)),
-          TextField(
-            obscureText: obscureText,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Color(0xFFE9EFFF),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(5),
-                borderSide: BorderSide.none,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+        ));
   }
 }

@@ -29,19 +29,19 @@ class _PetReportsState extends State<PetReports> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Reports"),
+        title: const Text("Reports"),
         foregroundColor: Colors.white,
         centerTitle: true,
-        backgroundColor: Color(0xfff59249),
+        backgroundColor: const Color(0xfff59249),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
           actions: [
             IconButton(
-              icon: Icon(Icons.person, color: Colors.white),
+              icon: const Icon(Icons.person, color: Colors.white),
               onPressed: () {
                 Navigator.pushNamed(context, '/profile');
               },
@@ -52,10 +52,10 @@ class _PetReportsState extends State<PetReports> {
         itemCount: petReportsList.length,
         itemBuilder: (context, index) {
           return Container(
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            padding: EdgeInsets.all(16),
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Color(0xFFE9EFFF),
+              color: const Color(0xFFE9EFFF),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -66,14 +66,14 @@ class _PetReportsState extends State<PetReports> {
                     children: [
                       Text(
                         petReportsList[index].reportName,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         petReportsList[index].message,
-                        style: TextStyle(color: Colors.black54),
+                        style: const TextStyle(color: Colors.black54),
                       ),
                     ],
                   ),

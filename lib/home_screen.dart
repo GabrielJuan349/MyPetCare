@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:lis_project/the_drawer.dart';
 import 'package:lis_project/data.dart';
-import 'package:lis_project/requests.dart';
-import 'package:lis_project/pet.dart';
 
 
 class HomeScreen extends StatefulWidget {
-  final User user;
-  const HomeScreen({super.key, required this.user});
+  const HomeScreen({super.key});
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -17,25 +14,26 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appBarColor = Color(0xfff59249);
+    final user = ModalRoute.of(context)!.settings.arguments as Owner;
+    const appBarColor = Color(0xfff59249);
     return Scaffold(
-      drawer:TheDrawer(),
+      drawer:const TheDrawer(),
         appBar: AppBar(
           backgroundColor: appBarColor,
-          iconTheme: IconThemeData(color: Colors.white),
-          title: Text(
+          iconTheme: const IconThemeData(color: Colors.white),
+          title: const Text(
             'Home',
             style: TextStyle(color: Colors.white),
           ),
           centerTitle: true,
           actions: [
             IconButton(
-              icon: Icon(Icons.person, color: Colors.white),
+              icon: const Icon(Icons.person, color: Colors.white),
               onPressed: () {
                 Navigator.pushNamed(
                     context,
                     '/profile',
-                  arguments: widget.user,
+                  arguments: user,
                 );
               },
             ),
@@ -46,13 +44,13 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisCount: 2,
           crossAxisSpacing: 20,
           mainAxisSpacing: 20,
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           children: <Widget>[
             _buildContainer(
               icon: Icons.pets,
               label: 'Pets',
-              color: Color(0xFFE9EFFF),
-              iconColor: Color(0xFF627ECB),
+              color: const Color(0xFFE9EFFF),
+              iconColor: const Color(0xFF627ECB),
               onTap: () {Navigator.pushNamed(
                   context,
                   '/pets',
@@ -64,30 +62,30 @@ class _HomeScreenState extends State<HomeScreen> {
             _buildContainer(
               icon: Icons.calendar_month,
               label: 'Agenda',
-              color: Color(0xFFE9EFFF),
-              iconColor: Color(0xFF627ECB),
+              color: const Color(0xFFE9EFFF),
+              iconColor: const Color(0xFF627ECB),
               onTap: () {},
             ),
             _buildContainer(
               icon: Icons.notifications_outlined,
               label: 'Reminders',
-              color: Color(0xFFE9EFFF),
-              iconColor: Color(0xFF627ECB),
+              color: const Color(0xFFE9EFFF),
+              iconColor: const Color(0xFF627ECB),
               onTap: () {Navigator.pushNamed(context, '/reminders');
                 },
             ),
             _buildContainer(
               icon: Icons.map,
               label: 'Map',
-              color: Color(0xFFE9EFFF),
-              iconColor: Color(0xFF627ECB),
+              color: const Color(0xFFE9EFFF),
+              iconColor: const Color(0xFF627ECB),
               onTap: () {},
             ),
             _buildContainer(
               icon: Icons.info_outline,
               label: 'Tips',
-              color: Color(0xFFE9EFFF),
-              iconColor: Color(0xFF627ECB),
+              color: const Color(0xFFE9EFFF),
+              iconColor: const Color(0xFF627ECB),
               onTap: () {},
             ),
           ],
@@ -108,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
         color: color,
         borderRadius: BorderRadius.circular(10),
       ),
-      padding: EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(10),
@@ -121,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 size: iconSize,
                 color: iconColor,
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
                 label,
                 style: TextStyle(
