@@ -57,7 +57,7 @@ router
 
 
 // GETPETBYOWNER pet info
-  //.get("/api/getPet/:owner", getPetsByOwner)
+  .get("/api/getPet/:owner", getPetsByOwner)
 
   //.get("/api/getprescription/:id", getRecipeOnce);
 
