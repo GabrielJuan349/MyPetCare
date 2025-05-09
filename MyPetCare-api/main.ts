@@ -9,6 +9,7 @@ import { registerUser } from './api-functions/registerUser.ts';
 //import { getRecipeOnce } from "./api-functions/recetas.ts";
 import { createPet, deletePet, updatePet, getPetById, getPetsByOwner } from "./api-functions/pet-request.ts";
 import { createPrescription, getPrescription, updatePrescription, deletePrescription } from "./api-functions/prescription.ts"
+import { getClinics } from "./api-functions/clinics.ts";
 
 
 import { updateUser, deleteUser } from "./api-functions/gestion.usuarios.ts";
@@ -74,7 +75,11 @@ router
   .delete("/api/deletePrescription/:id", deletePrescription)
 
   // UPDATE prescription info
-  .put("/api/putPrescription/:id", updatePrescription);
+  .put("/api/putPrescription/:id", updatePrescription)
+
+  // ---- Endpoints de CLINICS ----
+  // GET clinics info
+  .get("/api/getClinics/:id", getClinics);
 
 
 app.use(router.routes());
