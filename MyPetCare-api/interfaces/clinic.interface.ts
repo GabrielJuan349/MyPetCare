@@ -1,4 +1,4 @@
-export interface ClinicInfo {
+export interface Clinic {
   address: string;
   categories: string[];
   city: string;
