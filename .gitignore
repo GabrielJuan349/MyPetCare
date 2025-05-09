@@ -1,62 +1,69 @@
+# General
 **/.env
 **/.idea/
 **/.vscode/
+.DS_Store
 
-# Flutter
+# Flutter/Dart specific
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
-build/
 .packages
 .pub/
+build/
 coverage/
 *.iml
 pubspec.lock
-.DS_Store
+.fvm/
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-.pytest_cache/
-.coverage
-htmlcov/
-.tox/
-.venv
-venv/
-ENV/
+# iOS/XCode related
+ios/Pods/
+ios/*.mode1v3
+ios/*.mode2v3
+ios/*.moved-aside
+ios/*.pbxuser
+ios/*.perspectivev3
+ios/**/*sync/
+ios/.sconsign.dblite
+ios/.tags*
+ios/.vagrant/
+ios/DerivedData/
+ios/Icon?
+ios/Pods/
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Generated.xcconfig
+ios/Flutter/app.flx
+ios/Flutter/app.zip
+ios/Flutter/flutter_assets/
+ios/Flutter/flutter_export_environment.sh
+ios/ServiceDefinitions.json
+ios/.symlinks/
+ios/profile
+ios/xcuserdata
 
-# Java
-*.class
-*.jar
-*.war
-*.ear
-*.zip
-*.tar.gz
-*.rar
-hs_err_pid*
-.mtj.tmp/
-target/
-.gradle/
-out/
-.classpath
-.project
-.settings/
+# Android related
+android/gradlew
+android/gradlew.bat
+android/gradle/
+android/.gradle
+android/captures/
+android/local.properties
+android/key.properties
+android/app/debug
+android/app/profile
+android/app/release
+
+# Deno 2.0 specific
+.deno/
+deno.lock
+*-lock.json
+.deno_plugins/
+.vscode/.deno
+.cache/deno/
+lock.json
+import_map.json
+node_modules/
+
+# secret files
+MyPetCare-api/firebaseconfig/secret.ts
