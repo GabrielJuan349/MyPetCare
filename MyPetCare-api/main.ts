@@ -10,6 +10,7 @@ import { registerUser } from './api-functions/registerUser.ts';
 import { createPet, deletePet, updatePet, getPetById, getPetsByOwner } from "./api-functions/pet-request.ts";
 import { createPrescription, getPrescription, updatePrescription, deletePrescription } from "./api-functions/prescription.ts"
 import { getClinics, createClinic, deleteClinic, getAllClinics } from "./api-functions/clinics.ts";
+import { createVet } from "./api-functions/vets.ts";
 
 
 import { updateUser, deleteUser } from "./api-functions/gestion.usuarios.ts";
@@ -86,7 +87,10 @@ router
   // DELETE clinic info
   .delete("/api/deleteClinic/:id", deleteClinic)
   // GET all clinics info
-  .get("/api/getClinics", getAllClinics);
+  .get("/api/getClinics", getAllClinics)
+
+// ---- Endpoints de VETS ----
+  .post("/api/createVet", createVet);
 
 
 app.use(router.routes());
