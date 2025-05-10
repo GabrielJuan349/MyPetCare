@@ -10,10 +10,10 @@ import { registerUser } from './api-functions/registerUser.ts';
 import { createPet, deletePet, updatePet, getPetById, getPetsByOwner } from "./api-functions/pet-request.ts";
 import { createPrescription, getPrescription, updatePrescription, deletePrescription } from "./api-functions/prescription.ts"
 import { getClinics, createClinic, deleteClinic, getAllClinics } from "./api-functions/clinics.ts";
-import { createVet, deleteVet, getVetById , getVetsByClinic} from "./api-functions/vets.ts";
+import { createVet, deleteVet, getVetById, getVetsByClinic } from "./api-functions/vets.ts";
 
 
-import { updateUser, deleteUser } from "./api-functions/gestion.usuarios.ts";
+import { updateUser, deleteUser, getUserDataById } from "./api-functions/gestion.usuarios.ts";
 
 
 await load({ export: true });
@@ -42,8 +42,10 @@ router
   // DELETE user by id
   .delete("/user/:user_id", deleteUser)
 
+  // GET user by id
+  .get("/user/:user_id", getUserDataById)
 
-// ---- Endpoints de PETS ----
+  // ---- Endpoints de PETS ----
 
   // CREATE pet info
   .post("/api/pet", createPet)
@@ -58,13 +60,13 @@ router
   .get("/api/pet/:id", getPetById)
 
 
-// GETPETBYOWNER pet info
+  // GETPETBYOWNER pet info
   .get("/api/getPet/:owner", getPetsByOwner)
 
   //.get("/api/getprescription/:id", getRecipeOnce);
 
 
-// ---- Endpoints de PRESCRIPTIONS ----
+  // ---- Endpoints de PRESCRIPTIONS ----
 
   // CREATE prescription info
   .post("/api/prescription", createPrescription)
@@ -89,7 +91,7 @@ router
   // GET all clinics info
   .get("/api/getClinics", getAllClinics)
 
-// ---- Endpoints de VETS ----
+  // ---- Endpoints de VETS ----
   .post("/api/createVet", createVet)
   .delete("/api/deleteVet/:id", deleteVet)
   .get("/api/getVetsByClinic/:clinicId", getVetsByClinic)

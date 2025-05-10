@@ -10,19 +10,20 @@ const FireStoreUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PR
 async function saveUserToFirestore(user: any) {
   const firestoreData = {
     fields: {
-      userId: { stringValue: user.userId },
       email: { stringValue: user.email },
       firstName: { stringValue: user.firstName },
       lastName: { stringValue: user.lastName },
       phone: { stringValue: user.phone },
       accountType: { stringValue: user.accountType },
+      locality: {stringValue: user.locality},
       clinicInfo: user.clinicInfo 
         ? { stringValue: user.clinicInfo } 
         : { nullValue: null },
     },
   };
 
-  const response = await fetch(FireStoreUrl, {
+  // Use firebase auth uid as Document ID in firestore
+  const response = await fetch(`${FireStoreUrl}?documentId=${user.userId}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(firestoreData),
@@ -56,6 +57,7 @@ export async function registerUser(ctx: RouterContext<"/api/registerUser">) {
       firstName: userData.firstName,
       lastName: userData.lastName,
       accountType: userData.accountType,
+      locality: userData.locality,
       clinicInfo: userData.clinicInfo,
     };
   } catch (error) {
