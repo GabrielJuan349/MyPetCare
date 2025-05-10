@@ -11,6 +11,7 @@ import { createPet, deletePet, updatePet, getPetById, getPetsByOwner } from "./a
 import { createPrescription, getPrescription, updatePrescription, deletePrescription } from "./api-functions/prescription.ts"
 import { getClinics, createClinic, deleteClinic, getAllClinics } from "./api-functions/clinics.ts";
 import { createVet, deleteVet, getVetById , getVetsByClinic} from "./api-functions/vets.ts";
+import { createNews, getAllNews, deleteNews } from "./api-functions/news.ts";
 
 
 import { updateUser, deleteUser } from "./api-functions/gestion.usuarios.ts";
@@ -78,7 +79,8 @@ router
   // UPDATE prescription info
   .put("/api/putPrescription/:id", updatePrescription)
 
-  // ---- Endpoints de CLINICS ----
+
+// ---- Endpoints de CLINICS ----
   // GET clinics info
   .get("/api/getClinics/:id", getClinics)
 
@@ -89,11 +91,30 @@ router
   // GET all clinics info
   .get("/api/getClinics", getAllClinics)
 
+
 // ---- Endpoints de VETS ----
+  // CREATE vets info
   .post("/api/createVet", createVet)
+
+  // DELETE vets info
   .delete("/api/deleteVet/:id", deleteVet)
+  
+  // GET vets info
   .get("/api/getVetsByClinic/:clinicId", getVetsByClinic)
-  .get("/api/getVet/:id", getVetById);
+
+  .get("/api/getVet/:id", getVetById)
+
+
+// ---- Endpoints de NEWS ----
+  // CREATE news info
+  .post("/api/createNews", createNews)
+
+  // GET news info
+  .get("/api/getAllNews", getAllNews)
+  
+  // DELETE news info
+  .delete("/api/deleteNews/:id", deleteNews);
+
 
 
 app.use(router.routes());
