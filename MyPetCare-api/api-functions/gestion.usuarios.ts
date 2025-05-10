@@ -101,3 +101,39 @@ export async function deleteUser(ctx: RouterContext<"/user/:user_id">) {
         ctx.response.body = "Request error";
     }
 }
+
+
+/*
+Use it when log in to bring extra info not contained in firebase auth
+*/
+export async function getUserDataById(ctx: RouterContext<"/user/:user_id">) {
+    try {
+        const userId = ctx.params.user_id;
+        // Get userData from firestore
+        const response = await fetch(`${FireStoreUrl}/${userId}`);
+        const result = await response.json();
+
+        if (!response.ok) {
+            // If the user does not exist, return a 404 status
+            ctx.response.status = 404;
+            ctx.response.body = "User not found";
+        }
+        // Extraer campos limpios
+        const fields = result.fields || {};
+        const userData = {// Transform to JSON
+            userId,
+            ...Object.fromEntries(
+                Object.entries(fields).map(([key, value]) => [key, Object.values(value as { [key: string]: any })[0]])
+            )
+        };
+
+        console.log(userData);
+        ctx.response.status = 200;
+        ctx.response.body = userData;
+
+    } catch (e) {
+        ctx.response.status = 500;
+        ctx.response.body = `Internal error: ${e}`;
+    }
+
+}
