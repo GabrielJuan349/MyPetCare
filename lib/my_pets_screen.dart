@@ -14,13 +14,7 @@ class MyPetsScreen extends StatefulWidget {
 }
 
 class _MyPetsScreenState extends State<MyPetsScreen> {
-  /*
-  final List<Pet> pets = [
-    Pet("Test Cat", "Male", "4", "cat", "assets/pets/cat.jpg", 3, 5),
-    Pet("Test Dog", "Female", "6", "dog", "assets/pets/dog.jpg", 4, 3),
-    //Pet("Test Hamster", "Male", "2", "hamster", "assets/pets/hamster.jpg", 5, 0)
-  ];
-  */
+
   bool isLoading = true; //Default value when it first enters in this screen
   late List<Pet> pets;
 

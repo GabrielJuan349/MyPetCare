@@ -54,8 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () {Navigator.pushNamed(
                   context,
                   '/pets',
-                  //TODO: This is hardcoded, change later to the real userId
-                  arguments: "owner123",
+                  arguments: user.firebaseUser.uid,
               );
                 },
             ),

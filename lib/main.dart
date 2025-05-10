@@ -18,7 +18,7 @@ void main() async{
     options: DefaultFirebaseOptions.currentPlatform,
   );
   // Uncomment the following line to run auth in emulator mode:
-  await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+  // await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
   runApp(const MyApp());
 }
 

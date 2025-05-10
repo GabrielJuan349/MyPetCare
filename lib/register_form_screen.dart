@@ -35,8 +35,13 @@ class _RegisterFormScreenState extends State<RegisterFormScreen> {
     });
     print(_selectedValue);
     Owner user = Owner(firebaseUser);
-    user.addData(_selectedValue, _nameController.text, _surnameController.text,
-        _clinicController.text, _phoneController.text,_localityController.text);
+    user.setUserData(
+        _selectedValue,
+        _nameController.text,
+        _surnameController.text,
+        _clinicController.text,
+        _phoneController.text,
+        _localityController.text);
     // Save user data in firestore
     await addUser(user.getUserData());
     setState(() {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lis_project/register_screen.dart';
 import 'package:lis_project/data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:lis_project/requests.dart';
 
 class IniciarSesion extends StatefulWidget {
   const IniciarSesion({super.key});
@@ -25,8 +26,8 @@ class _IniciarSesionState extends State<IniciarSesion> {
 
       // TODO: Integrate with our user
       final firebaseUser = userCredential.user;
-
       Owner user = Owner(firebaseUser!);
+      getUserInfo(user);
 
       Navigator.pushNamed(
         context,

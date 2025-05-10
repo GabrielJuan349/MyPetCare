@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:lis_project/pet.dart';
+import 'package:lis_project/data.dart';
 
 // Change to the url of your actual backend
 const String BASE_URL = "http://localhost:6055";
@@ -60,11 +61,19 @@ Future<String> addUser(Map<String, dynamic>? body) async{
   return responseBody;
 }
 
-Future<void> getUserInfo(String userId) async{
-  Uri uri = Uri.parse("$BASE_URL/user/$userId");
+Future<void> getUserInfo(Owner owner) async{
+  Uri uri = Uri.parse("$BASE_URL/user/${owner.firebaseUser.uid}");
+  print("Parsed url is ${uri}");
   final responseBody = await sendRequest(uri, "GET");
-  print("getUserInfo result:$responseBody");
-  // TODO: Implement this to match the authentication part
+  final Map<String, dynamic> userMap = json.decode(responseBody);
+  owner.setUserData(
+      userMap['accountType'],
+      userMap['firstName'],
+      userMap['lastName'],
+      userMap['clinicInfo'],
+      userMap['phone'],
+      userMap['locality']
+  );
 }
 
 Future<List<Pet>> getUserPets(String userId) async{

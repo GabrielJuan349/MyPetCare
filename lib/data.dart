@@ -1,15 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
 class Owner{
-  // firebaseUser contains: displayName, email, isEmailVerified, isAnonymous
-  // metadata, phoneNumber, photoURL, refreshToken, uid
-  // Now we're only using email password authentication
-  // So we'll only get from firebaseUser: email, uid, refreshToken
+  /*
+  firebaseUser contains: displayName, email, isEmailVerified, isAnonymous
+  metadata, phoneNumber, photoURL, refreshToken, uid
+  Now we're only using email password authentication
+  So we'll only get from firebaseUser: email, uid, refreshToken
+   */
   late User firebaseUser;
   late String name, surname, clinicInfo, phoneNumber, locality, accountType;
   Owner(this.firebaseUser);
 
-  void addData(accountType,name, surname, clinicInfo, phoneNumber, locality){
+  void setUserData(accountType,name, surname, clinicInfo, phoneNumber, locality){
     this.accountType = accountType;
     this.name = name;
     this.surname = surname;
@@ -18,6 +20,7 @@ class Owner{
     this.locality = locality;
   }
 
+  // Get all user data
   Map<String, dynamic> getUserData(){
     return{
       'accountType': accountType,
@@ -33,6 +36,7 @@ class Owner{
 
   // Transform to what is defined in the database
   // This will be used to update the user data in the firestore
+  // So we'll only return the fields that can be changed
   Map<String, dynamic> toJson(){
     return{
       'firstName': name,
@@ -43,3 +47,5 @@ class Owner{
     };
   }
 }
+
+

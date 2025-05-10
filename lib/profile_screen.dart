@@ -13,6 +13,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final _formKey = GlobalKey<FormState>();
 
+
   Future<void> _signOut() async{
     await FirebaseAuth.instance.signOut();
   }
@@ -66,7 +67,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    //TODO: Check if it's okay. Integración de back and front.
+    //TODO: Check if it's okay. Integrate back & Front.
     final user = ModalRoute.of(context)!.settings.arguments as Owner;
     return Scaffold(
       appBar: AppBar(
