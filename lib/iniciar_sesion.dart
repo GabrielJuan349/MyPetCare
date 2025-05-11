@@ -3,6 +3,7 @@ import 'package:lis_project/register_screen.dart';
 import 'package:lis_project/data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lis_project/requests.dart';
+import 'package:provider/provider.dart';
 
 class IniciarSesion extends StatefulWidget {
   const IniciarSesion({super.key});
@@ -14,27 +15,30 @@ class IniciarSesion extends StatefulWidget {
 class _IniciarSesionState extends State<IniciarSesion> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
 
   String? _errorMessage;
 
   Future<void> _login() async {
     try {
-      final userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      setState(() {
+        _isLoading = true;
+      });
+      final userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
-      // TODO: Integrate with our user
-      final firebaseUser = userCredential.user;
-      Owner user = Owner(firebaseUser!);
-      getUserInfo(user);
+      await setGlobalUser(context);
 
-      Navigator.pushNamed(
+      setState(() {
+        _isLoading = false;
+      });
+      Navigator.pushReplacementNamed(
         context,
         '/home',
-        arguments: user,
       );
-
     } on FirebaseAuthException catch (e) {
       setState(() {
         if (e.code == 'user-not-found') {
@@ -111,20 +115,24 @@ class _IniciarSesionState extends State<IniciarSesion> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: _login,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF627ECB),
-                          padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: const Text(
-                          'Login',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                        ),
-                      ),
+                      _isLoading
+                          ? const CircularProgressIndicator()
+                          : ElevatedButton(
+                              onPressed: _login,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF627ECB),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 50, vertical: 15),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: const Text(
+                                'Login',
+                                style: TextStyle(
+                                    fontSize: 18, color: Colors.white),
+                              ),
+                            ),
                       if (_errorMessage != null) ...[
                         const SizedBox(height: 10),
                         Text(
@@ -163,7 +171,8 @@ class _IniciarSesionState extends State<IniciarSesion> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => RegisterScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => RegisterScreen()),
                       );
                     },
                     style: TextButton.styleFrom(

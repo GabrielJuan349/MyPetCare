@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lis_project/data.dart';
 import 'package:lis_project/requests.dart';
+import 'package:provider/provider.dart';
 
 class RegisterFormScreen extends StatefulWidget {
   const RegisterFormScreen({super.key});
@@ -50,8 +51,9 @@ class _RegisterFormScreenState extends State<RegisterFormScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Data submitted successfully!')),
     );
+    Provider.of<OwnerModel>(context, listen: false).setOwner(user);
     // Navigate to home page
-    Navigator.pushNamed(context, '/home', arguments: user);
+    Navigator.pushNamed(context, '/home');
   }
 
   @override

@@ -9,9 +9,11 @@ import 'package:lis_project/inbox.dart';
 import 'package:lis_project/register_screen.dart';
 import 'package:lis_project/register_form_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
+import 'package:lis_project/data.dart';
 import 'firebase_options.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(
@@ -19,7 +21,12 @@ void main() async{
   );
   // Uncomment the following line to run auth in emulator mode:
   // await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => OwnerModel(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -27,7 +34,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    runApp(const MyApp());
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -37,8 +43,8 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const HomeScreen(),
         '/profile': (context) => const ProfileScreen(),
         '/reminders': (context) => const RemindersScreen(),
-        '/pets': (context)=> const MyPetsScreen(),
-        '/inbox': (context)=> const Inbox(),
+        '/pets': (context) => const MyPetsScreen(),
+        '/inbox': (context) => const Inbox(),
         '/register': (context) => const RegisterScreen(),
         '/formRegister': (context) => const RegisterFormScreen(),
       },

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lis_project/requests.dart';
 import 'package:lis_project/data.dart';
+import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -11,11 +12,45 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  late Owner user;
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _surnameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _localityController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    setGlobalUser(context);
+    user = Provider.of<OwnerModel>(context, listen: false).owner!;
+    _nameController.text = user.name;
+    _surnameController.text = user.surname;
+    _phoneController.text = user.phoneNumber;
+    _localityController.text = user.locality;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final updatedUser = Provider.of<OwnerModel>(context, listen: false).owner;
+
+    if (updatedUser != null && updatedUser != user) {
+      setState(() {
+        user = updatedUser;
+        _nameController.text = user.name;
+        _surnameController.text = user.surname;
+        _phoneController.text = user.phoneNumber;
+        _localityController.text = user.locality;
+      });
+    }
+  }
 
 
   Future<void> _signOut() async{
     await FirebaseAuth.instance.signOut();
+    Provider.of<OwnerModel>(context).clearOwner();
   }
 
   // https://stackoverflow.com/questions/52293129/how-to-change-password-using-firebase-in-flutter
@@ -32,6 +67,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
+  Future<void> _saveUserData() async{
+    user.name = _nameController.text;
+    user.surname = _surnameController.text;
+    user.phoneNumber = _phoneController.text;
+    user.locality = _localityController.text;
+    context.read<OwnerModel>().updateOwner(user);
+    await updateUserInfo(user.firebaseUser.uid, user.toJson());
+  }
 
   Future<void> _dialogConfirmDelete(BuildContext context, Owner user) {
     return showDialog<void>(
@@ -67,8 +110,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    //TODO: Check if it's okay. Integrate back & Front.
-    final user = ModalRoute.of(context)!.settings.arguments as Owner;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xfff59249),
@@ -76,6 +117,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         centerTitle: true,
         elevation: 0,
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+              onPressed: (){
+
+              },
+              icon: const Icon(Icons.more_vert))
+        ],
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
@@ -97,10 +145,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 24),
 
               // Campos editables
-              _buildEditableField("Name", user.name, (val) => user.name = val),
-              _buildEditableField("Surname", user.surname, (val) => user.surname = val),
-              _buildEditableField("Phone", user.phoneNumber, (val) => user.phoneNumber = val, keyboardType: TextInputType.phone),
-              _buildEditableField("Location", user.locality, (val) => user.locality = val),
+              _buildEditableField("Name", _nameController),
+              _buildEditableField("Surname", _surnameController),
+              _buildEditableField("Phone", _phoneController, keyboardType: TextInputType.phone),
+              _buildEditableField("Location",_localityController),
               _buildReadonlyField("Email", user.firebaseUser.email!),
 
               const SizedBox(height: 24),
@@ -111,6 +159,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   // Acción para eliminar
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
+                    _saveUserData();
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Changes updated')),
                     );
@@ -158,22 +207,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildEditableField(String label, String initialValue, Function(String) onSaved,
+  Widget _buildEditableField(String label, TextEditingController textController,
       {TextInputType keyboardType = TextInputType.text}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
-        initialValue: initialValue,
+        controller: textController,
         keyboardType: keyboardType,
         decoration: InputDecoration(
           labelText: label,
           border: const OutlineInputBorder(),
         ),
         validator: (value) {
-          if (value == null || value.isEmpty) return 'Required';
+          if (value == null || value.isEmpty) return 'Enter a valid $label';
           return null;
         },
-        onSaved: (val) => onSaved(val!),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lis_project/the_drawer.dart';
 import 'package:lis_project/data.dart';
+import 'package:provider/provider.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -14,10 +15,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ModalRoute.of(context)!.settings.arguments as Owner;
     const appBarColor = Color(0xfff59249);
     return Scaffold(
-      drawer:const TheDrawer(),
+      drawer: const TheDrawer(),
         appBar: AppBar(
           backgroundColor: appBarColor,
           iconTheme: const IconThemeData(color: Colors.white),
@@ -33,7 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.pushNamed(
                     context,
                     '/profile',
-                  arguments: user,
                 );
               },
             ),
@@ -54,7 +53,6 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () {Navigator.pushNamed(
                   context,
                   '/pets',
-                  arguments: user.firebaseUser.uid,
               );
                 },
             ),

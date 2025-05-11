@@ -5,6 +5,10 @@ import 'package:lis_project/requests.dart';
 import 'package:lis_project/new_pet.dart';
 import 'dart:io';
 
+import 'package:provider/provider.dart';
+
+import 'data.dart';
+
 class MyPetsScreen extends StatefulWidget {
   const MyPetsScreen({super.key});
 
@@ -14,9 +18,13 @@ class MyPetsScreen extends StatefulWidget {
 }
 
 class _MyPetsScreenState extends State<MyPetsScreen> {
-
   bool isLoading = true; //Default value when it first enters in this screen
   late List<Pet> pets;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   //https://stackoverflow.com/questions/58371874/what-is-the-difference-between-didchangedependencies-and-initstate
   @override
@@ -26,10 +34,25 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
   }
 
   void _loadPets() async {
-    final userId = ModalRoute.of(context)!.settings.arguments as String;
-    final loadedPets = await getUserPets(userId);
+    final ownerModel  = Provider.of<OwnerModel>(context, listen: false);
+    final userId = ownerModel.owner?.firebaseUser.uid;
+    // Only get form firestore if we have not charged it
+    if (userId == null) {
+      print("userId is null — owner or firebaseUser not yet loaded");
+      return;
+    }
+
+    List<Pet>? loadedPets = ownerModel.pets;
+
+    if (loadedPets == null) {
+      loadedPets = await getUserPets(userId);
+      ownerModel.setPets(loadedPets);
+    }
+
+    if (!mounted) return;
+
     setState(() {
-      pets = loadedPets;
+      pets = loadedPets!;
       isLoading = false;
     });
   }
@@ -56,7 +79,9 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.person, color: Colors.white),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(context, '/profile');
+            },
           ),
         ],
       ),

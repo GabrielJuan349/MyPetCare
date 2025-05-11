@@ -30,14 +30,18 @@ class TheDrawer extends StatelessWidget {
               leading: const Icon(Icons.inbox, color: Colors.white),
               title: const Text('Inbox', style: TextStyle(color: Colors.white)),
               onTap: () {
-                Navigator.pushReplacementNamed(context, '/inbox');
+                // Close drawer
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/inbox');
               },
             ),
             ListTile(
               leading: const Icon(Icons.help_outline, color: Colors.white),
               title: const Text('Help', style: TextStyle(color: Colors.white)),
               onTap: () {
-                Navigator.pushReplacementNamed(context, '/help');
+                // Close drawer
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/help');
               },
             ),
             const Spacer(),
@@ -45,7 +49,9 @@ class TheDrawer extends StatelessWidget {
               leading: const Icon(Icons.language, color: Colors.white),
               title: const Text('Language', style: TextStyle(color: Colors.white)),
               onTap: () {
-                Navigator.pushReplacementNamed(context, '/language');
+                // Close drawer
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/language');
               },
             ),
           ],

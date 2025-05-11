@@ -1,6 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:lis_project/pet.dart';
+import 'package:lis_project/requests.dart';
+import 'package:provider/provider.dart';
 
-class Owner{
+class Owner {
   /*
   firebaseUser contains: displayName, email, isEmailVerified, isAnonymous
   metadata, phoneNumber, photoURL, refreshToken, uid
@@ -9,9 +13,11 @@ class Owner{
    */
   late User firebaseUser;
   late String name, surname, clinicInfo, phoneNumber, locality, accountType;
+
   Owner(this.firebaseUser);
 
-  void setUserData(accountType,name, surname, clinicInfo, phoneNumber, locality){
+  void setUserData(
+      accountType, name, surname, clinicInfo, phoneNumber, locality) {
     this.accountType = accountType;
     this.name = name;
     this.surname = surname;
@@ -21,8 +27,8 @@ class Owner{
   }
 
   // Get all user data
-  Map<String, dynamic> getUserData(){
-    return{
+  Map<String, dynamic> getUserData() {
+    return {
       'accountType': accountType,
       'userId': firebaseUser.uid,
       'email': firebaseUser.email,
@@ -34,11 +40,12 @@ class Owner{
     };
   }
 
+
   // Transform to what is defined in the database
   // This will be used to update the user data in the firestore
   // So we'll only return the fields that can be changed
-  Map<String, dynamic> toJson(){
-    return{
+  Map<String, dynamic> toJson() {
+    return {
       'firstName': name,
       'lastName': surname,
       'phone': phoneNumber,
@@ -48,4 +55,48 @@ class Owner{
   }
 }
 
+class OwnerModel extends ChangeNotifier {
+  Owner? _owner;
+  List<Pet>? _pets;
 
+  Owner? get owner => _owner;
+  List<Pet>? get pets => _pets;
+
+  void setOwner(Owner owner) {
+    _owner = owner;
+    notifyListeners();
+  }
+
+  void setPets(List<Pet> pets){
+    _pets = pets;
+    notifyListeners();
+  }
+
+  void addPet(Pet pet){
+    _pets?.add(pet);
+  }
+
+  void clearOwner() {
+    _owner = null;
+    _pets = null;
+    notifyListeners();
+  }
+
+
+  void updateOwner(Owner updatedOwner) {
+    _owner = updatedOwner;
+    notifyListeners();
+    print("Owner updated: ${_owner?.name}");
+  }
+}
+
+
+Future<void> setGlobalUser(BuildContext context) async{
+  if(Provider.of<OwnerModel>(context, listen: false).owner == null){
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    Owner owner = Owner(firebaseUser!);
+    await getUserInfo(owner);
+    // Save user locally with Provider.
+    Provider.of<OwnerModel>(context, listen: false).setOwner(owner);
+  }
+}
