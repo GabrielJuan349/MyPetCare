@@ -1,9 +1,19 @@
-import { Application, Router } from 'oak';
-import { oakCors } from 'cors';
+import { Application, Router } from "https://deno.land/x/oak@v12.6.1/mod.ts";
+
+import { oakCors } from "https://deno.land/x/cors@v1.2.2/mod.ts";
 import { load } from 'dotenv';
 
-import { getClinic, getClinics } from './api-functions/clinic-request.ts';
-import { getVetsByClinicId } from './api-functions/vet-request.ts';
+import { authenticate } from "./api-functions/authenticate.ts";
+import { validateToken } from './api-functions/validateToken.ts';
+import { registerUser } from './api-functions/registerUser.ts';
+//import { getRecipeOnce } from "./api-functions/recetas.ts";
+import { createPet, deletePet, updatePet, getPetById, getPetsByOwner } from "./api-functions/pet-request.ts";
+import { createPrescription, getPrescription, updatePrescription, deletePrescription } from "./api-functions/prescription.ts"
+import { getClinics, createClinic, deleteClinic, getAllClinics } from "./api-functions/clinics.ts";
+import { createVet, deleteVet, getVetById , getVetsByClinic} from "./api-functions/vets.ts";
+import { createNews, getAllNews, deleteNews } from "./api-functions/news.ts";
+import { updateUser, deleteUser, getUserDataById } from "./api-functions/gestion.usuarios.ts";
+
 
 await load({ export: true });
 
@@ -11,13 +21,15 @@ const app = new Application();
 const router = new Router();
 
 app.use(oakCors({
-  origin: ['http://localhost:4200'], // Reemplaza con el puerto de tu frontend
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+
+  origin: ["http://localhost:4200"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
   optionsSuccessStatus: 204,
 }));
 
+// ---- Endpoints de USERS ----
 router
   .post('/blocked/{date}/{id}', (ctx) => {
     const date = ctx.params.date;
@@ -49,57 +61,97 @@ router
     ctx.response.headers.set('Content-Type', 'text/plain');
     return ctx.response;
   })
-  .post('/clinic/list', async (ctx) => {
-    const clinics = await getClinics();
-    console.log(clinics);
-    ctx.response.body = clinics;
-    ctx.response.status = 200;
-    ctx.response.headers.set('Content-Type', 'application/json');
-    return ctx.response;
-  })
-  .post('/clinic/{id}', async (ctx) => {
-    const id = ctx.params.id;
-    if (id) {
-      const clinic = await getClinic(Number(id));
-      if (clinic) {
-        ctx.response.body = clinic;
-        ctx.response.status = 200;
-        ctx.response.headers.set('Content-Type', 'application/json');
-      } else {
-        ctx.response.status = 404;
-        ctx.response.body = { error: 'Clinic not found' };
-      }
-    } else {
-      ctx.response.status = 400;
-      ctx.response.body = { error: 'Invalid ID' };
-    }
-    return ctx.response;
-  })
-  .post('/category/{id}', (ctx) => {
-    console.log(ctx.request.body({ type: 'json' }));
-  })
-  .post('/vet/list', async (ctx) => {
-    const id = ctx.params.id_clinica;
-    console.log(id);
-    // if (id) {
-    //   // const vets = getVetsByClinicId(id);
-    //   const vets = getVetsByClinicId("81X7cMWJpEAkd9aFEoax");
-    //   ctx.response.body = vets;
-    //   ctx.response.status = 200;
-    // }
-    // else {
-    //   ctx.response.status = 400;
-    //   ctx.response.body = { error: 'Invalid ID' };
-    // }
-    const vets = await getVetsByClinicId('81X7cMWJpEAkd9aFEoax');
-    ctx.response.body = vets;
-    ctx.response.status = 200;
-    return ctx.response;
-  });
+  .post("/api/authenticate", authenticate)
+  .post("/api/validateToken", validateToken)
+  .post("/api/registerUser", registerUser)
+
+
+  // UPDATE user info
+  .put("/user/:user_id", updateUser)
+
+  // DELETE user by id
+  .delete("/user/:user_id", deleteUser)
+
+  // GET user by id
+  .get("/user/:user_id", getUserDataById)
+
+  // ---- Endpoints de PETS ----
+
+  // CREATE pet info
+  .post("/api/pet", createPet)
+
+  // DELETE pet info
+  .delete("/api/pet/:id", deletePet)
+
+  // UPDATE pet info
+  .put("/api/pet/:id", updatePet)
+
+  // GETPETBYID pet info
+  .get("/api/pet/:id", getPetById)
+
+
+  // GETPETBYOWNER pet info
+  .get("/api/getPet/:owner", getPetsByOwner)
+
+  //.get("/api/getprescription/:id", getRecipeOnce);
+
+
+  // ---- Endpoints de PRESCRIPTIONS ----
+
+  // CREATE prescription info
+  .post("/api/prescription", createPrescription)
+
+  // Get prescription info
+  .get("/api/getPrescription/:id", getPrescription)
+
+  // DELETE prescription info
+  .delete("/api/deletePrescription/:id", deletePrescription)
+
+  // UPDATE prescription info
+  .put("/api/putPrescription/:id", updatePrescription)
+
+
+// ---- Endpoints de CLINICS ----
+  // GET clinics info
+  .get("/api/getClinics/:id", getClinics)
+
+  .post("/api/createClinic", createClinic)
+
+  // DELETE clinic info
+  .delete("/api/deleteClinic/:id", deleteClinic)
+  // GET all clinics info
+  .get("/api/getClinics", getAllClinics)
+
+// ---- Endpoints de VETS ----
+  // CREATE vets info
+  .post("/api/createVet", createVet)
+
+  // DELETE vets info
+  .delete("/api/deleteVet/:id", deleteVet)
+  
+  // GET vets info
+  .get("/api/getVetsByClinic/:clinicId", getVetsByClinic)
+
+  .get("/api/getVet/:id", getVetById)
+
+
+// ---- Endpoints de NEWS ----
+  // CREATE news info
+  .post("/api/createNews", createNews)
+
+  // GET news info
+  .get("/api/getAllNews", getAllNews)
+  
+  // DELETE news info
+  .delete("/api/deleteNews/:id", deleteNews);
+
 
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-const port = Number(Deno.env.get('API_PORT'));
+
+const port = Number(Deno.env.get("API_PORT")) || 8000;
 app.listen({ port });
+console.log('PORT:', port);
 console.log(`Server running at http://localhost:${port}`);
+
