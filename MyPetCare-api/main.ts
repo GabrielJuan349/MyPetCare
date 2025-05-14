@@ -13,7 +13,13 @@ import { getClinics, createClinic, deleteClinic, getAllClinics } from "./api-fun
 import { createVet, deleteVet, getVetById , getVetsByClinic} from "./api-functions/vets.ts";
 import { createNews, getAllNews, deleteNews } from "./api-functions/news.ts";
 import { updateUser, deleteUser, getUserDataById } from "./api-functions/gestion.usuarios.ts";
+import {
+  createReport, getReportById, getReportsByVet, getReportsByPet, deleteReport
+} from "./api-functions/report.ts";
 
+import {
+  createTreatment, getTreatmentById, getTreatmentsByVet, getTreatmentsByPet, deleteTreatment
+} from "./api-functions/treatment.ts";
 
 await load({ export: true });
 
@@ -112,7 +118,52 @@ router
   .get("/api/getAllNews", getAllNews)
   
   // DELETE news info
-  .delete("/api/deleteNews/:id", deleteNews);
+  .delete("/api/deleteNews/:id", deleteNews)
+
+
+// ---- Endpoints de NEWS ----
+  // CREATE news info
+  .post("/api/createNews", createNews)
+
+  // GET all news info
+  .get("/api/getAllNews", getAllNews)
+  
+  // DELETE news info
+  .delete("/api/deleteNews/:id", deleteNews)
+
+
+// ---- Endpoints de REPORT ----
+  // CREATE report info
+  .post("/api/createReport", createReport)
+
+  // GET report by ID
+  .get("/api/getReportById/:id", getReportById)
+
+  // GET reports by vet ID
+  .get("/api/getReportsByVet/vet/:id", getReportsByVet)
+
+  // GET reports by pet ID
+  .get("/api/getReportsByPet/pet/:id", getReportsByPet)
+
+  // DELETE report info
+  .delete("/api/deleteReport/:id", deleteReport)
+
+
+// ---- Endpoints de TREATMENT ----
+  // CREATE treatment info
+  .post("/api/createTreatment", createTreatment)
+
+  // GET treatment by ID
+  .get("/api/getTreatmentById/:id", getTreatmentById)
+
+  // GET treatments by vet ID
+  .get("/api/getTreatmentsByVet/vet/:id", getTreatmentsByVet)
+
+  // GET treatments by pet ID
+  .get("/api/getTreatmentsByPet/pet/:id", getTreatmentsByPet)
+
+  // DELETE treatment info
+  .delete("/api/deleteTreatment/:id", deleteTreatment)
 
 
 
