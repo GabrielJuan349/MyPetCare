@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:lis_project/register_screen.dart';
 import 'package:lis_project/data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:lis_project/requests.dart';
-import 'package:provider/provider.dart';
 
 class IniciarSesion extends StatefulWidget {
   const IniciarSesion({super.key});
@@ -32,9 +30,6 @@ class _IniciarSesionState extends State<IniciarSesion> {
 
       await setGlobalUser(context);
 
-      setState(() {
-        _isLoading = false;
-      });
       Navigator.pushReplacementNamed(
         context,
         '/home',
@@ -43,8 +38,13 @@ class _IniciarSesionState extends State<IniciarSesion> {
       setState(() {
         if (e.code == 'user-not-found') {
           _errorMessage = 'No user found for that email.';
-        } else if (e.code == 'wrong-password') {
-          _errorMessage = 'Wrong password provided.';
+        } else if (e.code == 'invalid-credential') {
+          _errorMessage = 'Wrong email & password combination.';
+        } else if(e.code == 'invalid-email') {
+          _errorMessage =
+          'Please enter a valid email format: email@example.com';
+        }else if(e.code == 'missing-password'){
+          _errorMessage = 'Please enter a valid password';
         } else {
           _errorMessage = e.message;
         }
@@ -52,6 +52,10 @@ class _IniciarSesionState extends State<IniciarSesion> {
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();
+      });
+    }finally{
+      setState(() {
+        _isLoading = false;
       });
     }
   }
@@ -118,7 +122,9 @@ class _IniciarSesionState extends State<IniciarSesion> {
                       _isLoading
                           ? const CircularProgressIndicator()
                           : ElevatedButton(
-                              onPressed: _login,
+                              onPressed: (){
+                                _login();
+                              },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF627ECB),
                                 padding: const EdgeInsets.symmetric(
@@ -144,7 +150,9 @@ class _IniciarSesionState extends State<IniciarSesion> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pushReplacementNamed(context, '/resetPassword',);
+                          },
                           style: TextButton.styleFrom(
                             foregroundColor: const Color(0xFF627ECB),
                             overlayColor: Colors.transparent,

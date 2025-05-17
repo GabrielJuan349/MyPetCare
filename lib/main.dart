@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lis_project/init_screen.dart';
 import 'package:lis_project/home_screen.dart';
@@ -12,6 +11,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:lis_project/data.dart';
 import 'firebase_options.dart';
+import 'package:lis_project/reset_password_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,6 +47,7 @@ class MyApp extends StatelessWidget {
         '/inbox': (context) => const Inbox(),
         '/register': (context) => const RegisterScreen(),
         '/formRegister': (context) => const RegisterFormScreen(),
+        '/resetPassword': (context) => const ResetPasswordScreen(),
       },
     );
   }

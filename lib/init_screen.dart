@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:lis_project/home_screen.dart';
 import 'package:lis_project/iniciar_sesion.dart';
 import 'package:lis_project/data.dart';
 

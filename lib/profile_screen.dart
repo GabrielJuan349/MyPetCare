@@ -18,6 +18,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _surnameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _localityController = TextEditingController();
+  final _newPasswordController = TextEditingController();
 
   @override
   void initState() {
@@ -120,9 +121,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           IconButton(
               onPressed: (){
-
+                _dialogConfirmDelete(context, user);
               },
-              icon: const Icon(Icons.more_vert))
+              icon: const Icon(Icons.delete_outline),
+            tooltip: 'Delete account',
+          )
         ],
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -151,55 +154,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _buildEditableField("Location",_localityController),
               _buildReadonlyField("Email", user.firebaseUser.email!),
 
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                    onPressed: () {
+                      _buildChangePasswordPopUp(context);
+                    },
+                    style: TextButton.styleFrom(
+                      foregroundColor: const Color(0xFF627ECB),
+                      overlayColor: Colors.transparent,
+                    ),
+                    child: const Text('change password')
+                ),
+              ),
+
               const SizedBox(height: 24),
 
-              // Botón de actualizar
-              ElevatedButton(
-                onPressed: () {
-                  // Acción para eliminar
-                  if (_formKey.currentState!.validate()) {
-                    _formKey.currentState!.save();
-                    _saveUserData();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Changes updated')),
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF339551),
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.4,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch, // makes child buttons stretch horizontally
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          _formKey.currentState!.save();
+                          _saveUserData();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Changes updated successfully')),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF339551),
+                        padding: const EdgeInsets.symmetric(vertical: 20), // no horizontal padding
+                      ),
+                      child: const Text("Save Changes", style: TextStyle(color: Colors.white)),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    ElevatedButton(
+                      onPressed: () {
+                        _signOut();
+                        Navigator.pushNamed(context, '/init');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey,
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                      ),
+                      child: const Text("Sign out", style: TextStyle(color: Colors.white)),
+                    ),
+                  ],
                 ),
-                child: const Text("Save Changes", style: TextStyle(color: Colors.white)),
-              ),
+              )
 
-              const SizedBox(height: 10),
-
-              // Sign put button
-              ElevatedButton(
-                onPressed: () {
-                  _signOut();
-                  Navigator.pushNamed(context, '/init');
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey,
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                ),
-                child: const Text("Sign out", style: TextStyle(color: Colors.white)),
-              ),
-
-              const SizedBox(height: 50),
-
-              // Botón de eliminar cuenta
-              ElevatedButton(
-                onPressed: () {
-                  _dialogConfirmDelete(context, user);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 7),
-                ),
-                child: const Text("Delete Account", style: TextStyle(color: Colors.white)),
-              ),
             ],
           ),
         ),
@@ -226,32 +235,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildTextField(String label, {bool obscureText = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: const TextStyle(fontSize: 16)),
-          TextField(
-            obscureText: obscureText,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: const Color(0xFFE9EFFF),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(5),
-                borderSide: BorderSide.none,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildReadonlyField(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
         initialValue: value,
         readOnly: true,
@@ -262,4 +248,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
+
+  Future<void> _buildChangePasswordPopUp(BuildContext context) async{
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Change your password'),
+          content: TextFormField(
+            controller: _newPasswordController,
+            keyboardType: TextInputType.text,
+            obscureText: true,
+            decoration: const InputDecoration(
+              labelText: 'New password',
+              border: OutlineInputBorder(),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty || value.length <= 6) return 'Password must be at least 6 characters';
+              return null;
+            },
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(textStyle: Theme.of(context).textTheme.labelLarge),
+              child: const Text('save password'),
+              onPressed: () {
+                _changePassword(_newPasswordController.text);
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(textStyle: Theme.of(context).textTheme.labelLarge),
+              child: const Text('cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      }
+    );
+  }
+
 }
