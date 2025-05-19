@@ -83,3 +83,21 @@ Future<List<Pet>> getUserPets(String userId) async{
   final List<dynamic> decoded = json.decode(responseBody);
   return decoded.map((json)=> Pet.fromJson(json)).toList();
 }
+
+Future<List<Map<String, dynamic>>> getClinics() async {
+  final url = Uri.parse("$BASE_URL/api/getClinics");
+  print('Requesting clinics from: $url');
+  final response = await http.get(url);
+
+  print('Status code: ${response.statusCode}');
+  print('Response body: ${response.body}');
+
+  if (response.statusCode == 200) {
+    final decoded = json.decode(response.body);
+    print('Decoded JSON: $decoded');
+    return List<Map<String, dynamic>>.from(decoded);
+  } else {
+    throw Exception('Failed to load clinics');
+  }
+}
+

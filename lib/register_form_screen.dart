@@ -22,12 +22,29 @@ class _RegisterFormScreenState extends State<RegisterFormScreen> {
   bool _isLoading = false;
   String? _selectedValue;
   List<String> _options = ['Pet owner', 'Vet', 'Vet clinic', 'Admin'];
+  List<String> _clinics = [];
+String? _selectedClinic;
+
 
   @override
-  void initState() {
-    super.initState();
-    _selectedValue = _options.isNotEmpty ? _options[0] : null;
+void initState() {
+  super.initState();
+  _selectedValue = _options.isNotEmpty ? _options[0] : null;
+  _loadClinics();
+}
+
+Future<void> _loadClinics() async {
+  try {
+    final clinics = await getClinics(); 
+    setState(() {
+      _clinics = clinics.map<String>((clinic) => clinic['name'] as String).toList();
+      _selectedClinic = _clinics.isNotEmpty ? _clinics[0] : null;
+    });
+  } catch (e) {
+    print('Failed to load clinics: $e');
   }
+}
+
 
   Future<void> _addUserInfo(User firebaseUser) async{
     if (!_formKey.currentState!.validate()) return;
@@ -100,7 +117,7 @@ class _RegisterFormScreenState extends State<RegisterFormScreen> {
                             children: [
                               _buildTextField('Name', _nameController),
                               _buildTextField('Surname', _surnameController),
-                              _buildTextField('Clinic', _clinicController),
+                               _buildClinicDropdown(),
                               _buildTextField('Phone Number', _phoneController),
                               _buildTextField('Locality', _localityController),
                               _buildUserTypeSelector(),
@@ -204,4 +221,42 @@ class _RegisterFormScreenState extends State<RegisterFormScreen> {
       ),
     );
   }
+
+  Widget _buildClinicDropdown() {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0),
+    child: DropdownButtonFormField<String>(
+      value: _clinics.contains(_selectedClinic) ? _selectedClinic : null,
+      decoration: InputDecoration(
+        labelText: 'Clinic',
+        filled: true,
+        fillColor: Color(0xFFE9EFFF),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(5),
+          borderSide: BorderSide.none,
+        ),
+      ),
+      items: _clinics.toSet().toList().map((clinic) {  // elimina duplicados
+        return DropdownMenuItem<String>(
+          value: clinic,
+          child: Text(clinic),
+        );
+      }).toList(),
+      onChanged: (value) {
+        setState(() {
+          _selectedClinic = value!;
+          _clinicController.text = value;
+        });
+      },
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please select a clinic';
+        }
+        return null;
+      },
+    ),
+  );
+}
+
+
 }
