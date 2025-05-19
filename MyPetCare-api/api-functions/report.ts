@@ -18,6 +18,7 @@ function mapFirestore(doc: any) {
 export async function createReport(ctx: RouterContext<"/api/createReport">) {
   const { value } = await ctx.request.body({ type: "json" });
   const report: Report = await value;
+  const now = new Date();
 
   const res = await fetch(FirestoreReportURL, {
     method: "POST",
@@ -28,7 +29,7 @@ export async function createReport(ctx: RouterContext<"/api/createReport">) {
         id_vet: { stringValue: report.id_vet },
         name: { stringValue: report.name },
         text: { stringValue: report.text },
-        createdAt: { timestampValue: new Date().toISOString() },
+        createdAt: {timestampValue:  now.toISOString()},
       },
     }),
   });

@@ -19,6 +19,10 @@ export async function createTreatment(ctx: RouterContext<"/api/createTreatment">
   const { value } = await ctx.request.body({ type: "json" });
   const treatment: Treatment = await value;
 
+  const now = new Date();
+  const endDate = new Date(now);
+  endDate.setDate(now.getDate() + 13);  // sumamos 13 días a la fecha actual
+
   const res = await fetch(FirestoreTreatmentURL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -27,9 +31,9 @@ export async function createTreatment(ctx: RouterContext<"/api/createTreatment">
         id_pet: { stringValue: treatment.id_pet },
         id_vet: { stringValue: treatment.id_vet },
         name: { stringValue: treatment.name },
-        date_start: { timestampValue: new Date(treatment.date_start).toISOString() },
-        date_end: { timestampValue: new Date(treatment.date_end).toISOString() },
-        createdAt: { timestampValue: new Date().toISOString() },
+        date_start: { timestampValue: now.toISOString() },
+        date_end: { timestampValue: endDate.toISOString() },
+        createdAt: { timestampValue: now.toISOString() },
       },
     }),
   });
@@ -39,7 +43,9 @@ export async function createTreatment(ctx: RouterContext<"/api/createTreatment">
   ctx.response.body = result;
 }
 
+
 // Get by ID
+//not will be used
 export async function getTreatmentById(ctx: RouterContext<"/api/getTreatmentById/:id">) {
   const id = ctx.params.id;
   const res = await fetch(`${FirestoreTreatmentURL}/${id}`);
