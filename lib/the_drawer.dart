@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lis_project/main.dart';
 
 class TheDrawer extends StatelessWidget {
   const TheDrawer({Key? key}) : super(key: key);
@@ -27,9 +28,10 @@ class TheDrawer extends StatelessWidget {
               ),
             ),
             ListTile(
-              leading: Icon(Icons.inbox, color: Colors.white),
+              leading: Icon(inboxIcon, color: Colors.white),
               title: Text('Inbox', style: TextStyle(color: Colors.white)),
               onTap: () {
+                inboxIcon = Icons.inbox;
                 Navigator.pushReplacementNamed(context, '/inbox');
               },
             ),
