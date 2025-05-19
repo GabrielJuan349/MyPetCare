@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lis_project/home_screen.dart';
 import 'package:lis_project/inbox_message.dart';
 
 class Inbox extends StatefulWidget {
@@ -7,10 +8,6 @@ class Inbox extends StatefulWidget {
 }
 
 class _InboxState extends State<Inbox> {
-  List<InboxMessage> myMessages = [
-    InboxMessage("Welcome to MyPetCare", "Thanks for choosing us"),
-    InboxMessage("Medication added", "A new Medication has been added to your pet"),
-  ];
 
   @override
   void initState() {
@@ -31,13 +28,16 @@ class _InboxState extends State<Inbox> {
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) => HomeScreen(), // ← Tu nueva pantalla
+            ),);
           },
         ),
           actions: [
             IconButton(
               icon: Icon(Icons.person, color: Colors.white),
               onPressed: () {
-                Navigator.pushNamed(context, '/profile');
+                Navigator.pushNamed(context, '/home');
               },
             ),
           ],
@@ -77,6 +77,16 @@ class _InboxState extends State<Inbox> {
             ),
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          myMessages.add(InboxMessage("title", "message"));
+          setState(() {
+
+          });
+        },
+        child: Icon(Icons.add, color: Colors.white),
+        backgroundColor: Color(0xFF627ECB),
       ),
     );
   }
