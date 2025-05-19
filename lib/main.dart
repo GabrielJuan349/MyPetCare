@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 import 'package:lis_project/data.dart';
 import 'firebase_options.dart';
 import 'package:lis_project/reset_password_screen.dart';
+import 'package:lis_project/news.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,6 +49,7 @@ class MyApp extends StatelessWidget {
         '/register': (context) => const RegisterScreen(),
         '/formRegister': (context) => const RegisterFormScreen(),
         '/resetPassword': (context) => const ResetPasswordScreen(),
+        '/news': (context) => const NewsScreen(),
       },
     );
   }
