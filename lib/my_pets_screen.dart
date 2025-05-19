@@ -5,17 +5,29 @@ import 'package:lis_project/new_pet.dart';
 import 'dart:io';
 
 class MyPetsScreen extends StatefulWidget {
+  List<Pet> myPets;
+
+  MyPetsScreen({super.key, required this.myPets});
 
   @override
   _MyPetsScreenState createState() => _MyPetsScreenState();
 }
 
 class _MyPetsScreenState extends State<MyPetsScreen> {
-  final List<Pet> pets = [
-    Pet("Test Cat", "Male", "4", "cat", "assets/pets/cat.jpg", 3, 5),
-    Pet("Test Dog", "Female", "6", "dog", "assets/pets/dog.jpg", 4, 3),
-    Pet("Test Hamster", "Male", "2", "hamster", "assets/pets/hamster.jpg", 5, 0)
-  ];
+  late List<Pet> myPets;
+
+  @override
+  void initState() {
+    super.initState();
+    myPets = widget.myPets;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Esto se ejecutará cuando la pantalla vuelva a ser visible
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,16 +56,16 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
         ],
       ),
       body: ListView.builder(
-        itemCount: pets.length,
+        itemCount: myPets.length,
         itemBuilder: (context, index) {
           return ListTile(
             leading: CircleAvatar(foregroundImage: FileImage(File("assets/img/bone.jpg"))),
-            title: Text(pets[index].name),
+            title: Text(myPets[index].name),
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => PetNumScreen(myPet: pets[index]),
+                  builder: (context) => PetNumScreen(myPet: myPets[index]),
                 ),
               );
             },
