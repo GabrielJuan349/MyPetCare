@@ -73,7 +73,7 @@ class _PetNumScreenState extends State<PetNumScreen> {
       ),
       padding: EdgeInsets.all(16),
       child: InkWell(
-        onTap: () {
+        onTap: () async {
           if (label == "Pet details") {
             Navigator.of(context).push(
               MaterialPageRoute<void>(
