@@ -40,6 +40,8 @@ class ClinicInfoScreen extends StatelessWidget {
                 Text(clinic.phone),
               ],
             ),
+            SizedBox(height: 10),
+            Text('Website: ${clinic.website}'),
             SizedBox(height: 20),
             Text(
               'Coordenadas:',
