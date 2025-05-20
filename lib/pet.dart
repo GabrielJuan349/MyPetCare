@@ -3,6 +3,7 @@ class Pet {
   late double weight;
 
   String? image, chip, birthDate;
+  int? playful, friendly;
 
   Pet({
       required this.id,
@@ -15,7 +16,10 @@ class Pet {
       required this.weight,
       required this.owner,
       this.chip,
-      this.birthDate
+      this.birthDate,
+      required this.id,
+      this.playful,
+      this.friendly,
   });
 
   factory Pet.fromJson(Map<String, dynamic> json){
@@ -31,6 +35,7 @@ class Pet {
       weight: double.tryParse(json['weight']?.toString() ?? "") ?? 0.0,
       owner: json['owner'].toString() ?? "",
       birthDate: json['birthDate'].toString() ?? "",
+      id: json['id'].toString() ?? "",
     );
   }
 }

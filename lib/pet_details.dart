@@ -69,11 +69,17 @@ class _PetDetailsState extends State<PetDetails> {
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(12),
                 image: DecorationImage(
-                  image: AssetImage(myPet.image ?? 'assets/default_pet.png'),
+                  image: AssetImage(
+                    (myPet.image != null && myPet.image is String && myPet.image!.isNotEmpty)
+                    ? myPet.image!
+                    : "assets/logo/LogoConFondo.png",
+                  ),
                   fit: BoxFit.cover,
                 ),
               ),
             ),
+          
+            
             const SizedBox(height: 5),
             Text(
               "Breed: ${myPet.breed}"
@@ -85,7 +91,11 @@ class _PetDetailsState extends State<PetDetails> {
             const SizedBox(height: 10),
             Text(
                 "Age: ${myPet.age}"
-            )
+            ),
+            /*const SizedBox(height: 20),
+            buildStarRow("Friendly", myPet.friendly),
+            const SizedBox(height: 10),
+            buildStarRow("Playful", myPet.playful),*/
           ],
         ),
       ),

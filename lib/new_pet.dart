@@ -246,12 +246,15 @@ class _NewPetScreenState extends State<NewPetScreen> {
 
       print("Pet data: $petData");
 
-      final response = await addPet(petData);
-      print("Pet created: $response");
+      final String petId = await addPet(petData);
+      print("Pet created: $petId");
 
+      
       Pet newPet = Pet(
         id: nameController.text.trim(),
         name: nameController.text.trim(),
+        id: petId,
+        image: fotoFileName ?? "",
         gender: genderController.text.trim(),
         age: _calculateAge(birthDateController.text.trim()).toString(),
         weight: double.tryParse(weightController.text.trim()) ?? 0.0,
@@ -262,7 +265,7 @@ class _NewPetScreenState extends State<NewPetScreen> {
       );
       print("New pet: $newPet");
 
-      Provider.of<OwnerModel>(context, listen: false).addPet(newPet);
+      Provider.of<OwnerModel>(context, listen: true).addPet(newPet);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Mascota registrada correctamente')),
