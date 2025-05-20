@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Login extends StatelessWidget {
   const Login({super.key});
@@ -29,7 +30,6 @@ class Login extends StatelessWidget {
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -68,8 +68,28 @@ class Login extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/');
+                  onPressed: () async {
+                    try {
+                      await FirebaseAuth.instance.signInWithEmailAndPassword(
+                        email: emailController.text.trim(),
+                        password: passwordController.text.trim(),
+                      );
+                      Navigator.pushReplacementNamed(context, '/');
+                    } on FirebaseAuthException catch (e) {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("Error de inicio de sesión"),
+                          content: Text(e.message ?? "Error desconocido"),
+                          actions: [
+                            TextButton(
+                              child: const Text("Cerrar"),
+                              onPressed: () => Navigator.of(context).pop(),
+                            )
+                          ],
+                        ),
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF627ECB),
