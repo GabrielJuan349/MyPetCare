@@ -21,13 +21,15 @@ import {
   createTreatment, getTreatmentById, getTreatmentsByVet, getTreatmentsByPet, deleteTreatment
 } from "./api-functions/treatment.ts";
 
+import {getVaccineByPetID, createVaccine} from "./api-functions/vaccines.ts";
+
 await load({ export: true });
 
 const app = new Application();
 const router = new Router();
 
 app.use(oakCors({
-  origin: ["http://localhost:4200"],
+  origin: ["http://localhost:4000"],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
@@ -164,6 +166,10 @@ router
 
   // DELETE treatment info
   .delete("/api/deleteTreatment/:id", deleteTreatment)
+
+  //ENDPOINT VACCINES
+  .post("/api/vaccine", createVaccine)
+  .get("/api/getVaccineByPetID/pet/:id", getVaccineByPetID)
 
 
 
