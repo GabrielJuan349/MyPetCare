@@ -67,21 +67,32 @@ Future<void> getUserInfo(Owner owner) async{
   final responseBody = await sendRequest(uri, "GET");
   final Map<String, dynamic> userMap = json.decode(responseBody);
   owner.setUserData(
-      userMap['accountType'],
-      userMap['firstName'],
-      userMap['lastName'],
-      userMap['clinicInfo'],
-      userMap['phone'],
-      userMap['locality']
+      userMap['accountType'] ?? "user",
+      userMap['firstName'] ?? "unknown",
+      userMap['lastName'] ?? "unknown",
+      userMap['clinicInfo'] ?? "unknown",
+      userMap['phone'] ?? "unknown",
+      userMap['locality'] ?? "unknown",
   );
 }
 
-Future<List<Pet>> getUserPets(String userId) async{
+Future<List<Pet>> getUserPets(String userId) async {
   Uri uri = Uri.parse("$BASE_URL/api/getPet/$userId");
   final responseBody = await sendRequest(uri, "GET");
   print("getUserPets result:$responseBody");
-  final List<dynamic> decoded = json.decode(responseBody);
-  return decoded.map((json)=> Pet.fromJson(json)).toList();
+
+  try {
+    final decoded = json.decode(responseBody);
+    if (decoded is List) {
+      return decoded.map((json) => Pet.fromJson(json)).toList();
+    } else {
+      print("Expected a list but got: $decoded");
+      return [];
+    }
+  } catch (e) {
+    print("Error decoding pets: $e");
+    return [];
+  }
 }
 
 Future<String> addPet(Map<String, dynamic>? body) async{
@@ -94,9 +105,14 @@ Future<List<Clinic>> getAllClinics() async {
   Uri uri = Uri.parse("$BASE_URL/api/getClinics");
   final responseBody = await sendRequest(uri, "GET");
   final List<dynamic> decoded = json.decode(responseBody);
-  return decoded.map((json) => Clinic.fromJson(json)).toList();
-}
+  final clinics = decoded.map((json) => Clinic.fromJson(json)).toList();
 
+  for (var clinic in clinics) {
+    print("Clinic: ${clinic.name}, Latitude: ${clinic.latitude}, Longitude: ${clinic.longitude}");
+  }
+
+  return clinics;
+}
 Future<List<Map<String, dynamic>>> getClinics() async {
   final url = Uri.parse("$BASE_URL/api/getClinics");
   print('Requesting clinics from: $url');
