@@ -1,8 +1,9 @@
 class Pet {
-  late String name, gender, breed, type, owner, age;
+  late String name, gender, breed, type, owner, age, id;
   late double weight;
 
   String? image, chip, birthDate;
+  int? playful, friendly;
 
   Pet({
       required this.name,
@@ -14,21 +15,25 @@ class Pet {
       required this.weight,
       required this.owner,
       this.chip,
-      this.birthDate
+      this.birthDate,
+      required this.id,
+      this.playful,
+      this.friendly,
   });
 
   factory Pet.fromJson(Map<String, dynamic> json){
     return Pet(
       name: json['name'].toString() ?? "",
       gender: json['gender'].toString() ?? "",
-      age: json['age'] ?? "0",
+      age: json['age'].toString() ?? "0",
       breed: json['breed'].toString() ?? "",
       type: json['type'].toString() ?? "",
       image: json['image'].toString() ?? "",
       chip: json['chip'].toString() ?? "",
-      weight: double.tryParse(json['weight'] ?? 0.0) ?? 0.0,
+      weight: json['weight'],
       owner: json['owner'].toString() ?? "",
       birthDate: json['birthDate'].toString() ?? "",
+      id: json['id'].toString() ?? "",
     );
   }
 }

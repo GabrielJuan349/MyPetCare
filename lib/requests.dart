@@ -87,7 +87,10 @@ Future<List<Pet>> getUserPets(String userId) async{
 Future<String> addPet(Map<String, dynamic>? body) async{
   Uri uri = Uri.parse("$BASE_URL/api/pet");
   final String responseBody = await sendRequest(uri, "POST", req_body: body);
-  return responseBody;
+  final decoded = json.decode(responseBody);
+
+  // Asegúrate de que tu backend esté devolviendo un JSON como { "id": "abc123..." }
+  return decoded["id"]; // Esto es el ID generado por Firebase
 }
 
 Future<List<Clinic>> getAllClinics() async {
