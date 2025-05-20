@@ -253,7 +253,6 @@ class _NewPetScreenState extends State<NewPetScreen> {
       Pet newPet = Pet(
         id: nameController.text.trim(),
         name: nameController.text.trim(),
-        id: petId,
         image: fotoFileName ?? "",
         gender: genderController.text.trim(),
         age: _calculateAge(birthDateController.text.trim()).toString(),

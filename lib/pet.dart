@@ -17,7 +17,6 @@ class Pet {
       required this.owner,
       this.chip,
       this.birthDate,
-      required this.id,
       this.playful,
       this.friendly,
   });
@@ -35,7 +34,6 @@ class Pet {
       weight: double.tryParse(json['weight']?.toString() ?? "") ?? 0.0,
       owner: json['owner'].toString() ?? "",
       birthDate: json['birthDate'].toString() ?? "",
-      id: json['id'].toString() ?? "",
     );
   }
 }
