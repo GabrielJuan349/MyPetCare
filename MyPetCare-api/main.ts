@@ -8,7 +8,7 @@ import { validateToken } from './api-functions/validateToken.ts';
 import { registerUser } from './api-functions/registerUser.ts';
 //import { getRecipeOnce } from "./api-functions/recetas.ts";
 import { createPet, deletePet, updatePet, getPetById, getPetsByOwner } from "./api-functions/pet-request.ts";
-import { createPrescription, getPrescription, updatePrescription, deletePrescription } from "./api-functions/prescription.ts"
+import { createPrescription, getPrescription, updatePrescription, deletePrescription, getPrescriptionByPet } from "./api-functions/prescription.ts"
 import { getClinics, createClinic, deleteClinic, getAllClinics } from "./api-functions/clinics.ts";
 import { createVet, deleteVet, getVetById , getVetsByClinic} from "./api-functions/vets.ts";
 import { createNews, getAllNews, deleteNews } from "./api-functions/news.ts";
@@ -86,6 +86,8 @@ router
 
   // UPDATE prescription info
   .put("/api/putPrescription/:id", updatePrescription)
+
+  .get("/api/getPrescriptionByPet/pet/:id", getPrescriptionByPet)
 
 
 // ---- Endpoints de CLINICS ----

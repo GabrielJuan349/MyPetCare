@@ -4,6 +4,17 @@ import {Prescription} from "../interfaces/prescription.interface.ts";
 const FIREBASE_PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID");
 const FirestorePrescriptionURL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/prescription`;
 
+
+function mapFirestore(doc: any) {
+  const fields = doc.fields || {};
+  return {
+    id: doc.name.split("/").pop(),
+    ...Object.fromEntries(
+      Object.entries(fields).map(([k, v]) => [k, Object.values(v)[0]])
+    ),
+  };
+}
+
 // Crear receta (funciona bien)
 export async function createPrescription(ctx: RouterContext<"/api/prescription">) {
   console.log("Creando receta");
@@ -124,6 +135,19 @@ export async function updatePrescription(ctx: RouterContext<"/api/putPrescriptio
       updated: result,
     };
   }
+
+  export async function getPrescriptionByPet(ctx: RouterContext<"/api/getPrescriptionByPet/pet/:id">) {
+    const id = ctx.params.id;
+    const res = await fetch(FirestorePrescriptionURL);
+    const data = await res.json();
+  
+    const filtered = (data.documents || [])
+      .map(mapFirestore)
+      .filter((r) => r.id_pet === id);
+  
+    ctx.response.body = filtered;
+  }
+  
   
 
 
