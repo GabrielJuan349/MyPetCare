@@ -112,8 +112,23 @@ class Clinic {
   final String website;
   final List<String> categories;
   final List<String> geolocation;
-  double get latitude => double.tryParse(geolocation[0]) ?? 0.0;
-  double get longitude => double.tryParse(geolocation[1]) ?? 0.0;
+  double parseCoordinate(String coord) {
+    final pattern = RegExp(r'([0-9.]+)º?\s*([NSEW])', caseSensitive: false);
+    final match = pattern.firstMatch(coord.trim());
+    if (match != null) {
+      double value = double.parse(match.group(1)!);
+      String direction = match.group(2)!.toUpperCase();
+
+      if (direction == 'S' || direction == 'W') {
+        value = -value;
+      }
+      return value;
+    } else {
+      throw FormatException('Formato inválido para coordenada: $coord');
+    }
+  }
+  double get latitude => parseCoordinate(geolocation[0]);
+  double get longitude => parseCoordinate(geolocation[1]);
 
   Clinic({
     required this.id,
