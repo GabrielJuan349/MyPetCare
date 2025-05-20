@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lis_project/FAQs.dart';
 import 'package:lis_project/init_screen.dart';
 import 'package:lis_project/home_screen.dart';
 import 'package:lis_project/profile_screen.dart';
@@ -13,6 +14,7 @@ import 'package:lis_project/data.dart';
 import 'firebase_options.dart';
 import 'package:lis_project/reset_password_screen.dart';
 import 'package:lis_project/news.dart';
+import 'package:lis_project/map.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,6 +52,8 @@ class MyApp extends StatelessWidget {
         '/formRegister': (context) => const RegisterFormScreen(),
         '/resetPassword': (context) => const ResetPasswordScreen(),
         '/news': (context) => const NewsScreen(),
+        '/map' : (context) => MapScreen(),
+        '/help' : (context) => FAQScreen(),
       },
     );
   }

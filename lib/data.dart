@@ -100,3 +100,46 @@ Future<void> setGlobalUser(BuildContext context) async{
     Provider.of<OwnerModel>(context, listen: false).setOwner(owner);
   }
 }
+
+class Clinic {
+  final String id;
+  final String name;
+  final String address;
+  final String city;
+  final String cp;
+  final String email;
+  final String phone;
+  final String website;
+  final List<String> categories;
+  final List<String> geolocation;
+  double get latitude => double.tryParse(geolocation[0]) ?? 0.0;
+  double get longitude => double.tryParse(geolocation[1]) ?? 0.0;
+
+  Clinic({
+    required this.id,
+    required this.name,
+    required this.address,
+    required this.city,
+    required this.cp,
+    required this.email,
+    required this.phone,
+    required this.website,
+    required this.categories,
+    required this.geolocation,
+  });
+
+  factory Clinic.fromJson(Map<String, dynamic> json) {
+    return Clinic(
+      id: json['id'],
+      name: json['name'],
+      address: json['address'],
+      city: json['city'],
+      cp: json['cp'],
+      email: json['email'],
+      phone: json['phone'],
+      website: json['website'],
+      categories: List<String>.from(json['categories'] ?? []),
+      geolocation: List<String>.from(json['geolocation'] ?? []),
+    );
+  }
+}

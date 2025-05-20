@@ -76,7 +76,9 @@ class _HomeScreenState extends State<HomeScreen> {
               label: 'Map',
               color: const Color(0xFFE9EFFF),
               iconColor: const Color(0xFF627ECB),
-              onTap: () {},
+              onTap: () {
+                Navigator.pushNamed(context, '/map');
+              },
             ),
             _buildContainer(
               icon: Icons.info_outline,

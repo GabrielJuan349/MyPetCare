@@ -84,6 +84,13 @@ Future<List<Pet>> getUserPets(String userId) async{
   return decoded.map((json)=> Pet.fromJson(json)).toList();
 }
 
+Future<List<Clinic>> getAllClinics() async {
+  Uri uri = Uri.parse("$BASE_URL/api/getClinics");
+  final responseBody = await sendRequest(uri, "GET");
+  final List<dynamic> decoded = json.decode(responseBody);
+  return decoded.map((json) => Clinic.fromJson(json)).toList();
+}
+
 Future<List<Map<String, dynamic>>> getClinics() async {
   final url = Uri.parse("$BASE_URL/api/getClinics");
   print('Requesting clinics from: $url');
