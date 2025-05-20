@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'pet_details.dart';
 
 class Patients extends StatefulWidget {
   const Patients({super.key});
@@ -106,6 +107,14 @@ class _PatientsPageState extends State<Patients> {
                 ],
                 rows: filteredPets.map((pet) {
                   return DataRow(
+                    onSelectChanged: (_) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PetDetailsScreen(petId: pet['petId']),
+                        ),
+                      );
+                    },
                     cells: [
                       DataCell(Text(pet['name'] ?? '', style: GoogleFonts.inter())),
                       DataCell(Text(pet['type'] ?? '', style: GoogleFonts.inter())),
@@ -140,6 +149,7 @@ class _PatientsPageState extends State<Patients> {
         final ownerName = usersByDocId[ownerId] ?? 'Unknown';
 
         return {
+          'petId' : petDoc.id,
           'name': data['name'],
           'type': data['type'],
           'breed': data['breed'],

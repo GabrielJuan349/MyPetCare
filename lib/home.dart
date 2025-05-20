@@ -23,7 +23,7 @@ class _HomePageState extends State<HomePage> {
     HomeContent(),
     Clients(),
     Patients(),
-    Schedule(),
+    ScheduleScreen(),
   ];
 
   void onMenuTap(int index) => setState(() => selectedIndex = index);
