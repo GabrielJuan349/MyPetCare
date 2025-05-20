@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lis_project/pet.dart';
 import 'package:lis_project/pet_details.dart';
 import 'package:lis_project/reports_screen.dart';
+import 'package:lis_project/vaccine_screen.dart';
 
 class PetNumScreen extends StatefulWidget {
   Pet myPet;
@@ -59,6 +60,7 @@ class _PetNumScreenState extends State<PetNumScreen> {
             _buildGridItem(context, Icons.info_outline, 'Pet details'),
             _buildGridItem(context, Icons.receipt_long_outlined, 'Reports'),
             _buildGridItem(context, Icons.medical_services_outlined, 'Medical prescriptions'),
+            _buildGridItem(context, Icons.vaccines, 'Vaccines'),
           ],
         ),
       ),
@@ -87,6 +89,15 @@ class _PetNumScreenState extends State<PetNumScreen> {
             Navigator.of(context).push(
               MaterialPageRoute<void>(
                 builder: (context) => PetReports(idPet: myPet.id),
+              ),
+            ).then((_) {
+              setState(() {});
+            });
+          }
+          if(label == "Vaccines"){
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (context) => VaccineScreen(petId: myPet.id),
               ),
             ).then((_) {
               setState(() {});
