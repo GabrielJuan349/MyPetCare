@@ -13,6 +13,8 @@ import { getClinics, createClinic, deleteClinic, getAllClinics } from "./api-fun
 import { createVet, deleteVet, getVetById , getVetsByClinic} from "./api-functions/vets.ts";
 import { createNews, getAllNews, deleteNews } from "./api-functions/news.ts";
 import { updateUser, deleteUser, getUserDataById } from "./api-functions/gestion.usuarios.ts";
+import { dayBlockedRequest, monthBlockedRequest } from './api-functions/blocked-request.ts';
+import { getCitasByVetId } from './api-functions/citas.ts';
 
 
 await load({ export: true });
@@ -31,32 +33,12 @@ app.use(oakCors({
 
 // ---- Endpoints de USERS ----
 router
-  .post('/blocked/{date}/{id}', (ctx) => {
-    const date = ctx.params.date;
-    if (date === 'month') {
-      const id = ctx.params.id;
-      if (id) {
-        console.log('month', id);
-      } else {
-        ctx.response.status = 400;
-        ctx.response.body = { error: 'Invalid clinic identificator' };
-      }
-    } else if (date === 'day') {
-      const id = ctx.params.id;
-      if (id) {
-        console.log('day', id);
-      } else {
-        ctx.response.status = 400;
-        ctx.response.body = { error: 'Invalid vet identificator' };
-      }
-    } else {
-      ctx.response.status = 400;
-      ctx.response.body = { error: 'Invalid identificator' };
-    }
-    return ctx.response;
-  })
+  .post("/blocked/day/:id", dayBlockedRequest)
+  .post("/blocked/month/:id", monthBlockedRequest)
+  .post("/api/citas/vet/:vetId", getCitasByVetId)
+  
   .get('/', (ctx) => {
-    ctx.response.body = 'Hello World!';
+    ctx.response.body = 'MyPetCare API Online✅';
     ctx.response.status = 200;
     ctx.response.headers.set('Content-Type', 'text/plain');
     return ctx.response;
@@ -64,7 +46,6 @@ router
   .post("/api/authenticate", authenticate)
   .post("/api/validateToken", validateToken)
   .post("/api/registerUser", registerUser)
-
 
   // UPDATE user info
   .put("/user/:user_id", updateUser)
