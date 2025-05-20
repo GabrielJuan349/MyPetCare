@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:lis_project/data.dart';
 import 'package:lis_project/requests.dart';
 import 'package:lis_project/pet.dart';
-import 'package:lis_project/scanAllModule.dart';
+//import 'package:lis_project/scanAllModule.dart';
 
 class NewPetScreen extends StatefulWidget {
   const NewPetScreen({super.key});
@@ -230,6 +230,7 @@ class _NewPetScreenState extends State<NewPetScreen> {
       final String? userId = Provider.of<OwnerModel>(context, listen: false).owner?.firebaseUser.uid;
 
       final petData = {
+        "id": "",
         "name": nameController.text.trim(),
         "type": typeController.text.trim(),
         "breed": breedController.text.trim(),
@@ -249,6 +250,7 @@ class _NewPetScreenState extends State<NewPetScreen> {
       print("Pet created: $response");
 
       Pet newPet = Pet(
+        id: nameController.text.trim(),
         name: nameController.text.trim(),
         gender: genderController.text.trim(),
         age: _calculateAge(birthDateController.text.trim()).toString(),
