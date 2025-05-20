@@ -22,6 +22,14 @@ import {
 } from "./api-functions/treatment.ts";
 
 import {getVaccineByPetID, createVaccine} from "./api-functions/vaccines.ts";
+import {
+  createAdoption,
+  getAllAdoptions,
+  getAdoptionById,
+  updateAdoption,
+  deleteAdoption
+} from "./api-functions/adoption.ts";
+
 
 await load({ export: true });
 
@@ -170,6 +178,13 @@ router
   //ENDPOINT VACCINES
   .post("/api/vaccine", createVaccine)
   .get("/api/getVaccineByPetID/pet/:id", getVaccineByPetID)
+
+// ---- Endpoints de ADOPTION ----
+  .post("/api/createAdoption", createAdoption)
+  .get("/api/getAllAdoptions", getAllAdoptions)
+  .get("/api/getAdoptionById/:id", getAdoptionById)
+  .put("/api/updateAdoption/:id", updateAdoption)
+  .delete("/api/deleteAdoption/:id", deleteAdoption)
 
 
 
