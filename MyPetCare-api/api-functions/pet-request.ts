@@ -25,13 +25,16 @@ export async function createPet(ctx: RouterContext<"/api/pet">) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       fields: {
-        age: { integerValue: Pet.age },
+        age: { doubleValue: Pet.age },
         birthDate: { stringValue: Pet.birthDate },
         breed: { stringValue: Pet.breed },
         name: { stringValue: Pet.name },
         owner: { stringValue: Pet.owner },
         type: { stringValue: Pet.type },
-        weight: { doubleValue: Pet.weight }
+        weight: { doubleValue: Pet.weight },
+        photoUrls: { stringValue: Pet.image },
+        chip: { stringValue: Pet.chip },
+        gender: { stringValue: Pet.gender },
       }
     }),
   });
@@ -45,9 +48,13 @@ export async function createPet(ctx: RouterContext<"/api/pet">) {
 
   ctx.response.status = 200;
   ctx.response.body = 'Pet created successfully!';
+  const fullDocPath = result.name; 
+  const segments = fullDocPath.split("/");
+  const documentId = segments[segments.length - 1]; 
+
+  ctx.response.body = { id: documentId }; // Conseguir petID
 
   return result;
-
 }
 
 //Delete
