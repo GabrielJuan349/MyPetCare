@@ -8,6 +8,8 @@ export interface Pet {
   birthDate: string;
   age: number;
   weight: number;
+  gender: "male" | "female";
+  chip: string;
   owner: DocumentReference;
   photoUrls: string[];
   createdAt: Date;
