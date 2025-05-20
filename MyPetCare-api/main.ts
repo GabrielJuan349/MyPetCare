@@ -27,7 +27,8 @@ import {
   getAllAdoptions,
   getAdoptionById,
   updateAdoption,
-  deleteAdoption
+  deleteAdoption,
+  getAdoptionsByClinic
 } from "./api-functions/adoption.ts";
 
 
@@ -185,6 +186,8 @@ router
   .get("/api/getAdoptionById/:id", getAdoptionById)
   .put("/api/updateAdoption/:id", updateAdoption)
   .delete("/api/deleteAdoption/:id", deleteAdoption)
+  .get("/api/getAdoptionsByClinic/:id", getAdoptionsByClinic)
+
 
 
 

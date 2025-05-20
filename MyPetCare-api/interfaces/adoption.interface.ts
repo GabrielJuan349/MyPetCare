@@ -5,4 +5,6 @@ export interface Adoption {
   description: string;
   email: string;
   dateFound: Date;
+  clinic_id: string;
+  createdAt: Date;
 }
