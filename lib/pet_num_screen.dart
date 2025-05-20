@@ -3,6 +3,7 @@ import 'package:lis_project/pet.dart';
 import 'package:lis_project/pet_details.dart';
 import 'package:lis_project/reports_screen.dart';
 import 'package:lis_project/vaccine_screen.dart';
+import 'package:lis_project/prescription.dart';
 
 class PetNumScreen extends StatefulWidget {
   Pet myPet;
@@ -89,6 +90,15 @@ class _PetNumScreenState extends State<PetNumScreen> {
             Navigator.of(context).push(
               MaterialPageRoute<void>(
                 builder: (context) => PetReports(idPet: myPet.id),
+              ),
+            ).then((_) {
+              setState(() {});
+            });
+          }
+          if(label == "Medical prescriptions"){
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (context) => PrescriptionListPage(petId: myPet.id),
               ),
             ).then((_) {
               setState(() {});

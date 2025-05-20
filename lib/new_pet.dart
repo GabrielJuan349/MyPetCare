@@ -1,5 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:lis_project/data.dart';
+import 'package:lis_project/requests.dart';
+import 'package:lis_project/pet.dart';
+import 'package:lis_project/scanAllModule.dart';
 
 class NewPetScreen extends StatefulWidget {
   const NewPetScreen({super.key});
@@ -9,14 +16,15 @@ class NewPetScreen extends StatefulWidget {
 }
 
 class _NewPetScreenState extends State<NewPetScreen> {
-  final nameController = TextEditingController();
-  final typeController = TextEditingController();
-  final breedController = TextEditingController();
-  final birthDateController = TextEditingController();
-  final chipController = TextEditingController();
-  final cartillaController = TextEditingController();
-  final fotoController = TextEditingController();
-  final genderController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController typeController = TextEditingController();
+  final TextEditingController breedController = TextEditingController();
+  final TextEditingController birthDateController = TextEditingController();
+  final TextEditingController chipController = TextEditingController();
+  final TextEditingController cartillaController = TextEditingController();
+  final TextEditingController fotoController = TextEditingController();
+  final TextEditingController genderController = TextEditingController();
+  final TextEditingController weightController = TextEditingController();
   
   final appBarColor = const Color(0xfff59249);
 
@@ -25,25 +33,8 @@ class _NewPetScreenState extends State<NewPetScreen> {
   String? selectedPetType;
   String? selectedGender;
 
-  List<String> petTypes = ['Dog', 'Cat', 'Rodent', 'Reptile', 'Fish'];
-  List<String> genders = ['Male', 'Female'];
-
-  Future<void> pickPdfFile(String label) async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf'],
-    );
-
-    if (result != null && result.files.isNotEmpty) {
-      setState(() {
-        if (label == "Cartilla") {
-          cartillaFileName = result.files.single.name;
-        } else {
-          fotoFileName = result.files.single.name;
-        }
-      });
-    }
-  }
+  List<String> petTypes = ['dog', 'cat', 'rodent', 'other'];
+  List<String> genders = ['male', 'female'];
 
   @override
   Widget build(BuildContext context) {
@@ -59,13 +50,19 @@ class _NewPetScreenState extends State<NewPetScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pop(context, true);
           },
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.person, color: Colors.white),
-            onPressed: () {},
+            onPressed: () {
+              dispose();
+              Navigator.pushNamed(
+                    context,
+                    '/profile',
+                );
+            },
           ),
         ],
       ),
@@ -76,18 +73,20 @@ class _NewPetScreenState extends State<NewPetScreen> {
             buildField("Name", nameController),
             buildDropdown("Type of Pet", petTypes, typeController),
             buildField("Breed", breedController),
-            buildMultipleChoice("Gender", genders),
+            buildDropdown("Gender", genders, genderController),
             buildDateSelector("Date of Birth", birthDateController),
+            buildField("Weight", weightController),
             buildField("Chip Number", chipController),
             buildFileGetter("Cartilla", cartillaFileName),
             buildFileGetter("Foto", fotoFileName),
             
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async{
                 // Lógica guardado de datos
-                // TODO: Connect to backend to create the new pet
-                //TODO: Once added the new pet show snackbar showing success
+                // Connect to backend to create the new pet + add to frontend
+                await createPet();
+                // Navigate back to the previous screen
                 Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(
@@ -114,6 +113,7 @@ class _NewPetScreenState extends State<NewPetScreen> {
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
           const SizedBox(height: 4),
           TextField(
+            controller: controller,
             decoration: InputDecoration(
               filled: true,
               fillColor: const Color(0xFFECF1FF),
@@ -146,7 +146,7 @@ class _NewPetScreenState extends State<NewPetScreen> {
               foregroundColor: Colors.white,
             ),
             child: Text(fileName ?? "Upload PDF"),
-          ),
+          )
         ],
       ),
     );
@@ -162,13 +162,18 @@ class _NewPetScreenState extends State<NewPetScreen> {
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
           const SizedBox(height: 4),
           DropdownButtonFormField<String>(
+            value: controller.text.isNotEmpty ? controller.text : null,
             items: items.map((String item) {
               return DropdownMenuItem<String>(
                 value: item,
                 child: Text(item),
               );
             }).toList(),
-            onChanged: (value) => setState(() => selectedGender = value),
+            onChanged: (value) {
+              if (value != null) {
+                controller.text = value;
+              }
+            },
             decoration: InputDecoration(
               filled: true,
               fillColor: const Color(0xFFECF1FF),
@@ -177,32 +182,6 @@ class _NewPetScreenState extends State<NewPetScreen> {
                 borderSide: BorderSide.none,
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildMultipleChoice(String label, List<String> items) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-          const SizedBox(height: 4),
-          Wrap(
-            spacing: 8.0,
-            children: items.map((String item) {
-              return ChoiceChip(
-                label: Text(item),
-                selected: false,
-                onSelected: (bool selected) {
-                  // Lógica para manejar selección
-                },
-              );
-            }).toList(),
           ),
         ],
       ),
@@ -245,6 +224,84 @@ class _NewPetScreenState extends State<NewPetScreen> {
       ),
     );
   }
+
+  Future<void> createPet() async {
+    try {
+      final String? userId = Provider.of<OwnerModel>(context, listen: false).owner?.firebaseUser.uid;
+
+      final petData = {
+        "name": nameController.text.trim(),
+        "type": typeController.text.trim(),
+        "breed": breedController.text.trim(),
+        "gender": genderController.text.trim(),
+        "birthDate": birthDateController.text.trim(),
+        "weight": double.tryParse(weightController.text.trim()) ?? 0.0,
+        "chip": chipController.text.trim()?? "",
+        "image": fotoFileName ?? "",
+        "cartilla": cartillaFileName ?? "",
+        "owner": userId,
+        "age": _calculateAge(birthDateController.text.trim()),
+      };
+
+      print("Pet data: $petData");
+
+      final response = await addPet(petData);
+      print("Pet created: $response");
+
+      Pet newPet = Pet(
+        name: nameController.text.trim(),
+        gender: genderController.text.trim(),
+        age: _calculateAge(birthDateController.text.trim()).toString(),
+        weight: double.tryParse(weightController.text.trim()) ?? 0.0,
+        type: typeController.text.trim(),
+        breed: breedController.text.trim(),
+        owner: userId ?? "",
+        chip: chipController.text.trim(),
+      );
+      print("New pet: $newPet");
+
+      Provider.of<OwnerModel>(context, listen: false).addPet(newPet);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Mascota registrada correctamente')),
+      );
+    } catch (e) {
+      print("Error al registrar mascota: $e");
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error al registrar mascota')),
+      );
+    }
+  }
+
+  Future<void> pickPdfFile(String label) async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
+
+    if (result != null && result.files.isNotEmpty) {
+      setState(() {
+        if (label == "Cartilla") {
+          cartillaFileName = result.files.single.name;
+        } else {
+          fotoFileName = result.files.single.name;
+        }
+      });
+    }
+  }
+
+  int _calculateAge(String birthDate) {
+    DateTime dateOfBirth = DateTime.parse(birthDate);
+    DateTime today = DateTime.now();
+    int age = (today.year - dateOfBirth.year).toInt();
+    if (today.month < dateOfBirth.month ||
+        (today.month == dateOfBirth.month && today.day < dateOfBirth.day)) {
+      age--;
+    }
+    return age;
+  }
+
   @override
   void dispose() {
     nameController.dispose();
