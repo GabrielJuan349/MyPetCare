@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+
+import 'login.dart';  // la pantalla de login que crearemos
 import 'home.dart';
 
 void main() async {
@@ -17,10 +19,10 @@ class MyPetCareApp extends StatelessWidget {
     return MaterialApp(
       title: 'MyPetCare',
       debugShowCheckedModeBanner: false,
-      initialRoute: '/',
+      initialRoute: '/login',
       routes: {
+        '/login': (context) => const Login(),
         '/': (context) => const HomePage(),
-        // Puedes añadir más rutas si lo necesitas
       },
     );
   }

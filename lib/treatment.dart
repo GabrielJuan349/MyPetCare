@@ -29,6 +29,7 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
     });
 
     _treatmentController.clear();
+
   }
 
   Future<void> _deleteTreatment(String docId) async {

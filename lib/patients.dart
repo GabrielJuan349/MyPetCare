@@ -89,45 +89,76 @@ class _PatientsPageState extends State<Patients> {
           return const Center(child: Text('No pets found'));
         }
 
-        final screenWidth = MediaQuery.of(context).size.width;
-
-        return SizedBox(
-          width: double.infinity,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Container(
-              width: screenWidth,
-              child: DataTable(
-                headingRowColor: WidgetStateProperty.all(_highlightColor),
-                columns: [
-                  DataColumn(label: Text('Name', style: GoogleFonts.inter(fontWeight: FontWeight.bold))),
-                  DataColumn(label: Text('Type', style: GoogleFonts.inter(fontWeight: FontWeight.bold))),
-                  DataColumn(label: Text('Breed', style: GoogleFonts.inter(fontWeight: FontWeight.bold))),
-                  DataColumn(label: Text('Owner', style: GoogleFonts.inter(fontWeight: FontWeight.bold))),
+        return ListView(
+          children: [
+            // Header row
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
+              color: _highlightColor,
+              child: Row(
+                children: [
+                  _buildHeaderCell('Name'),
+                  _buildHeaderCell('Type'),
+                  _buildHeaderCell('Breed'),
+                  _buildHeaderCell('Owner'),
                 ],
-                rows: filteredPets.map((pet) {
-                  return DataRow(
-                    onSelectChanged: (_) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => PetDetailsScreen(petId: pet['petId']),
-                        ),
-                      );
-                    },
-                    cells: [
-                      DataCell(Text(pet['name'] ?? '', style: GoogleFonts.inter())),
-                      DataCell(Text(pet['type'] ?? '', style: GoogleFonts.inter())),
-                      DataCell(Text(pet['breed'] ?? '', style: GoogleFonts.inter())),
-                      DataCell(Text(pet['ownerName'] ?? 'Unknown', style: GoogleFonts.inter())),
-                    ],
-                  );
-                }).toList(),
               ),
             ),
-          ),
+            const Divider(height: 0, thickness: 1),
+            // Data rows
+            ...filteredPets.map((pet) {
+              return InkWell(
+                onTap: () => _openPetDetails(pet['petId']),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                      child: Row(
+                        children: [
+                          _buildDataCell(pet['name'] ?? ''),
+                          _buildDataCell(pet['type'] ?? ''),
+                          _buildDataCell(pet['breed'] ?? ''),
+                          _buildDataCell(pet['ownerName'] ?? 'Unknown'),
+                        ],
+                      ),
+                    ),
+                    const Divider(height: 0, thickness: 0.5),
+                  ],
+                ),
+              );
+            }).toList(),
+          ],
         );
       },
+    );
+  }
+
+  Widget _buildHeaderCell(String label) {
+    return Expanded(
+      flex: 1,
+      child: Text(
+        label,
+        style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  Widget _buildDataCell(String value) {
+    return Expanded(
+      flex: 1,
+      child: Text(
+        value,
+        style: GoogleFonts.inter(),
+      ),
+    );
+  }
+
+  void _openPetDetails(String petId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PetDetailsScreen(petId: petId),
+      ),
     );
   }
 
@@ -149,7 +180,7 @@ class _PatientsPageState extends State<Patients> {
         final ownerName = usersByDocId[ownerId] ?? 'Unknown';
 
         return {
-          'petId' : petDoc.id,
+          'petId': petDoc.id,
           'name': data['name'],
           'type': data['type'],
           'breed': data['breed'],
