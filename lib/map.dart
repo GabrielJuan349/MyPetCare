@@ -18,20 +18,25 @@ class _MapScreenState extends State<MapScreen> {
     super.initState();
     fetchClinics();
   }
+
   Future<void> fetchClinics() async {
+    
     try {
       List<Clinic> fetchedClinics = await getAllClinics();
       setState(() {
         clinics = fetchedClinics;
       });
+      if (clinics.isNotEmpty) {
+        _mapController.move(
+            LatLng(clinics[0].latitude, clinics[0].longitude), 13);
+      }
     } catch (e) {
       print("Error obteniendo clínicas: $e");
     }
   }
+
   // Ubicación predeterminada
   final LatLng _defaultLocation = LatLng(41.3825, 2.176944);
-
-
 
   void _onMapTap(TapPosition tapPosition, LatLng latLng) {
     for (final clinic in clinics) {
@@ -53,7 +58,8 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
-  double _calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+  double _calculateDistance(
+      double lat1, double lon1, double lat2, double lon2) {
     const Distance distance = Distance();
     return distance(LatLng(lat1, lon1), LatLng(lat2, lon2));
   }
@@ -94,15 +100,18 @@ class _MapScreenState extends State<MapScreen> {
                 point: _defaultLocation,
                 width: 40,
                 height: 40,
-                builder: (BuildContext context) => const Icon(Icons.my_location, color: Colors.blue),
+                builder: (BuildContext context) =>
+                    const Icon(Icons.my_location, color: Colors.blue),
               ),
               ...clinics.map((clinic) {
                 return Marker(
                   point: LatLng(clinic.latitude, clinic.longitude),
                   width: 50,
                   height: 50,
-                  builder: (BuildContext context) =>
-                  const Icon(Icons.local_hospital, color: Colors.green, size: 40),
+                  builder: (BuildContext context) => const Icon(
+                      Icons.local_hospital,
+                      color: Colors.green,
+                      size: 40),
                 );
               }).toList(),
             ],

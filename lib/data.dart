@@ -40,7 +40,6 @@ class Owner {
     };
   }
 
-
   // Transform to what is defined in the database
   // This will be used to update the user data in the firestore
   // So we'll only return the fields that can be changed
@@ -67,12 +66,12 @@ class OwnerModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setPets(List<Pet> pets){
+  void setPets(List<Pet> pets) {
     _pets = pets;
     notifyListeners();
   }
 
-  void addPet(Pet pet){
+  void addPet(Pet pet) {
     _pets?.add(pet);
   }
 
@@ -82,7 +81,6 @@ class OwnerModel extends ChangeNotifier {
     notifyListeners();
   }
 
-
   void updateOwner(Owner updatedOwner) {
     _owner = updatedOwner;
     notifyListeners();
@@ -90,9 +88,8 @@ class OwnerModel extends ChangeNotifier {
   }
 }
 
-
-Future<void> setGlobalUser(BuildContext context) async{
-  if(Provider.of<OwnerModel>(context, listen: false).owner == null){
+Future<void> setGlobalUser(BuildContext context) async {
+  if (Provider.of<OwnerModel>(context, listen: false).owner == null) {
     final firebaseUser = FirebaseAuth.instance.currentUser;
     Owner owner = Owner(firebaseUser!);
     await getUserInfo(owner);
@@ -111,24 +108,8 @@ class Clinic {
   final String phone;
   final String website;
   final List<String> categories;
-  final List<String> geolocation;
-  double parseCoordinate(String coord) {
-    final pattern = RegExp(r'([0-9.]+)º?\s*([NSEW])', caseSensitive: false);
-    final match = pattern.firstMatch(coord.trim());
-    if (match != null) {
-      double value = double.parse(match.group(1)!);
-      String direction = match.group(2)!.toUpperCase();
-
-      if (direction == 'S' || direction == 'W') {
-        value = -value;
-      }
-      return value;
-    } else {
-      throw FormatException('Formato inválido para coordenada: $coord');
-    }
-  }
-  double get latitude => parseCoordinate(geolocation[0]);
-  double get longitude => parseCoordinate(geolocation[1]);
+  final double latitude;
+  final double longitude;
 
   Clinic({
     required this.id,
@@ -140,7 +121,8 @@ class Clinic {
     required this.phone,
     required this.website,
     required this.categories,
-    required this.geolocation,
+    required this.latitude,
+    required this.longitude,
   });
 
   factory Clinic.fromJson(Map<String, dynamic> json) {
@@ -153,8 +135,16 @@ class Clinic {
       email: json['email'],
       phone: json['phone'],
       website: json['website'],
-      categories: List<String>.from(json['categories'] ?? []),
-      geolocation: List<String>.from(json['geolocation'] ?? []),
+      categories: (json['categories']?['values'] as List<dynamic>?)
+              ?.map((e) => e['stringValue'] as String)
+              .toList() ??
+          [],
+      latitude: (json['latitude'] is double)
+          ? json['latitude']
+          : double.tryParse(json['latitude'].toString()) ?? 0.0,
+      longitude: (json['longitude'] is double)
+          ? json['longitude']
+          : double.tryParse(json['longitude'].toString()) ?? 0.0,
     );
   }
 }

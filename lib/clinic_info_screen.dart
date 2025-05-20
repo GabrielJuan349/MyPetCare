@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'data.dart';
+import 'clinic_adoptions_screen.dart'; // Asegúrate de tener este archivo creado
 
 class ClinicInfoScreen extends StatelessWidget {
   final Clinic clinic;
@@ -49,8 +50,32 @@ class ClinicInfoScreen extends StatelessWidget {
             ),
             Text('Lat: ${clinic.latitude}'),
             Text('Lng: ${clinic.longitude}'),
-            SizedBox(height: 30)
-
+            SizedBox(height: 30),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ClinicAdoptionsScreen(clinicId: clinic.id),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xfff59249),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                ),
+                child: Text(
+                  'Ver adopciones',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            )
           ],
         ),
       ),
