@@ -86,7 +86,7 @@ class _PetNumScreenState extends State<PetNumScreen> {
           if(label == "Reports"){
             Navigator.of(context).push(
               MaterialPageRoute<void>(
-                builder: (context) => PetReports(),
+                builder: (context) => PetReports(idPet: myPet.id),
               ),
             ).then((_) {
               setState(() {});

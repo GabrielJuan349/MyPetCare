@@ -1,8 +1,9 @@
 class Pet {
-  late String name, gender, age, breed, image, type;
+  late String name, gender, age, breed, image, type, id;
   late int playful, friendly;
 
   Pet({
+      required this.id,
       required this.name,
       required this.gender,
       required this.age,
@@ -15,6 +16,7 @@ class Pet {
 
   factory Pet.fromJson(Map<String, dynamic> json){
     return Pet(
+      id: json['id'] ?? "",
       name: json['name'] ?? "",
       gender: json['gender'] ?? "",
       age: json['age'] ?? "",

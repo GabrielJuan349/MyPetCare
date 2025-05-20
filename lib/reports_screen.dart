@@ -1,29 +1,49 @@
 import 'package:flutter/material.dart';
-import 'package:lis_project/report.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'report.dart';
 
 class PetReports extends StatefulWidget {
-   List<ReportMessage>? petReports;
+  final String idPet;
 
-   PetReports({super.key, this.petReports});
+  const PetReports({super.key, required this.idPet});
 
-   @override
-   State<PetReports> createState() => _PetReportsState();
+  @override
+  State<PetReports> createState() => _PetReportsState();
 }
 
-
 class _PetReportsState extends State<PetReports> {
-  List<ReportMessage> petReportsList = [
-    ReportMessage("Laboratory results", "This is a long text that is going to resume what you'll find on the particular report"),
-    ReportMessage("Vaccination calendar", "This is a long text that is going to resume what you'll find on the particular report"),
-    ReportMessage("Illness diagnosis", "This is a long text that is going to resume what you'll find on the particular report"),
-  ];
+  List<ReportMessage> petReportsList = [];
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    fetchReports();
   }
 
-  _PetReportsState();
+  Future<void> fetchReports() async {
+    final uri = Uri.parse(
+        'http://localhost:6055/api/getReportsByPet/pet/${widget.idPet}');
+    try {
+      final response = await http.get(uri);
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        setState(() {
+          petReportsList =
+              data.map((json) => ReportMessage.fromJson(json)).toList();
+          isLoading = false;
+        });
+      } else {
+        throw Exception('Error del servidor');
+      }
+    } catch (e) {
+      print('Error al obtener los reportes: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,50 +59,59 @@ class _PetReportsState extends State<PetReports> {
             Navigator.pop(context);
           },
         ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.person, color: Colors.white),
-              onPressed: () {
-                Navigator.pushNamed(context, '/profile');
-              },
-            ),
-          ],
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person, color: Colors.white),
+            onPressed: () {
+              Navigator.pushNamed(context, '/profile');
+            },
+          ),
+        ],
       ),
-      body: ListView.builder(
-        itemCount: petReportsList.length,
-        itemBuilder: (context, index) {
-          return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFFE9EFFF),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        petReportsList[index].reportName,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : petReportsList.isEmpty
+              ? const Center(child: Text("No reports available"))
+              : ListView.builder(
+                  itemCount: petReportsList.length,
+                  itemBuilder: (context, index) {
+                    return Container(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 6),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE9EFFF),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        petReportsList[index].message,
-                        style: const TextStyle(color: Colors.black54),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  petReportsList[index].reportName,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  petReportsList[index].message,
+                                  style: const TextStyle(color: Colors.black54),
+                                ),
+                                Text(
+                                  petReportsList[index].formattedDate,
+                                  style: const TextStyle(
+                                      fontSize: 12, color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
-              ],
-            ),
-          );
-        },
-      ),
     );
   }
 }
