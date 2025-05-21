@@ -10,9 +10,9 @@ class ClinicInfoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xfff59249),
+        backgroundColor: const Color(0xfff59249),
         foregroundColor: Colors.white,
-        title: Text('Clinic Info'),
+        title: const Text('Clinic Info'),
         centerTitle: true,
       ),
       body: Padding(
@@ -22,35 +22,64 @@ class ClinicInfoScreen extends StatelessWidget {
           children: [
             Text(
               clinic.name,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Row(
               children: [
-                Icon(Icons.location_on, color: Colors.grey),
-                SizedBox(width: 8),
+                const Icon(Icons.location_on, color: Colors.grey),
+                const SizedBox(width: 8),
                 Expanded(child: Text(clinic.address)),
               ],
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Row(
               children: [
-                Icon(Icons.phone, color: Colors.grey),
-                SizedBox(width: 8),
+                const Icon(Icons.phone, color: Colors.grey),
+                const SizedBox(width: 8),
                 Text(clinic.phone),
               ],
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text('Website: ${clinic.website}'),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'Coordenadas:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             Text('Lat: ${clinic.latitude}'),
             Text('Lng: ${clinic.longitude}'),
+<<<<<<< Updated upstream
             SizedBox(height: 30)
 
+=======
+            const SizedBox(height: 30),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ClinicAdoptionsScreen(clinicId: clinic.id),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xfff59249),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                ),
+                child: const Text(
+                  'Ver adopciones',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            )
+>>>>>>> Stashed changes
           ],
         ),
       ),

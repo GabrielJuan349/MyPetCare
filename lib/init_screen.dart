@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lis_project/iniciar_sesion.dart';
 import 'package:lis_project/data.dart';
+import 'package:provider/provider.dart';
 
 class InitScreen extends StatelessWidget {
   const InitScreen({super.key});
@@ -44,6 +45,7 @@ class InitScreen extends StatelessWidget {
 
               Future.delayed(const Duration(seconds: 2), () {
                 if (snapshot.hasData) {
+                  // User is logged in
                   Owner user = Owner(snapshot.data!);
                   Navigator.pushNamed(
                     context,

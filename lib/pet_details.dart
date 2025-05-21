@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:lis_project/pet.dart';
 import 'package:lis_project/edit_pet.dart';
@@ -70,11 +72,9 @@ class _PetDetailsState extends State<PetDetails> {
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(12),
                 image: DecorationImage(
-                  image: AssetImage(
-                    (myPet.image != null && myPet.image is String && myPet.image!.isNotEmpty)
-                    ? myPet.image!
-                    : "assets/logo/LogoConFondo.png",
-                  ),
+                  image: myPet.image != null && myPet.image!.isNotEmpty
+                    ? FileImage(File(myPet.image!)) as ImageProvider
+                    : AssetImage("assets/logo/LogoConFondo.png"),
                   fit: BoxFit.cover,
                 ),
               ),

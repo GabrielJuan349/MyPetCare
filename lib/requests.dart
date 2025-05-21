@@ -5,7 +5,7 @@ import 'package:lis_project/pet.dart';
 import 'package:lis_project/data.dart';
 
 // Change to the url of your actual backend
-const String BASE_URL = "http://localhost:6055";
+const String BASE_URL = "http://10.0.2.2:6055";
 
 Future<String> sendRequest(Uri uri, String action, {Map<String, dynamic>? req_body}) async{
   late final http.Response response;
@@ -63,7 +63,7 @@ Future<String> addUser(Map<String, dynamic>? body) async{
 
 Future<void> getUserInfo(Owner owner) async{
   Uri uri = Uri.parse("$BASE_URL/user/${owner.firebaseUser.uid}");
-  print("Parsed url is ${uri}");
+  print("Parsed url is $uri");
   final responseBody = await sendRequest(uri, "GET");
   final Map<String, dynamic> userMap = json.decode(responseBody);
   owner.setUserData(
@@ -122,3 +122,17 @@ Future<List<Map<String, dynamic>>> getClinics() async {
   }
 }
 
+<<<<<<< Updated upstream
+=======
+
+Future<void> deletePet(String petId) async {
+  final url = Uri.parse("$BASE_URL/api/pet/$petId");
+  final response = await http.delete(url);
+
+  if (response.statusCode != 200) {
+    throw Exception("Failed to delete pet: ${response.body}");
+  }
+}
+
+
+>>>>>>> Stashed changes

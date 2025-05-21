@@ -22,7 +22,7 @@ class Prescription {
 class PrescriptionListPage extends StatefulWidget {
   final String petId;
 
-  const PrescriptionListPage({Key? key, required this.petId}) : super(key: key);
+  const PrescriptionListPage({super.key, required this.petId});
 
   @override
   State<PrescriptionListPage> createState() => _PrescriptionListPageState();

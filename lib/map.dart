@@ -6,6 +6,8 @@ import 'package:lis_project/clinic_info_screen.dart';
 import 'package:lis_project/requests.dart';
 
 class MapScreen extends StatefulWidget {
+  const MapScreen({super.key});
+
   @override
   _MapScreenState createState() => _MapScreenState();
 }
@@ -29,7 +31,7 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
   // Ubicación predeterminada
-  final LatLng _defaultLocation = LatLng(41.3825, 2.176944);
+  final LatLng _defaultLocation = const LatLng(41.3825, 2.176944);
 
 
 
@@ -62,7 +64,7 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xfff59249),
+        backgroundColor: const Color(0xfff59249),
         title: const Text("Clinics Map", style: TextStyle(color: Colors.white)),
         centerTitle: true,
         leading: IconButton(
@@ -104,7 +106,7 @@ class _MapScreenState extends State<MapScreen> {
                   builder: (BuildContext context) =>
                   const Icon(Icons.local_hospital, color: Colors.green, size: 40),
                 );
-              }).toList(),
+              }),
             ],
           ),
         ],

@@ -180,7 +180,7 @@ class _IniciarSesionState extends State<IniciarSesion> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => RegisterScreen()),
+                            builder: (context) => const RegisterScreen()),
                       );
                     },
                     style: TextButton.styleFrom(

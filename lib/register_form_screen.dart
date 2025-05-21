@@ -21,7 +21,7 @@ class _RegisterFormScreenState extends State<RegisterFormScreen> {
 
   bool _isLoading = false;
   String? _selectedValue;
-  List<String> _options = ['Pet owner', 'Vet', 'Vet clinic', 'Admin'];
+  final List<String> _options = ['Pet owner', 'Vet', 'Vet clinic', 'Admin'];
   List<String> _clinics = [];
 String? _selectedClinic;
 
@@ -78,7 +78,7 @@ Future<void> _loadClinics() async {
     final firebaseUser = ModalRoute.of(context)!.settings.arguments as User;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor:Color(0xfff59249),
+        backgroundColor:const Color(0xfff59249),
         title: const Text(
           'Register',
           style: TextStyle(color: Colors.white),
@@ -146,9 +146,9 @@ Future<void> _loadClinics() async {
             _addUserInfo(firebaseUser);
           },
           style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.symmetric(vertical: 15, horizontal: 80),
-            textStyle: TextStyle(fontSize: 18),
-            backgroundColor: Color(0xFF627ECB),
+            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 80),
+            textStyle: const TextStyle(fontSize: 18),
+            backgroundColor: const Color(0xFF627ECB),
             foregroundColor: Colors.white,
           ),
           child: const Text('Submit'),
@@ -171,7 +171,7 @@ Future<void> _loadClinics() async {
             const SizedBox(height: 10),
             DropdownButton<String>(
               value: _selectedValue,
-              hint: Text('Choose an option'),
+              hint: const Text('Choose an option'),
               isExpanded: true,
               items: _options.map((String option) {
                 return DropdownMenuItem<String>(
@@ -185,7 +185,7 @@ Future<void> _loadClinics() async {
                 });
               },
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -210,7 +210,7 @@ Future<void> _loadClinics() async {
             decoration: InputDecoration(
               labelText: label,
               filled: true,
-              fillColor: Color(0xFFE9EFFF),
+              fillColor: const Color(0xFFE9EFFF),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(5),
                 borderSide: BorderSide.none,
@@ -230,7 +230,7 @@ Future<void> _loadClinics() async {
       decoration: InputDecoration(
         labelText: 'Clinic',
         filled: true,
-        fillColor: Color(0xFFE9EFFF),
+        fillColor: const Color(0xFFE9EFFF),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(5),
           borderSide: BorderSide.none,
