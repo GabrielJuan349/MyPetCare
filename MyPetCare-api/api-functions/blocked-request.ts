@@ -10,7 +10,7 @@ function getDatabaseDate(month: string, year: string) {
     return monthIndex+"_"+year;
 }
 
-export async function dayBlockedRequest(ctx: RouterContext<"/blocked/day/:id">) {
+export async function newAppointment(ctx: RouterContext<"/api/appointment/:id">) {
     const clinicId = ctx.params.id; // Renombrado para claridad
     let requestPayload;
     console.log("Received request payload:", clinicId);

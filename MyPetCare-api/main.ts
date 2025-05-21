@@ -13,7 +13,7 @@ import { getClinics, createClinic, deleteClinic, getAllClinics } from "./api-fun
 import { createVet, deleteVet, getVetById , getVetsByClinic} from "./api-functions/vets.ts";
 import { createNews, getAllNews, deleteNews } from "./api-functions/news.ts";
 import { updateUser, deleteUser, getUserDataById } from "./api-functions/gestion.usuarios.ts";
-import { dayBlockedRequest, monthBlockedRequest } from './api-functions/blocked-request.ts';
+import { newAppointment, monthBlockedRequest } from './api-functions/blocked-request.ts';
 import { getCitasByVetId } from './api-functions/citas.ts';
 
 
@@ -33,7 +33,7 @@ app.use(oakCors({
 
 // ---- Endpoints de USERS ----
 router
-  .post("/blocked/day/:id", dayBlockedRequest)
+  .post("/api/appointment/:id", newAppointment)
   .post("/blocked/month/:id", monthBlockedRequest)
   .post("/api/citas/vet/:vetId", getCitasByVetId)
   
