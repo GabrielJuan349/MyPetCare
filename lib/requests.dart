@@ -5,7 +5,7 @@ import 'package:lis_project/pet.dart';
 import 'package:lis_project/data.dart';
 
 // Change to the url of your actual backend
-const String BASE_URL = "http://localhost:6055";
+const String BASE_URL = "http://10.0.2.2:6055";
 
 Future<String> sendRequest(Uri uri, String action, {Map<String, dynamic>? req_body}) async{
   late final http.Response response;
@@ -121,6 +121,7 @@ Future<List<Clinic>> getAllClinics() async {
 
   return clinics;
 }
+
 Future<List<Map<String, dynamic>>> getClinics() async {
   final url = Uri.parse("$BASE_URL/api/getClinics");
   print('Requesting clinics from: $url');
@@ -179,5 +180,9 @@ Future<void> createVaccine(Map<String, String> vaccine) async {
   }
 }
 
-
+Future<List<dynamic>> getAllNews() async{
+  final uri = Uri.parse('$BASE_URL/api/getAllNews');
+  final response = await sendRequest(uri, "GET");
+  return json.decode(response);
+}
 
