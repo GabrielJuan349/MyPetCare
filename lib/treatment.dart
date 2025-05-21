@@ -47,7 +47,9 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
       appBar: AppBar(
           backgroundColor: const Color(0xFFF6F6F6),
           elevation: 0,
-          title: const Text('Tratamientos')
+          title: const Text('Tratamientos'),
+          foregroundColor: Colors.orange
+
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

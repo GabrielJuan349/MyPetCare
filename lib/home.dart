@@ -119,13 +119,14 @@ class _HomePageState extends State<HomePage> {
 class HomeContent extends StatelessWidget {
   const HomeContent({super.key});
 
-  @override
   Widget build(BuildContext context) {
-    return Column(
+    return SingleChildScrollView(
+      child: Column(
         children: [
           const HeaderImage(),
           _buildHomeLayout(),
-        ]
+        ],
+      ),
     );
   }
 

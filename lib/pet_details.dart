@@ -138,7 +138,13 @@ class PetDetailsScreen extends StatelessWidget {
                   context,
                   label: 'Recetas',
                   onPressed: () {
-                    // TODO: revisar conflictos con file_picker
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PrescriptionUploadScreen(petId: petId),
+                      ),
+                    );
+
                   },
                   color: highlightColor,
                 ),
