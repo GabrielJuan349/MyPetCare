@@ -13,8 +13,8 @@ import { getClinics, createClinic, deleteClinic, getAllClinics } from "./api-fun
 import { createVet, deleteVet, getVetById , getVetsByClinic} from "./api-functions/vets.ts";
 import { createNews, getAllNews, deleteNews } from "./api-functions/news.ts";
 import { updateUser, deleteUser, getUserDataById } from "./api-functions/gestion.usuarios.ts";
-import { newAppointment, monthBlockedRequest } from './api-functions/blocked-request.ts';
-import { getCitasByVetId } from './api-functions/citas.ts';
+import { monthBlockedRequest } from './api-functions/blocked-request.ts';
+import { getCitasByVetId, newAppointment } from './api-functions/appointments.ts';
 
 
 await load({ export: true });
