@@ -74,7 +74,7 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          if (myPets.length < 5) {
+          if (myPets.length < 20) {
             Navigator.push(
               context,
               MaterialPageRoute(
