@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:lis_project/data.dart';
 import 'package:lis_project/pet.dart';
 import 'package:lis_project/pet_details.dart';
 import 'package:lis_project/reports_screen.dart';
 import 'package:lis_project/vaccine_screen.dart';
 import 'package:lis_project/prescription.dart';
-import 'package:lis_project/requests.dart'; 
+import 'package:lis_project/requests.dart';
+import 'package:provider/provider.dart'; 
 
 class PetNumScreen extends StatefulWidget {
   Pet myPet;
@@ -47,7 +49,8 @@ class _PetNumScreenState extends State<PetNumScreen> {
       try {
         await deletePet(myPet.id); 
         if (!mounted) return;
-        Navigator.of(context).pop(); 
+        Provider.of<OwnerModel>(context, listen: false).removePet(myPet);
+        Navigator.of(context).pop(true); 
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to delete pet')),

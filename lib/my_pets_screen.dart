@@ -90,13 +90,14 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
           return ListTile(
             leading: CircleAvatar(foregroundImage: FileImage(File("assets/img/bone.jpg"))),
             title: Text(pets[index].name),
-            onTap: () {
-              Navigator.push(
+            onTap: () async {
+              await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => PetNumScreen(myPet: pets[index]),
                 ),
               );
+              _loadPets(); // Reload pets after returning from PetNumScreen
             },
           );
         },
