@@ -12,13 +12,22 @@ class ClinicAdoptionsScreen extends StatefulWidget {
 }
 
 class _ClinicAdoptionsScreenState extends State<ClinicAdoptionsScreen> {
-  List<Map<String, dynamic>> adoptions = [];
+  List<Map<String, dynamic>> allAdoptions = [];
+  List<Map<String, dynamic>> filteredAdoptions = [];
   bool isLoading = true;
+  TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     fetchAdoptions();
+    searchController.addListener(_filterAdoptions);
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   Future<void> fetchAdoptions() async {
@@ -27,8 +36,10 @@ class _ClinicAdoptionsScreenState extends State<ClinicAdoptionsScreen> {
     try {
       final res = await http.get(url);
       if (res.statusCode == 200) {
+        final List<Map<String, dynamic>> data = List<Map<String, dynamic>>.from(json.decode(res.body));
         setState(() {
-          adoptions = List<Map<String, dynamic>>.from(json.decode(res.body));
+          allAdoptions = data;
+          filteredAdoptions = data;
           isLoading = false;
         });
       } else {
@@ -42,6 +53,20 @@ class _ClinicAdoptionsScreenState extends State<ClinicAdoptionsScreen> {
     }
   }
 
+void _filterAdoptions() {
+  final query = searchController.text.toLowerCase();
+  setState(() {
+    if (query.isEmpty) {
+      filteredAdoptions = allAdoptions;
+    } else {
+      filteredAdoptions = allAdoptions.where((adoption) {
+        final name = adoption['name']?.toLowerCase() ?? '';
+        return name.contains(query);
+      }).toList();
+    }
+  });
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,37 +78,56 @@ class _ClinicAdoptionsScreenState extends State<ClinicAdoptionsScreen> {
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
-          : adoptions.isEmpty
-              ? Center(child: Text('There are no adoptions available'))
-              : ListView.builder(
-                  itemCount: adoptions.length,
-                  itemBuilder: (context, index) {
-                    final adoption = adoptions[index];
-                    return Card(
-                      margin: EdgeInsets.all(12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
+          : Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search by name...',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      elevation: 3,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              adoption['name'] ?? 'unknown',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(height: 6),
-                            Text("Type: ${adoption['type'] ?? 'unknown'}"),
-                            Text("Age: ${adoption['age'] ?? 'N/A'} years old"),
-                            Text("If you are interested in adopting, please contact the mail: ${adoption['email'] ?? 'unknown'}"),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
+                      prefixIcon: Icon(Icons.search),
+                    ),
+                  ),
                 ),
+                Expanded(
+                  child: filteredAdoptions.isEmpty
+                      ? Center(child: Text('No matching adoptions found'))
+                      : ListView.builder(
+                          itemCount: filteredAdoptions.length,
+                          itemBuilder: (context, index) {
+                            final adoption = filteredAdoptions[index];
+                            return Card(
+                              margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              elevation: 3,
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      adoption['name'] ?? 'unknown',
+                                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                    ),
+                                    SizedBox(height: 6),
+                                    Text("Type: ${adoption['type'] ?? 'unknown'}"),
+                                    Text("Age: ${adoption['age'] ?? 'N/A'} years old"),
+                                    Text("If you are interested in adopting, please contact the mail: ${adoption['email'] ?? 'unknown'}"),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                ),
+              ],
+            ),
     );
   }
 }
