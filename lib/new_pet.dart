@@ -6,13 +6,10 @@ import 'package:provider/provider.dart';
 import 'package:lis_project/data.dart';
 import 'package:lis_project/requests.dart';
 import 'package:lis_project/pet.dart';
-<<<<<<< Updated upstream
-=======
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 //import 'package:lis_project/scanAllModule.dart';
->>>>>>> Stashed changes
 
 class NewPetScreen extends StatefulWidget {
   const NewPetScreen({super.key});

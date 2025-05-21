@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:lis_project/requests.dart';
+import 'package:lis_project/add_vaccine_screen.dart';
 
 class VaccineScreen extends StatefulWidget {
   final String petId;
@@ -22,18 +24,12 @@ class _VaccineScreenState extends State<VaccineScreen> {
   }
 
   Future<void> fetchVaccines() async {
-    final uri = Uri.parse('http://localhost:6055/api/getVaccineByPetID/pet/${widget.petId}');
     try {
-      final response = await http.get(uri);
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        setState(() {
-          vaccines = data;
-          isLoading = false;
-        });
-      } else {
-        throw Exception('Error en la respuesta del servidor');
-      }
+      final data = await getVaccinesByPetId(widget.petId);
+      setState(() {
+        vaccines = data;
+        isLoading = false;
+      });
     } catch (e) {
       print('Error al obtener vacunas: $e');
       setState(() {
@@ -57,7 +53,9 @@ class _VaccineScreenState extends State<VaccineScreen> {
           children: [
             Text(name,
                 style: const TextStyle(
-                    fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF627ECB))),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF627ECB))),
             const SizedBox(height: 8),
             Text(date,
                 style: const TextStyle(fontSize: 16, color: Colors.grey)),
@@ -75,6 +73,22 @@ class _VaccineScreenState extends State<VaccineScreen> {
         backgroundColor: const Color(0xfff59249),
         iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => AddVaccineScreen(petId: widget.petId),
+                ),
+              );
+              if (result == true) {
+                fetchVaccines(); // Refrescar al volver
+              }
+            },
+          )
+        ],
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())

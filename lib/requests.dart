@@ -5,7 +5,7 @@ import 'package:lis_project/pet.dart';
 import 'package:lis_project/data.dart';
 
 // Change to the url of your actual backend
-const String BASE_URL = "http://10.0.2.2:6055";
+const String BASE_URL = "http://localhost:6055";
 
 Future<String> sendRequest(Uri uri, String action, {Map<String, dynamic>? req_body}) async{
   late final http.Response response;
@@ -147,5 +147,37 @@ Future<void> deletePet(String petId) async {
     throw Exception("Failed to delete pet: ${response.body}");
   }
 }
+
+Future<List<dynamic>> getVaccinesByPetId(String petId) async {
+  final uri = Uri.parse('$BASE_URL/api/getVaccineByPetID/pet/$petId');
+  
+  final response = await http.get(uri);
+
+  if (response.statusCode == 200) {
+    return json.decode(response.body);
+  } else {
+    throw Exception('Error al obtener vacunas');
+  }
+}
+
+
+Future<void> createVaccine(Map<String, String> vaccine) async {
+  final uri = Uri.parse('$BASE_URL/api/vaccine');
+
+  final response = await http.post(
+    uri,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      "Date": vaccine['Date'],
+      "PetId": vaccine['PetId'],
+      "name": vaccine['name'],
+    }),
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception("Error al crear la vacuna: ${response.body}");
+  }
+}
+
 
 

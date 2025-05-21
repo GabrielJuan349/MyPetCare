@@ -122,7 +122,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       const Text('or'),
                       ElevatedButton(
                           onPressed: () {
-                            signInWithGoogle();
+                            _signInWithGoogle();
                           },
                           child: const Text('Sign up with google')),
                     ],
