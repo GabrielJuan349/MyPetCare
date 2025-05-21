@@ -29,7 +29,7 @@ class Pet {
       age: json['age'].toString() ?? "",
       breed: json['breed'].toString() ?? "",
       type: json['type'].toString() ?? "",
-      image: json['image'].toString() ?? "",
+      image: json['photoUrls'].toString() ?? "",
       chip: json['chip'].toString() ?? "",
       weight: double.tryParse(json['weight']?.toString() ?? "") ?? 0.0,
       owner: json['owner'].toString() ?? "",

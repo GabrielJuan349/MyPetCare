@@ -44,20 +44,20 @@ class _EditPetState extends State<EditPet> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Color(0xfff59249),
-        title: Text("Edit Pet details"),
+        backgroundColor: const Color(0xfff59249),
+        title: const Text("Edit Pet details"),
         foregroundColor: Colors.white,
         centerTitle: true,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
       ),
       body: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
               Expanded(
@@ -81,28 +81,28 @@ class _EditPetState extends State<EditPet> {
   }
 
   Widget _buildTextField(String label, {bool obscureText = false}) {
-    late TextEditingController _textController;
+    late TextEditingController textController;
     if (label == "Name") {
-      _textController = _textControllerName;
+      textController = _textControllerName;
     } else if (label == "Gender") {
-      _textController = _textControllerGender;
+      textController = _textControllerGender;
     } else if (label == "Breed") {
-      _textController = _textControllerBreed;
+      textController = _textControllerBreed;
     } else if (label == "Weight") {
-      _textController = _textControllerWeight;
+      textController = _textControllerWeight;
     }
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: TextStyle(fontSize: 16)),
+          Text(label, style: const TextStyle(fontSize: 16)),
           TextField(
-            controller: _textController,
+            controller: textController,
             obscureText: obscureText,
             decoration: InputDecoration(
               filled: true,
-              fillColor: Color(0xFFE9EFFF),
+              fillColor: const Color(0xFFE9EFFF),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(5),
                 borderSide: BorderSide.none,
@@ -130,14 +130,14 @@ class _EditPetState extends State<EditPet> {
               ),
             );
           },
-          child: Text('Submit'),
           style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.symmetric(vertical: 15, horizontal: 80),
-            textStyle: TextStyle(fontSize: 18),
-            backgroundColor: Color(0xFF627ECB),
+            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 80),
+            textStyle: const TextStyle(fontSize: 18),
+            backgroundColor: const Color(0xFF627ECB),
             foregroundColor: Colors.white,
           
           ),
+          child: Text('Submit'),
         ),
       ),
     );

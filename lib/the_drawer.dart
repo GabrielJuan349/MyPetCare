@@ -37,7 +37,7 @@ class TheDrawer extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.help_outline, color: Colors.white),
-              title: const Text('Help', style: TextStyle(color: Colors.white)),
+              title: const Text('FAQs', style: TextStyle(color: Colors.white)),
               onTap: () {
                 // Close drawer
                 Navigator.pop(context);

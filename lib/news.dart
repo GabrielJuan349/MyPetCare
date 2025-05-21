@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:lis_project/the_drawer.dart';
 
 class NewsScreen extends StatefulWidget {
   const NewsScreen({super.key});

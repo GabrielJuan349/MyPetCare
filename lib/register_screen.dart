@@ -6,7 +6,7 @@ import 'package:lis_project/iniciar_sesion.dart';
 import 'signInWithGoogle.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+  const RegisterScreen({super.key});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -120,7 +120,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         child: const Text('Register'),
                       ),
                       const Text('or'),
-                      _buildInitOptionsButton('assets/logo/google.png', 'Google')
+                      ElevatedButton(
+                          onPressed: () {
+                            signInWithGoogle();
+                          },
+                          child: const Text('Sign up with google')),
                     ],
                   ),
                 ),

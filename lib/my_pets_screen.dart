@@ -24,6 +24,7 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
   @override
   void initState() {
     super.initState();
+    _loadPets();
   }
 
   //https://stackoverflow.com/questions/58371874/what-is-the-difference-between-didchangedependencies-and-initstate

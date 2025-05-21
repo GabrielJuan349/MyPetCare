@@ -24,17 +24,19 @@ class FAQScreen extends StatelessWidget {
     },
   ];
 
+  FAQScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xfff59249),
-        title: Text("FAQs"),
+        backgroundColor: const Color(0xfff59249),
+        title: const Text("FAQs"),
         centerTitle: true,
         elevation: 0,
         foregroundColor: Colors.white,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -46,7 +48,7 @@ class FAQScreen extends StatelessWidget {
           return ExpansionTile(
             title: Text(
               faqs[index]['question']!,
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             children: [
               Padding(

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lis_project/the_drawer.dart';
 import 'package:lis_project/data.dart';
-import 'package:provider/provider.dart';
+import 'package:lis_project/the_drawer.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -10,9 +9,16 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
+
+
 class _HomeScreenState extends State<HomeScreen> {
   double iconSize = 70;
 
+  @override
+  void initState() {
+    super.initState();
+    setGlobalUser(context);
+  }
   @override
   Widget build(BuildContext context) {
     const appBarColor = Color(0xfff59249);

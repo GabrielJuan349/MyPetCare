@@ -6,7 +6,13 @@ import 'package:provider/provider.dart';
 import 'package:lis_project/data.dart';
 import 'package:lis_project/requests.dart';
 import 'package:lis_project/pet.dart';
+<<<<<<< Updated upstream
+=======
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 //import 'package:lis_project/scanAllModule.dart';
+>>>>>>> Stashed changes
 
 class NewPetScreen extends StatefulWidget {
   const NewPetScreen({super.key});
@@ -138,7 +144,13 @@ class _NewPetScreenState extends State<NewPetScreen> {
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
           const SizedBox(height: 4),
           ElevatedButton(
-            onPressed: () => pickPdfFile(label),
+            onPressed: () {
+              if (label == "Foto") {
+                fileName = (pickImageFile() ?? "") as String?;
+              } else {
+                pickPdfFile(label);
+              }
+            },
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 80),
               textStyle: const TextStyle(fontSize: 18),
@@ -264,7 +276,7 @@ class _NewPetScreenState extends State<NewPetScreen> {
       );
       print("New pet: $newPet");
 
-      Provider.of<OwnerModel>(context, listen: true).addPet(newPet);
+      Provider.of<OwnerModel>(context, listen: false).addPet(newPet);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Mascota registrada correctamente')),
@@ -281,7 +293,7 @@ class _NewPetScreenState extends State<NewPetScreen> {
   Future<void> pickPdfFile(String label) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['pdf'],
+      allowedExtensions: ['pdf', 'jpg', 'png'],
     );
 
     if (result != null && result.files.isNotEmpty) {
@@ -295,6 +307,37 @@ class _NewPetScreenState extends State<NewPetScreen> {
     }
   }
 
+  Future<String> pickImageFile() async {
+    final picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      final savedPath = await saveImageLocally(pickedFile);
+
+      if (savedPath != null) {
+          setState(() {
+            fotoFileName = savedPath; // Ruta local
+            print("Foto file name: $fotoFileName");
+        });
+      }
+    }
+    return fotoFileName ?? ""; // Devuelve la ruta local o null
+  }
+
+  Future<String?> saveImageLocally(XFile imageFile) async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final localPath = p.join(directory.path, fileName);
+
+      final File localImage = await File(imageFile.path).copy(localPath);
+      return localImage.path; // Devuelve la ruta local del archivo
+    } catch (e) {
+      print("Error saving image locally: $e");
+      return null;
+    }
+  }
+
   int _calculateAge(String birthDate) {
     DateTime dateOfBirth = DateTime.parse(birthDate);
     DateTime today = DateTime.now();
@@ -305,6 +348,7 @@ class _NewPetScreenState extends State<NewPetScreen> {
     }
     return age;
   }
+
 
   @override
   void dispose() {
