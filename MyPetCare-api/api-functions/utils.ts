@@ -8,3 +8,4 @@ export function getDatabaseDate(month: string, year: string) {
     const monthIndex:string = Months[parseInt(month)-1];
     return monthIndex+"_"+year;
 }
+

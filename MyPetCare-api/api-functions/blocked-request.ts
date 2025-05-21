@@ -81,6 +81,7 @@ export async function monthBlockedRequest(ctx: RouterContext<"/blocked/month/:id
             .filter((entry: any) => entry.document)
             .map((entry: any) => {
                 const fields = entry.document.fields;
+                console.log("Fields:", fields.January_2025.mapValue.fields);
                 const citaData: any = {};
                 for (const fieldName in fields) {
                     if (fieldName != "clinicId" && fieldName === databaseIndex) {
