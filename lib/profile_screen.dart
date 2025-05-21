@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lis_project/requests.dart';
 import 'package:lis_project/data.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -49,10 +50,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
 
-  Future<void> _signOut() async{
-    await FirebaseAuth.instance.signOut();
-    Provider.of<OwnerModel>(context).clearOwner();
-  }
+  Future<void> _signOut() async {
+  await FirebaseAuth.instance.signOut();
+
+  // Limpia datos locales si los usas
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.clear();
+
+  Provider.of<OwnerModel>(context, listen: false).clearOwner();
+
+  // Navega limpiando toda la pila de navegación
+  Navigator.pushNamedAndRemoveUntil(context, '/init', (route) => false);
+}
+
 
   // https://stackoverflow.com/questions/52293129/how-to-change-password-using-firebase-in-flutter
   Future<void> _changePassword(String password) async{
