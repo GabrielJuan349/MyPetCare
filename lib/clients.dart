@@ -37,7 +37,7 @@ class _ClientsState extends State<Clients> {
       child: Align(
         alignment: Alignment.centerRight,
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 400), // Ancho máximo del buscador
+          constraints: const BoxConstraints(maxWidth: 400),
           child: TextField(
             decoration: InputDecoration(
               labelText: 'Search clients',

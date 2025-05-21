@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lis_web/report_list.dart';
 
 import 'report.dart';
 import 'schedule.dart';
@@ -102,7 +103,7 @@ class PetDetailsScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => ReportFormScreen(petId: petId),
+                        builder: (_) => ReportsListScreen(petId: petId),
                       ),
                     );
                   },

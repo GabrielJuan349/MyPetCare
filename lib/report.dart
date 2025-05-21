@@ -62,7 +62,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: Color(0xFFF6F6F6),
+        backgroundColor: const Color(0xFFF6F6F6),
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black87),
         title: Text(
