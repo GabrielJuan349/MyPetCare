@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lis_project/FAQs.dart';
+import 'package:lis_project/calendar_screen.dart';
 import 'package:lis_project/init_screen.dart';
 import 'package:lis_project/home_screen.dart';
 import 'package:lis_project/profile_screen.dart';
@@ -9,6 +10,7 @@ import 'package:lis_project/inbox.dart';
 import 'package:lis_project/register_screen.dart';
 import 'package:lis_project/register_form_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:lis_project/schedule_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:lis_project/data.dart';
 import 'firebase_options.dart';
@@ -54,6 +56,7 @@ class MyApp extends StatelessWidget {
         '/news': (context) => const NewsScreen(),
         '/map' : (context) => MapScreen(),
         '/help' : (context) => FAQScreen(),
+        '/calendar' : (context) => CalendarScreen()
       },
     );
   }

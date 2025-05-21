@@ -61,7 +61,11 @@ class _HomeScreenState extends State<HomeScreen> {
               label: 'Agenda',
               color: const Color(0xFFE9EFFF),
               iconColor: const Color(0xFF627ECB),
-              onTap: () {},
+              onTap: () {Navigator.pushNamed(
+                context,
+                '/calendar',
+              );
+              },
             ),
             _buildContainer(
               icon: Icons.notifications_outlined,
