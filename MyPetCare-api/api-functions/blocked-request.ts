@@ -85,12 +85,50 @@ export async function dayBlockedRequest(ctx: RouterContext<"/blocked/day/:id">) 
 
 export async function monthBlockedRequest(ctx: RouterContext<"/blocked/month/:id">) {
     const clinicId = ctx.params.id; // Renombrado para claridad
-    const month = ctx.request.url.searchParams.get("month");
-    const year = ctx.request.url.searchParams.get("year");
+    let requestPayload;
 
-    if (!month || !year || !clinicId) {
-        ctx.response.status = 400;
-        ctx.response.body = { error: "Clínica, mes o año no proporcionado" };
+    try {
+        // El cuerpo de la solicitud se espera que sea JSON.
+        const body = ctx.request.body({ type: "json" });
+        requestPayload = await body.value; // Esto puede lanzar un error si el cuerpo no es JSON válido.
+        console.log("Received request payload:", requestPayload);
+    } catch (e) {
+        // Registrar el error y devolver una respuesta 400 si falla el análisis JSON.
+        console.error("Failed to parse JSON body:", e.message);
+        ctx.response.status = 400; // Bad Request
+        ctx.response.body = { 
+            error: "Invalid JSON payload.",
+            details: `Failed to parse JSON: ${e.message}` // Proporcionar detalles del analizador.
+        };
+        return;
+    }
+    
+    // En este punto, requestPayload debería ser el objeto JSON analizado.
+    // Desestructurar month y year de él.
+    const { month, year } = requestPayload; 
+
+    // Estas líneas console.log son para depuración, mantenidas del código original.
+    // const month = ctx.request.body.arguments.get("month");
+    // console.log("lol", lol);
+    console.log("month received:", month);
+    console.log("clinicId from path:", clinicId);
+    // const year = ctx.request.body.searchParams.get("year");
+    console.log("year received:", year);
+
+    // Validar que todos los parámetros requeridos estén presentes.
+    // clinicId viene de la ruta, month y year del cuerpo JSON.
+    if (!month || !year || !clinicId) { // Manteniendo la verificación de clinicId como en la lógica original
+        ctx.response.status = 400; // Bad Request
+        const missingParams = [];
+        if (!month) missingParams.push("month");
+        if (!year) missingParams.push("year");
+        // clinicId viene de la ruta, es menos probable que falte si la ruta coincidió, pero se verifica por completitud.
+        if (!clinicId) missingParams.push("'clinicId' (from path)"); 
+        
+        ctx.response.body = { 
+            error: "Missing required parameters.",
+            message: `The following parameters are required: ${missingParams.join(", ")}.` 
+        };
         return;
     }
     

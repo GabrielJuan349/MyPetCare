@@ -11,6 +11,7 @@ const FirestoreQueryUrl = `https://firestore.googleapis.com/v1/projects/${FIREBA
 
 export async function getCitasByVetId(ctx: RouterContext<"/api/citas/vet/:vetId">) {
     const vetId = ctx.params.vetId;
+    console.log("vetId", vetId);
 
     if (!vetId) {
         ctx.response.status = 400;
@@ -20,10 +21,10 @@ export async function getCitasByVetId(ctx: RouterContext<"/api/citas/vet/:vetId"
 
     const query = {
         structuredQuery: {
-            from: [{ collectionId: "citas" }], // Nombre de tu colección de citas
+            from: [{ collectionId: "blocked_date" }], // Nombre de tu colección de citas
             where: {
                 fieldFilter: {
-                    field: { fieldPath: "vetId" }, // Campo para filtrar por ID de veterinario
+                    field: { fieldPath: "clinicId" }, // Campo para filtrar por ID de veterinario
                     op: "EQUAL",
                     value: { stringValue: vetId }
                 }
@@ -49,36 +50,24 @@ export async function getCitasByVetId(ctx: RouterContext<"/api/citas/vet/:vetId"
         }
 
         const result = await response.json();
+    
 
-        // Los resultados de runQuery vienen como un array de objetos,
-        // cada uno puede ser un documento o una notificación de que no hay más resultados.
-        // Filtramos solo los que tienen un documento.
         const citas = result
             .filter((entry: any) => entry.document)
             .map((entry: any) => {
-                const document = entry.document;
-                const id = document.name.split("/").pop(); // Extrae el ID del documento de su path
-                const fields = document.fields;
-                
-                // Transforma los campos de Firestore a un objeto más plano
-                const citaData: { [key: string]: any } = { id };
+                const fields = entry.document.fields;
+                const citaData: any = {};
                 for (const fieldName in fields) {
-                    const valueWrapper = fields[fieldName];
-                    // El valor real está dentro de una clave como stringValue, integerValue, mapValue, etc.
-                    const valueType = Object.keys(valueWrapper)[0];
-                    citaData[fieldName] = valueWrapper[valueType];
+                    if (fieldName != "clinicId") {
+                        const valueWrapper = fields[fieldName];
+                        // El valor real está dentro de una clave como stringValue, integerValue, mapValue, etc.
+                        const valueType = Object.keys(valueWrapper)[0];
+                        citaData[fieldName] = valueWrapper[valueType];
+                    }
                 }
+                
                 return citaData;
-                // Si tienes una interfaz Cita, puedes mapear a ella:
-                // return {
-                //     id: id,
-                //     // ...otros campos mapeados según tu interfaz Cita
-                //     // Ejemplo:
-                //     // petId: fields.petId?.stringValue,
-                //     // fecha: fields.fecha?.timestampValue, 
-                //     // motivo: fields.motivo?.stringValue,
-                //     // vetId: fields.vetId?.stringValue 
-                // } as Cita;
+             
             });
 
         ctx.response.status = 200;
