@@ -85,13 +85,10 @@ export async function updatePet(ctx: RouterContext<"/api/pet/:id">) {
   const pet = await value;
 
   const fields: any = {
-    age: { integerValue: pet.age },
-    birthDate: { stringValue: pet.birthDate },
     breed: { stringValue: pet.breed },
     name: { stringValue: pet.name },
-    owner: { stringValue: pet.owner },
-    type: { stringValue: pet.type },
-    weight: { doubleValue: pet.weight }
+    weight: { doubleValue: pet.weight },
+    gender: { stringValue: pet.gender },
   };
 
   const updateMask = [
