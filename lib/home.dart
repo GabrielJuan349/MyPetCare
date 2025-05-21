@@ -98,12 +98,15 @@ class _HomePageState extends State<HomePage> {
               color: isSelected ? highlightColor : Colors.transparent,
               borderRadius: BorderRadius.circular(6),
             ),
-            child: Text(
-              labels[index],
-              style: GoogleFonts.inter(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: isSelected ? Colors.white : highlightColor,
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Text(
+                labels[index],
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: isSelected ? Colors.white : highlightColor,
+                ),
               ),
             ),
           ),
@@ -118,8 +121,64 @@ class HomeContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(children: [HeaderImage()]);
+    return Column(
+        children: [
+          const HeaderImage(),
+          _buildHomeLayout(),
+        ]
+    );
   }
+
+  Widget _buildCardHome(String text) {
+    return Card(
+      color: Colors.white70,
+      shadowColor: Colors.blueAccent,
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Title
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              color: Colors.orange.shade300,
+              child: Text(
+                "Today's $text",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+
+            // Body
+            Container(
+              height: 400,
+              color: Colors.grey.shade100,
+              child: Center(
+                child: Text('No $text yet'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHomeLayout() {
+    return Padding(
+      padding: const EdgeInsets.all(40.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(child: _buildCardHome('appointments')),
+          const SizedBox(width: 20),
+          Expanded(child: _buildCardHome('Arrivals')),
+        ],
+      ),
+    );
+  }
+
 }
 
 class HeaderImage extends StatelessWidget {

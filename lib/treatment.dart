@@ -19,7 +19,7 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
     final now = DateTime.now();
     final endDate = now.add(Duration(days: durationDays));
 
-    await FirebaseFirestore.instance.collection('treatments').add({
+    await FirebaseFirestore.instance.collection('treatment').add({
       'id_pet': widget.petId,
       'id_vet': 'default_vet', // no tengo claro como recibirlo, creo que no esta implementado el login
       'name': name,
@@ -33,15 +33,22 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
   }
 
   Future<void> _deleteTreatment(String docId) async {
-    await FirebaseFirestore.instance.collection('treatments').doc(docId).delete();
+    await FirebaseFirestore.instance.collection('treatment').doc(docId).delete();
   }
 
 
 
   @override
   Widget build(BuildContext context) {
+    final Color backgroundColor = Colors.white;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Tratamientos')),
+      backgroundColor: backgroundColor,
+      appBar: AppBar(
+          backgroundColor: const Color(0xFFF6F6F6),
+          elevation: 0,
+          title: const Text('Tratamientos')
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -49,14 +56,17 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
-                    .collection('treatments')
+                    .collection('treatment')
                     .where('id_pet', isEqualTo: widget.petId)
                     .orderBy('date_start', descending: true)
                     .snapshots(),
                 builder: (context, snapshot) {
-                  if (!snapshot.hasData) return const CircularProgressIndicator();
+                  if (snapshot.hasError) {
+                    return const Center(child: Text('Error charging treatment'));
+                  }
+                  if (snapshot.connectionState == ConnectionState.waiting) return const CircularProgressIndicator();
 
-                  final docs = snapshot.data!.docs;
+                  final docs = snapshot.data?.docs ?? [];
 
                   if (docs.isEmpty) {
                     return const Text('No hay tratamientos asignados.');
@@ -71,9 +81,16 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
                       final isExpired = dateEnd.isBefore(now);
 
                       return Card(
+                          color: const Color(0xFFFFF2D6),
+                        shadowColor: Colors.orange,
                         margin: const EdgeInsets.symmetric(vertical: 8),
                         child: ListTile(
-                          title: Text(data['name']),
+                          title: Text(
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold
+                            ),
+                              data['name']
+                          ),
                           subtitle: Text(
                             'Desde: ${DateFormat('dd/MM/yyyy').format(dateStart)}\nHasta: ${DateFormat('dd/MM/yyyy').format(dateEnd)}',
                           ),

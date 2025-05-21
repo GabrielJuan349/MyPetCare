@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
 
 import 'login.dart';  // la pantalla de login que crearemos
@@ -14,16 +15,30 @@ void main() async {
 }
 
 class MyPetCareApp extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'MyPetCare',
       debugShowCheckedModeBanner: false,
-      initialRoute: '/login',
-      routes: {
-        '/login': (context) => const Login(),
-        '/': (context) => const HomePage(),
-      },
+      home: AuthLogic(),
+    );
+  }
+}
+
+class AuthLogic extends StatelessWidget{
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: _auth.authStateChanges(),
+      builder: (BuildContext ctx, snapshot) {
+        if (snapshot.hasData) {
+          return const HomePage();
+        }
+        return const Login();
+      }
     );
   }
 }
