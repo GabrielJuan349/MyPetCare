@@ -75,6 +75,20 @@ class OwnerModel extends ChangeNotifier {
     _pets?.add(pet);
   }
 
+  void removePet(Pet pet){
+    _pets?.remove(pet);
+  }
+
+  void updatePet(Pet pet) {
+    for (int i = 0; i < _pets!.length; i++) {
+      if (_pets![i].id == pet.id) {
+        _pets![i] = pet;
+        break;
+      }
+    }
+    notifyListeners();
+  }
+
   void clearOwner() {
     _owner = null;
     _pets = null;

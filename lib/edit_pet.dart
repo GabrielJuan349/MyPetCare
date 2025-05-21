@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:lis_project/data.dart';
 import 'package:lis_project/pet.dart';
 import 'package:lis_project/pet_details.dart';
+import 'package:lis_project/requests.dart';
+import 'package:provider/provider.dart';
 
 class EditPet extends StatefulWidget {
   Pet myPet;
@@ -66,7 +69,7 @@ class _EditPetState extends State<EditPet> {
                         _buildTextField('Gender'),
                         _buildTextField('Breed'),
                         _buildTextField('Weight'),
-                        _buildButton()
+                        _buildButton(),
                       ],
                     ),
                   )
@@ -116,24 +119,10 @@ class _EditPetState extends State<EditPet> {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: ElevatedButton(
-          onPressed: () {
-            myPet.name = _textControllerName.text;
-            myPet.gender = _textControllerGender.text;
-            myPet.breed = _textControllerBreed.text;
-            myPet.weight = double.tryParse(_textControllerWeight.text) ?? 0.0;
-            /*
-            setState(() {
-              //myPet = updatedPet;
-              for (int i = 0; i < pets.length; i++) {
-                if (pets[i].id == myPet.id) {
-                  pets[i] = updatedPet;
-                }
-              }
-            });*/
-            Navigator.pop(context);
-            Navigator.pop(context);
-            Navigator.pop(context);
-            Navigator.pop(context);
+          onPressed: () async{
+            await editPet();
+            // Navigate back to the previous screen
+            Navigator.pop(context, true);
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -147,9 +136,46 @@ class _EditPetState extends State<EditPet> {
             textStyle: TextStyle(fontSize: 18),
             backgroundColor: Color(0xFF627ECB),
             foregroundColor: Colors.white,
+          
           ),
         ),
       ),
     );
   }
+
+  Future<void> editPet() async {
+    try {
+      
+      final petData = {
+        "name": _textControllerName.text.trim(),
+        "gender": _textControllerGender.text.trim(),
+        "breed": _textControllerBreed.text.trim(),
+        "weight": double.tryParse(_textControllerWeight.text.trim()) ?? 0.0,
+      };
+
+      print("Pet data: $petData");
+
+      final String petId = await updatePet(myPet.id,petData);
+      print("Pet updated: $petId");
+
+      myPet.name = _textControllerName.text.trim();
+      myPet.breed = _textControllerBreed.text.trim();
+      myPet.weight = double.tryParse(_textControllerWeight.text.trim()) ?? 0.0;
+      myPet.gender = _textControllerGender.text.trim();
+
+      // Update the pet in the provider
+      Provider.of<OwnerModel>(context, listen: false).updatePet(myPet);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Mascota editada correctamente')),
+      );
+    } catch (e) {
+      print("Error al editar mascota: $e");
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error al editar mascota')),
+      );
+    }
+  }
+
 }

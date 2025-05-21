@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lis_project/pet.dart';
+import 'package:lis_project/edit_pet.dart';
 
 class PetDetails extends StatefulWidget {
   Pet myPet;
@@ -92,6 +93,10 @@ class _PetDetailsState extends State<PetDetails> {
             Text(
                 "Age: ${myPet.age}"
             ),
+            const SizedBox(height: 10),
+            Text(
+                "Weight: ${myPet.weight} kg"
+            ),
             /*const SizedBox(height: 20),
             buildStarRow("Friendly", myPet.friendly),
             const SizedBox(height: 10),
@@ -101,7 +106,14 @@ class _PetDetailsState extends State<PetDetails> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.white,
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EditPet(myPet: myPet),
+            ),
+          );
+        },
         child: const Icon(Icons.edit, color: Colors.blue),
       ),
     );
