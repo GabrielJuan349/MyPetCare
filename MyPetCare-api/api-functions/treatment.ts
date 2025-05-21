@@ -47,6 +47,7 @@ export async function createTreatment(ctx: RouterContext<"/api/createTreatment">
 // Get by ID
 //not will be used
 export async function getTreatmentById(ctx: RouterContext<"/api/getTreatmentById/:id">) {
+  await cleanExpiredTreatments(); 
   const id = ctx.params.id;
   const res = await fetch(`${FirestoreTreatmentURL}/${id}`);
   const result = await res.json();
@@ -57,6 +58,7 @@ export async function getTreatmentById(ctx: RouterContext<"/api/getTreatmentById
 
 // Get by id_pet
 export async function getTreatmentsByPet(ctx: RouterContext<"/api/getTreatmentsByPet/pet/:id">) {
+  await cleanExpiredTreatments(); 
   const id = ctx.params.id;
   const res = await fetch(FirestoreTreatmentURL);
   const data = await res.json();
@@ -70,6 +72,7 @@ export async function getTreatmentsByPet(ctx: RouterContext<"/api/getTreatmentsB
 
 // Get by id_vet
 export async function getTreatmentsByVet(ctx: RouterContext<"/api/getTreatmentsByVet/vet/:id">) {
+  await cleanExpiredTreatments(); 
   const id = ctx.params.id;
   const res = await fetch(FirestoreTreatmentURL);
   const data = await res.json();
@@ -88,4 +91,25 @@ export async function deleteTreatment(ctx: RouterContext<"/api/deleteTreatment/:
 
   ctx.response.status = res.ok ? 200 : 500;
   ctx.response.body = res.ok ? { success: true } : { error: "Delete failed" };
+}
+
+export async function cleanExpiredTreatments(): Promise<number> {
+  const PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID");
+  const FirestoreTreatmentURL = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/treatment`;
+
+  const now = new Date();
+  const res = await fetch(FirestoreTreatmentURL);
+  const data = await res.json();
+
+  const toDelete = (data.documents || []).filter((doc: any) => {
+    const endDate = new Date(doc.fields?.date_end?.timestampValue);
+    return endDate < now;
+  });
+
+  for (const doc of toDelete) {
+    const id = doc.name.split("/").pop();
+    await fetch(`${FirestoreTreatmentURL}/${id}`, { method: "DELETE" });
+  }
+
+  return toDelete.length;
 }
