@@ -22,7 +22,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     setState(() => _isSaving = true);
 
     try {
-      await FirebaseFirestore.instance.collection('reports').add({
+      await FirebaseFirestore.instance.collection('report').add({
         'petId': widget.petId,
         'reportText': _reportController.text.trim(),
         'createdAt': Timestamp.now(),
