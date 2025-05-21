@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:lis_project/iniciar_sesion.dart';
 
+import 'signInWithGoogle.dart';
+
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
 
@@ -14,27 +16,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
   bool _isLoading = false;
+  bool _isLoadingGoogle = false;
 
-  // Before add the key: https://developers.google.com/android/guides/client-auth?hl=es-419
-  // Log in with google: https://firebase.google.com/docs/auth/flutter/federated-auth?hl=es-419
-  Future<UserCredential> signInWithGoogle() async {
-    // Trigger the authentication flow
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
-    // Obtain the auth details from the request
-    final GoogleSignInAuthentication? googleAuth =
-        await googleUser?.authentication;
-
-    // Create a new credential
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth?.accessToken,
-      idToken: googleAuth?.idToken,
-    );
-
-    // Once signed in, return the UserCredential
-    return await FirebaseAuth.instance.signInWithCredential(credential);
-  }
 
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
@@ -58,7 +43,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         const SnackBar(content: Text('User registered successfully')),
       );
 
-      Navigator.pushNamed(context, '/formRegister', arguments: firebaseuser,);
+      Navigator.pushNamed(context, '/formRegister', arguments: firebaseuser);
 
     } on FirebaseAuthException catch (e) {
       String message;
@@ -135,11 +120,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         child: const Text('Register'),
                       ),
                       const Text('or'),
-                      ElevatedButton(
-                          onPressed: () {
-                            signInWithGoogle();
-                          },
-                          child: Text('Sign up with google')),
+                      _buildInitOptionsButton('assets/logo/google.png', 'Google')
                     ],
                   ),
                 ),
@@ -180,4 +161,37 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ],
         ));
   }
+
+  Future<void> _signInWithGoogle() async{
+    final GoogleAuthService authService = GoogleAuthService();
+    final firebaseuser = await authService.signInWithGoogle();
+    print("userType from firebase $firebaseuser");
+    print("UID: ${firebaseuser?.uid}");
+    print("Token: ${await firebaseuser?.getIdToken()}");
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('User registered successfully')),
+    );
+
+    Navigator.pushNamed(context, '/formRegister', arguments: firebaseuser,);
+  }
+
+  Widget _buildInitOptionsButton(String imagePath, String method){
+    final GoogleAuthService authService = GoogleAuthService();
+    return TextButton.icon(
+      onPressed: () {
+        setState(() {_isLoadingGoogle = true;});
+        _signInWithGoogle();
+        setState(() {_isLoadingGoogle = false;});
+      },
+      icon: Image.asset(imagePath, width: 20,),
+      label: Text('Sign in with $method'),
+      style: TextButton.styleFrom(
+          side: const BorderSide(
+              color: Colors.grey
+          )
+      ),
+    );
+  }
+
 }
