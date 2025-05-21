@@ -1,3 +1,4 @@
+import { Console } from 'node:console';
 import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
 const FIREBASE_PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID");
 // URL base para operaciones de documentos individuales y para :commit
@@ -11,11 +12,24 @@ function getDatabaseDate(month: string, year: string) {
 
 export async function dayBlockedRequest(ctx: RouterContext<"/blocked/day/:id">) {
     const clinicId = ctx.params.id; // Renombrado para claridad
-    const day = ctx.request.url.searchParams.get("day");
-    const month = ctx.request.url.searchParams.get("month");
-    const year = ctx.request.url.searchParams.get("year");
-    const petId = ctx.request.url.searchParams.get("petId");
-    const buttonId = ctx.request.url.searchParams.get("buttonId");
+    let requestPayload;
+    console.log("Received request payload:", clinicId);
+
+    try {
+        // El cuerpo de la solicitud se espera que sea JSON.
+        const body = ctx.request.body({ type: "json" });
+        requestPayload = await body.value; // Esto puede lanzar un error si el cuerpo no es JSON válido.
+    } catch (e) {
+        // Registrar el error y devolver una respuesta 400 si falla el análisis JSON.
+        console.error("Failed to parse JSON body:", e.message);
+        ctx.response.status = 400; // Bad Request
+        ctx.response.body = { 
+            error: "Invalid JSON payload.",
+            details: `Failed to parse JSON: ${e.message}` // Proporcionar detalles del analizador.
+        };
+        return;
+    }
+    const { day, month, year, buttonId, petId } = requestPayload; // Desestructuración del payload
 
     if (!day || !month || !year || !clinicId) {
         ctx.response.status = 400;
@@ -86,12 +100,12 @@ export async function dayBlockedRequest(ctx: RouterContext<"/blocked/day/:id">) 
 export async function monthBlockedRequest(ctx: RouterContext<"/blocked/month/:id">) {
     const clinicId = ctx.params.id; // Renombrado para claridad
     let requestPayload;
+    console.log("Received request payload:", clinicId);
 
     try {
         // El cuerpo de la solicitud se espera que sea JSON.
         const body = ctx.request.body({ type: "json" });
         requestPayload = await body.value; // Esto puede lanzar un error si el cuerpo no es JSON válido.
-        console.log("Received request payload:", requestPayload);
     } catch (e) {
         // Registrar el error y devolver una respuesta 400 si falla el análisis JSON.
         console.error("Failed to parse JSON body:", e.message);
@@ -102,27 +116,14 @@ export async function monthBlockedRequest(ctx: RouterContext<"/blocked/month/:id
         };
         return;
     }
-    
-    // En este punto, requestPayload debería ser el objeto JSON analizado.
-    // Desestructurar month y year de él.
+
     const { month, year } = requestPayload; 
 
-    // Estas líneas console.log son para depuración, mantenidas del código original.
-    // const month = ctx.request.body.arguments.get("month");
-    // console.log("lol", lol);
-    console.log("month received:", month);
-    console.log("clinicId from path:", clinicId);
-    // const year = ctx.request.body.searchParams.get("year");
-    console.log("year received:", year);
-
-    // Validar que todos los parámetros requeridos estén presentes.
-    // clinicId viene de la ruta, month y year del cuerpo JSON.
     if (!month || !year || !clinicId) { // Manteniendo la verificación de clinicId como en la lógica original
         ctx.response.status = 400; // Bad Request
         const missingParams = [];
         if (!month) missingParams.push("month");
         if (!year) missingParams.push("year");
-        // clinicId viene de la ruta, es menos probable que falte si la ruta coincidió, pero se verifica por completitud.
         if (!clinicId) missingParams.push("'clinicId' (from path)"); 
         
         ctx.response.body = { 
@@ -133,12 +134,26 @@ export async function monthBlockedRequest(ctx: RouterContext<"/blocked/month/:id
     }
     
     const databaseIndex = getDatabaseDate(month, year);
-    const documentUrl = `${FirestoreBaseUrl}/blocked_date/${databaseIndex}`;
+    const documentUrl = `${FirestoreBaseUrl}:runQuery`;
+    const query = {
+        structuredQuery: {
+            from: [{ collectionId: "blocked_date" }], // Nombre de tu colección de citas
+            where: {
+                fieldFilter: {
+                    field: { fieldPath: "clinicId" }, // Campo para filtrar por ID de veterinario
+                    op: "EQUAL",
+                    value: { stringValue: clinicId }
+                }
+            }
+            
+        }
+    };
 
     try {
         const response = await fetch(documentUrl, {
-            method: "GET",
+            method: "POST",
             headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(query)
         });
 
         if (!response.ok) {
@@ -156,25 +171,34 @@ export async function monthBlockedRequest(ctx: RouterContext<"/blocked/month/:id
 
         const result = await response.json();
         
-        let clinicBlockedData = {}; // Por defecto, si la clínica no tiene datos en el documento
-
-        if (result.fields && result.fields[clinicId] && result.fields[clinicId].mapValue && result.fields[clinicId].mapValue.fields) {
-            const clinicData = result.fields[clinicId].mapValue.fields;
-            // Transformar los datos de la clínica a un formato más simple
-            clinicBlockedData = Object.fromEntries(
-                Object.entries(clinicData).map(([day, dayDataWrapper]: [string, any]) => {
-                    if (dayDataWrapper.arrayValue && dayDataWrapper.arrayValue.values) {
-                        return [day, dayDataWrapper.arrayValue.values.map((v: any) => v.stringValue)];
-                    } else if (dayDataWrapper.booleanValue !== undefined && day === "month_is_blocked") {
-                         return [day, dayDataWrapper.booleanValue];
+        // const clinicData = result.document.fields; // Acceder a los campos del documento
+        // console.log("Clinic data:", clinicData);
+        const citas = result
+            .filter((entry: any) => entry.document)
+            .map((entry: any) => {
+                const fields = entry.document.fields;
+                const citaData: any = {};
+                for (const fieldName in fields) {
+                    if (fieldName != "clinicId" && fieldName === databaseIndex) {
+                        const valueWrapper = fields[fieldName];
+                        const appoint_day = valueWrapper.mapValue.fields;
+                        // El valor real está dentro de una clave como stringValue, integerValue, mapValue, etc.
+                        const day = Object.keys(appoint_day)[0];
+                        citaData[day] = [];
+                        // citaData[day] = appoint_day[day].mapValue.fields;
+                        for (const fieldName in appoint_day[day].mapValue.fields) {
+                            citaData[day].push(fieldName);
+                        }
                     }
-                    return [day, dayDataWrapper]; // Devolver el wrapper si no es un array o el booleano esperado
-                })
-            );
-        }
+                }
+                
+                return citaData;
+             
+            });
+        console.log("Citas:", citas);
 
         ctx.response.status = 200;
-        ctx.response.body = { clinicId, month, year, blockedDays: clinicBlockedData };
+        ctx.response.body = { blockedDays: citas };
 
     } catch (error) {
         console.error("Excepción al obtener fechas bloqueadas:", error);

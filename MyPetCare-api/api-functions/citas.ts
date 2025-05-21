@@ -21,10 +21,10 @@ export async function getCitasByVetId(ctx: RouterContext<"/api/citas/vet/:vetId"
 
     const query = {
         structuredQuery: {
-            from: [{ collectionId: "blocked_date" }], // Nombre de tu colección de citas
+            from: [{ collectionId: "appointments" }], // Nombre de tu colección de citas
             where: {
                 fieldFilter: {
-                    field: { fieldPath: "clinicId" }, // Campo para filtrar por ID de veterinario
+                    field: { fieldPath: "vetId" }, // Campo para filtrar por ID de veterinario
                     op: "EQUAL",
                     value: { stringValue: vetId }
                 }
