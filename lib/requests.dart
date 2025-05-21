@@ -133,3 +133,14 @@ Future<List<Map<String, dynamic>>> getClinics() async {
   }
 }
 
+
+Future<void> deletePet(String petId) async {
+  final url = Uri.parse("http://localhost:6055/api/pet/$petId");
+  final response = await http.delete(url);
+
+  if (response.statusCode != 200) {
+    throw Exception("Failed to delete pet: ${response.body}");
+  }
+}
+
+

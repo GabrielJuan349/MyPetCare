@@ -34,28 +34,26 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
   }
 
   void _loadPets() async {
-    final ownerModel  = Provider.of<OwnerModel>(context, listen: false);
-    final userId = ownerModel.owner?.firebaseUser.uid;
-    // Only get form firestore if we have not charged it
-    if (userId == null) {
-      print("userId is null — owner or firebaseUser not yet loaded");
-      return;
-    }
+  final ownerModel  = Provider.of<OwnerModel>(context, listen: false);
+  final userId = ownerModel.owner?.firebaseUser.uid;
 
-    List<Pet>? loadedPets = ownerModel.pets;
-
-    if (loadedPets == null) {
-      loadedPets = await getUserPets(userId);
-      ownerModel.setPets(loadedPets);
-    }
-
-    if (!mounted) return;
-
-    setState(() {
-      pets = loadedPets!;
-      isLoading = false;
-    });
+  if (userId == null) {
+    print("userId is null — owner or firebaseUser not yet loaded");
+    return;
   }
+
+  // SIEMPRE hacemos la petición al backend para tener los datos actualizados
+  List<Pet> loadedPets = await getUserPets(userId);
+  ownerModel.setPets(loadedPets); // Opcional: si quieres que esté actualizado también en el modelo global
+
+  if (!mounted) return;
+
+  setState(() {
+    pets = loadedPets;
+    isLoading = false;
+  });
+}
+
 
   @override
   Widget build(BuildContext context) {
