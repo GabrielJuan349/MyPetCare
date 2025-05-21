@@ -74,12 +74,23 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => NewPetScreen(), // ← Tu nueva pantalla
-            ),
-          );
+          if (myPets.length < 5) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => NewPetScreen(), // ← Tu nueva pantalla
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('No puedes añadir más de 5 mascotas.'),
+                duration: Duration(seconds: 2),
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: Colors.redAccent,
+              ),
+            );
+          }
         },
         child: Icon(Icons.add, color: Colors.white),
         backgroundColor: Color(0xFF627ECB),
