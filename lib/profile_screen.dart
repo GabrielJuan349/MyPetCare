@@ -21,6 +21,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _localityController = TextEditingController();
   final _newPasswordController = TextEditingController();
 
+  bool _isLoadingDeleteUser = false;
+
   @override
   void initState() {
     super.initState();
@@ -51,17 +53,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 
   Future<void> _signOut() async {
-  await FirebaseAuth.instance.signOut();
+    await FirebaseAuth.instance.signOut();
 
-  // Limpia datos locales si los usas
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.clear();
+    // Limpia datos locales si los usas
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
 
-  Provider.of<OwnerModel>(context, listen: false).clearOwner();
+    Provider.of<OwnerModel>(context, listen: false).clearOwner();
 
-  // Navega limpiando toda la pila de navegación
-  Navigator.pushNamedAndRemoveUntil(context, '/init', (route) => false);
-}
+    // Navega limpiando toda la pila de navegación
+    Navigator.pushNamedAndRemoveUntil(context, '/init', (route) => false);
+  }
 
 
   // https://stackoverflow.com/questions/52293129/how-to-change-password-using-firebase-in-flutter
@@ -98,11 +100,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               'All your data, preferences, and saved content will be permanently deleted.'
           ),
           actions: <Widget>[
-            TextButton(
+            _isLoadingDeleteUser ? const CircularProgressIndicator() : TextButton(
               style: TextButton.styleFrom(textStyle: Theme.of(context).textTheme.labelLarge),
               child: const Text('yes, delete my account'),
               onPressed: () {
+                _isLoadingDeleteUser = true;
                 deleteUser(user.firebaseUser.uid);
+                _isLoadingDeleteUser = false;
                 Navigator.pushNamed(context, '/init');
               },
             ),
