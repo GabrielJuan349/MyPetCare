@@ -14,7 +14,7 @@ import { createVet, deleteVet, getVetById , getVetsByClinic} from "./api-functio
 import { createNews, getAllNews, deleteNews } from "./api-functions/news.ts";
 import { updateUser, deleteUser, getUserDataById } from "./api-functions/gestion.usuarios.ts";
 import { monthBlockedRequest } from './api-functions/blocked-request.ts';
-import { deleteAppointment, getCitasByVetId, newAppointment } from './api-functions/appointments.ts';
+import { deleteAppointment, getCitasByVetId, newAppointment, getAppointmentById } from './api-functions/appointments.ts';
 import { createReport, getReportById, getReportsByVet, getReportsByPet, deleteReport } from "./api-functions/report.ts";
 import { createTreatment, getTreatmentById, getTreatmentsByVet, getTreatmentsByPet, deleteTreatment } from "./api-functions/treatment.ts";
 import {getVaccineByPetID, createVaccine} from "./api-functions/vaccines.ts";
@@ -165,10 +165,13 @@ router
   // DELETE Appointments
   .delete("/api/appointment/:id", deleteAppointment)
 
+  // GET Appointment by ID
+  .get("/api/getAppointment/:id", getAppointmentById)
+
   // GET month blocked days from clinicId
-  .post("/blocked/month/:id", monthBlockedRequest)
+  .post("/calendar/month/:id", monthBlockedRequest)
   // GET dates from vetId
-  .post("/api/citas/vet/:vetId", getCitasByVetId)
+  .post("/api/appointment/vet/:vetId", getCitasByVetId)
 
 // ---- Endpoints de TREATMENT ----
   // CREATE treatment info

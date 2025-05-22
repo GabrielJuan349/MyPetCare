@@ -1,3 +1,4 @@
+import console from 'node:console';
 import { FirestoreBaseUrl, getDatabaseDate } from "./utils.ts"; 
 import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
 
@@ -5,10 +6,9 @@ import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
  * Maneja las solicitudes para obtener los días bloqueados para una clínica en un mes y año específicos.
  * @param ctx El contexto del enrutador de Oak.
  */
-export async function monthBlockedRequest(ctx: RouterContext<"/blocked/month/:id">) {
+export async function monthBlockedRequest(ctx: RouterContext<"/calendar/month/:id">) {
     const clinicId = ctx.params.id; 
     let requestPayload;
-    console.log("Received request payload:", clinicId);
 
     try {
 
@@ -17,7 +17,7 @@ export async function monthBlockedRequest(ctx: RouterContext<"/blocked/month/:id
         
     } catch (e) {
 
-        console.error("Failed to parse JSON body:", (e as Error).message);
+        console.error("⚠️ Failed to parse JSON body:", (e as Error).message);
         ctx.response.status = 400; 
         ctx.response.body = { 
             error: "Invalid JSON payload.",
@@ -71,7 +71,7 @@ export async function monthBlockedRequest(ctx: RouterContext<"/blocked/month/:id
                 return;
             }
             const errorBody = await response.json();
-            console.error("Error al obtener fechas bloqueadas:", errorBody);
+            console.error("⚠️ Error al obtener fechas bloqueadas:", errorBody);
             ctx.response.status = response.status;
             ctx.response.body = { error: 'Error al obtener las fechas bloqueadas', details: errorBody };
             return;
@@ -99,11 +99,12 @@ export async function monthBlockedRequest(ctx: RouterContext<"/blocked/month/:id
              
             });
 
+        console.log("✅ Fechas bloqueadas obtenidas");
         ctx.response.status = 200;
         ctx.response.body = { blockedDays: citas };
 
     } catch (error) {
-        console.error("Excepción al obtener fechas bloqueadas:", error);
+        console.error("⚠️ Excepción al obtener fechas bloqueadas:", error);
         ctx.response.status = 500;
         ctx.response.body = { error: 'Excepción interna del servidor al obtener fechas bloqueadas' };
     }
