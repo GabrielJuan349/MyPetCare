@@ -1,3 +1,4 @@
+
 import { db } from "./api-functions/firebase.ts";
 
 console.log("📡 Probando conexión con Firestore…");
