@@ -138,7 +138,7 @@ class PetDetailsScreen extends StatelessWidget {
                 _buildStyledButton(
                   context,
                   label: 'Recetas',
-                  onPressed: () {
+                  onPressed: () {/*
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -146,7 +146,7 @@ class PetDetailsScreen extends StatelessWidget {
                       ),
                     );
 
-                  },
+                  */},
                   color: highlightColor,
                 ),
               ],

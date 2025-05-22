@@ -1,14 +1,87 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'clinic_home.dart';
+import 'home.dart';
 
-class Login extends StatelessWidget {
+class Login extends StatefulWidget {
   const Login({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
+  State<Login> createState() => _LoginState();
+}
 
+class _LoginState extends State<Login> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  String? _errorMessage;
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleLogin() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    try {
+      // Busca el usuario en Firestore por email
+      final query = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      if (query.docs.isEmpty) {
+        setState(() => _errorMessage = 'El usuario no existe.');
+        return;
+      }
+
+      final userData = query.docs.first.data();
+      final accountType = userData['accountType'];
+
+      // Login con Firebase Auth
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      if (!mounted) return;
+
+      // Redirección según el tipo de cuenta
+      if (accountType == 'clinic') {
+        final clinicInfo = userData['clinicInfo'];
+        final clinicName = clinicInfo is Map ? clinicInfo['name'] : clinicInfo;
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ClinicHomeScreen(clinicName: clinicName),
+          ),
+        );
+      } else if (accountType == 'vet') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const HomePage(),
+          ),
+        );
+      } else {
+        setState(() => _errorMessage = 'Tipo de cuenta no reconocido.');
+      }
+    } on FirebaseAuthException catch (e) {
+      setState(() => _errorMessage = e.message ?? 'Error desconocido');
+    } catch (e) {
+      setState(() => _errorMessage = 'Error inesperado: $e');
+    }
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -19,7 +92,6 @@ class Login extends StatelessWidget {
               Color(0xFFF8BE8C),
               Color(0xFFF6C59A),
             ],
-            stops: [0.07, 0.62, 0.74, 0.90],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -28,9 +100,6 @@ class Login extends StatelessWidget {
           child: Container(
             width: 400,
             padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -40,6 +109,15 @@ class Login extends StatelessWidget {
                   height: 100,
                 ),
                 const SizedBox(height: 20),
+                if (_errorMessage != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Text(
+                      _errorMessage!,
+                      style: const TextStyle(color: Colors.red),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                 TextField(
                   controller: emailController,
                   decoration: InputDecoration(
@@ -68,29 +146,7 @@ class Login extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () async {
-                    try {
-                      await FirebaseAuth.instance.signInWithEmailAndPassword(
-                        email: emailController.text.trim(),
-                        password: passwordController.text.trim(),
-                      );
-                      Navigator.pushReplacementNamed(context, '/');
-                    } on FirebaseAuthException catch (e) {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text("Error de inicio de sesión"),
-                          content: Text(e.message ?? "Error desconocido"),
-                          actions: [
-                            TextButton(
-                              child: const Text("Cerrar"),
-                              onPressed: () => Navigator.of(context).pop(),
-                            )
-                          ],
-                        ),
-                      );
-                    }
-                  },
+                  onPressed: _handleLogin,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF627ECB),
                     padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
@@ -103,6 +159,29 @@ class Login extends StatelessWidget {
                     style: TextStyle(fontSize: 18, color: Colors.white),
                   ),
                 ),
+                const SizedBox(height: 16),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 6,
+                  children: [
+                    const Text("¿Eres una clínica?"),
+                    InkWell(
+                      onTap: () => Navigator.pushNamed(context, '/clinic-login'),
+                      child: const Text(
+                        "Inicia sesión",
+                        style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
+                      ),
+                    ),
+                    const Text("o"),
+                    InkWell(
+                      onTap: () => Navigator.pushNamed(context, '/clinic-register'),
+                      child: const Text(
+                        "Regístrate",
+                        style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
+                      ),
+                    ),
+                  ],
+                )
               ],
             ),
           ),

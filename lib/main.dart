@@ -3,8 +3,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
 
-import 'login.dart';  // la pantalla de login que crearemos
+import 'login.dart';
 import 'home.dart';
+import 'clinic_register.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,6 +22,10 @@ class MyPetCareApp extends StatelessWidget {
     return MaterialApp(
       title: 'MyPetCare',
       debugShowCheckedModeBanner: false,
+      routes: {
+        '/login': (context) => const Login(),
+        '/clinic-register': (context) => const ClinicRegisterScreen(),
+      },
       home: AuthLogic(),
     );
   }
