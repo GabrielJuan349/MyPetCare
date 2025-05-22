@@ -186,3 +186,13 @@ Future<List<dynamic>> getAllNews() async{
   return json.decode(response);
 }
 
+Future<List<Map<String, dynamic>>> getAdoptionsByClinic(String clinicId) async {
+  final url = Uri.parse("$BASE_URL/api/getAdoptionsByClinic/$clinicId");
+
+  final response = await http.get(url);
+  if (response.statusCode == 200) {
+    return List<Map<String, dynamic>>.from(json.decode(response.body));
+  } else {
+    throw Exception("Failed to fetch adoptions from clinic $clinicId");
+  }
+}

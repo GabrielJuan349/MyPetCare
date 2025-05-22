@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'adoption_details_screen.dart';
+import 'requests.dart';
 
 class ClinicAdoptionsScreen extends StatefulWidget {
   final String clinicId;
@@ -30,28 +32,22 @@ class _ClinicAdoptionsScreenState extends State<ClinicAdoptionsScreen> {
     super.dispose();
   }
 
-  Future<void> fetchAdoptions() async {
-    final url = Uri.parse("http://localhost:6055/api/getAdoptionsByClinic/${widget.clinicId}");
-
-    try {
-      final res = await http.get(url);
-      if (res.statusCode == 200) {
-        final List<Map<String, dynamic>> data = List<Map<String, dynamic>>.from(json.decode(res.body));
-        setState(() {
-          allAdoptions = data;
-          filteredAdoptions = data;
-          isLoading = false;
-        });
-      } else {
-        throw Exception("Error del servidor");
-      }
-    } catch (e) {
-      print("Error al obtener adopciones: $e");
-      setState(() {
-        isLoading = false;
-      });
-    }
+Future<void> fetchAdoptions() async {
+  try {
+    final data = await getAdoptionsByClinic(widget.clinicId);
+    setState(() {
+      allAdoptions = data;
+      filteredAdoptions = data;
+      isLoading = false;
+    });
+  } catch (e) {
+    print("Error al obtener adopciones: $e");
+    setState(() {
+      isLoading = false;
+    });
   }
+}
+
 
 void _filterAdoptions() {
   final query = searchController.text.toLowerCase();
@@ -67,40 +63,49 @@ void _filterAdoptions() {
   });
 }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xfff59249),
-        foregroundColor: Colors.white,
-        title: Text('Clinic Adoptions'),
-        centerTitle: true,
-      ),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: TextField(
-                    controller: searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Search by name...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      prefixIcon: Icon(Icons.search),
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      backgroundColor: Color(0xfff59249),
+      foregroundColor: Colors.white,
+      title: Text('Clinic Adoptions'),
+      centerTitle: true,
+    ),
+    body: isLoading
+        ? Center(child: CircularProgressIndicator())
+        : Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: TextField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search by name...',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
+                    prefixIcon: Icon(Icons.search),
                   ),
                 ),
-                Expanded(
-                  child: filteredAdoptions.isEmpty
-                      ? Center(child: Text('No matching adoptions found'))
-                      : ListView.builder(
-                          itemCount: filteredAdoptions.length,
-                          itemBuilder: (context, index) {
-                            final adoption = filteredAdoptions[index];
-                            return Card(
+              ),
+              Expanded(
+                child: filteredAdoptions.isEmpty
+                    ? Center(child: Text('No matching adoptions found'))
+                    : ListView.builder(
+                        itemCount: filteredAdoptions.length,
+                        itemBuilder: (context, index) {
+                          final adoption = filteredAdoptions[index];
+                          return InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => AdoptionDetailScreen(adoption: adoption),
+                                ),
+                              );
+                            },
+                            child: Card(
                               margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15),
@@ -122,12 +127,14 @@ void _filterAdoptions() {
                                   ],
                                 ),
                               ),
-                            );
-                          },
-                        ),
-                ),
-              ],
-            ),
-    );
-  }
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
+  );
+}
+
 }
