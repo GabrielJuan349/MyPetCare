@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:lis_project/requests.dart';
 
 class NewsScreen extends StatefulWidget {
   const NewsScreen({super.key});
@@ -20,20 +21,14 @@ class _NewsScreenState extends State<NewsScreen> {
   }
 
   Future<void> fetchNews() async {
-    final uri = Uri.parse('http://localhost:6055/api/getAllNews');
     try {
-      final response = await http.get(uri);
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        setState(() {
-          newsList = data;
-          isLoading = false;
-        });
-      } else {
-        throw Exception('Error en la respuesta del servidor');
-      }
+      final List<dynamic> data = await getAllNews();
+      setState(() {
+        newsList = data;
+      });
     } catch (e) {
       print('Error al obtener noticias: $e');
+    }finally{
       setState(() {
         isLoading = false;
       });
