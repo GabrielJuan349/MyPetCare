@@ -450,3 +450,121 @@ export async function deleteAppointment(ctx: RouterContext<"/api/appointment/:id
         ctx.response.body = { error: 'Excepción interna del servidor' };
     }
 }
+
+export async function getAppointmentById(ctx: RouterContext<"/api/getAppointment/:id">) {
+    const appointmentId = ctx.params.id; 
+    if (!appointmentId) {
+        ctx.response.status = 400;
+        ctx.response.body = { error: "ID de cita no proporcionado" };
+        return;
+    }
+    const appointmentUrl = `${FirestoreBaseUrl}/appointments/${appointmentId}`;
+    try {
+        const response = await fetch(appointmentUrl, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        });
+        if (!response.ok) {
+            const errorBody = await response.json();
+            console.error("⚠️ Error al obtener la cita:", errorBody);
+            ctx.response.status = response.status;
+            ctx.response.body = { error: 'Error al obtener la cita', details: errorBody };
+            return;
+        }
+        const result = await response.json();
+        console.log("✅ Cita encontrada:", appointmentId);
+
+        const vetId = result.fields.vetId.stringValue;
+        const vetUrl = `${FirestoreBaseUrl}/vets/${vetId}`;
+        const responseVet = await fetch(vetUrl, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        });
+        if (!responseVet.ok) {
+            const errorBody = await responseVet.json();
+            console.error("⚠️ Error al obtener la clínica del veterinario:", errorBody);
+            ctx.response.status = responseVet.status;
+            ctx.response.body = { error: 'Error al obtener la clínica del veterinario', details: errorBody };
+            return;
+        }
+        const resultVet = await responseVet.json();
+        console.log("✅ Veterinario encontrado:", vetId);
+        const clinicId = resultVet.fields.clinicId.stringValue;
+        const clinicUrl = `${FirestoreBaseUrl}/clinic/${clinicId}`;
+        const responseClinic = await fetch(clinicUrl, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        });
+        if (!responseClinic.ok) {
+            const errorBody = await responseClinic.json();
+            console.error("⚠️ Error al obtener la clínica:", errorBody);
+            ctx.response.status = responseClinic.status;
+            ctx.response.body = { error: 'Error al obtener la clínica', details: errorBody };
+            return;
+        }
+        const resultClinic = await responseClinic.json();
+        console.log("✅ Clínica encontrada:", clinicId);
+        const clinicName = resultClinic.fields.name.stringValue;
+        const petId = result.fields.petId.stringValue;
+        const petUrl = `${FirestoreBaseUrl}/pets/${petId}`;
+        const responsePet = await fetch(petUrl, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        });
+        if (!responsePet.ok) {
+            const errorBody = await responsePet.json();
+            console.error("⚠️ Error al obtener la mascota:", errorBody);
+            ctx.response.status = responsePet.status;
+            ctx.response.body = { error: 'Error al obtener la mascota', details: errorBody };
+            return;
+        }
+        const resultPet = await responsePet.json();
+        console.log("✅ Mascota encontrada:", petId);
+        const ownerId = resultPet.fields.owner.stringValue;
+        const ownerUrl = `${FirestoreBaseUrl}/users/${ownerId}`;
+        const responseOwner = await fetch(ownerUrl, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        });
+        if (!responseOwner.ok) {
+            const errorBody = await responseOwner.json();
+            console.error("⚠️ Error al obtener el propietario:", errorBody);
+            ctx.response.status = responseOwner.status;
+            ctx.response.body = { error: 'Error al obtener el propietario', details: errorBody };
+            return;
+        }
+        const resultOwner = await responseOwner.json();
+        console.log("✅ Propietario encontrado:", ownerId);
+
+
+        const ownerPhone= resultOwner.fields.phone.stringValue;
+        const vetName = resultVet.fields.firstName.stringValue + " " + resultVet.fields.lastName.stringValue;
+        const ownerName = resultOwner.fields.firstName.stringValue + " " + resultOwner.fields.lastName.stringValue;
+
+        const appointmentData = {
+            id: appointmentId,
+            date: result.fields.date.stringValue,
+            time: result.fields.time.stringValue,
+            vetName: vetName,
+            clinicName: clinicName,
+            petName: resultPet.fields.name.stringValue,
+            petType: resultPet.fields.type.stringValue,
+            petBreed: resultPet.fields.breed.stringValue,
+            ownerName: ownerName,
+            ownerEmail: resultOwner.fields.email.stringValue,
+            ownerPhone: ownerPhone,
+            ownerId: ownerId,
+            clinicId: clinicId,
+            vetId: vetId,
+            petId: petId
+        }
+        console.log("✅ Cita obtenida:", appointmentData);
+        ctx.response.status = 200;
+        ctx.response.body = appointmentData;
+
+    } catch (error) {
+        console.error("⚠️ Excepción al obtener la cita:", error);
+        ctx.response.status = 500;
+        ctx.response.body = { error: 'Excepción interna del servidor' };
+    }
+}
