@@ -5,7 +5,8 @@ export interface Clinic {
   city: string;
   cp: string;
   email: string;
-  geolocation: [string, string];
+  latitude: number;
+  longitude: number;
   name: string;
   phone: string;
   website: string;
