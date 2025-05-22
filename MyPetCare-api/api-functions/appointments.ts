@@ -1,14 +1,13 @@
 import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
-import { documentName, FirestoreBaseUrl, FirestoreQueryUrl, getDatabaseDate } from "./utils.ts"; // Asegúrate de que la ruta sea correcta
+import { documentName, FirestoreBaseUrl, FirestoreQueryUrl, getDatabaseDate, getDateInfoForDelete, getVetIdFromClinics } from "./utils.ts"; 
 import console from 'node:console';
-import { randomInt } from 'node:crypto';
 
-async function createAppointmenInDatabase(day:number, month:number, year:number, buttonId:number, petId:String, vetId:String): String|Error {
-    // Implementación de la función para crear una cita en la base de datos
+async function createAppointmenInDatabase(day:number, month:number, year:number, buttonId:number, petId:String, vetId:String) {
+
     const appDate = new Date(year, month - 1, day).toLocaleDateString('fr-CA');
     console.log("Cita creada en la base de datos:", appDate);
     const minutes = 15*buttonId;
-    const hoursFromJournal = Math.floor(minutes/60)+8;
+    const hoursFromJournal = Math.floor(minutes/60)+9;
     const minutesFromJournal = minutes % 60;
     if (hoursFromJournal > 17 || hoursFromJournal < 9) {
         console.log("La hora de la cita está fuera del horario laboral");
@@ -18,68 +17,35 @@ async function createAppointmenInDatabase(day:number, month:number, year:number,
     const time = `${hoursFromJournal}:${minutesFromJournal}`;
     console.log("Cita creada en la base de datos:", time);
     const appointmentUrl = `${FirestoreBaseUrl}/appointments`;
-
-    const response = await fetch(appointmentUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      fields: {
-        date: { stringValue: appDate },
-        time: { stringValue: time },
-        petId: { stringValue: petId },
-        vetId: { stringValue: vetId },
-        createdAt: { stringValue: new Date().toISOString() }, 
-      }
-    }),
-  });   
-     
-    const result = await response.json();
-    const appointId = result.name.split("/").pop();
-    return appointId;  
-}
-
-async function getVetIdFromClinics(clinicId: string){
-    const query = {
-        structuredQuery: {
-            from: [{ collectionId: "vets" }], // Nombre de tu colección de citas
-            where: {
-                fieldFilter: {
-                    field: { fieldPath: "clinicId" }, // Campo para filtrar por ID de veterinario
-                    op: "EQUAL",
-                    value: { stringValue: clinicId }
-                }
-            }
-        }
-    };
-
     try {
-        const response = await fetch(FirestoreQueryUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(query)
-        });
-
-        if (!response.ok) {
-            const errorBody = await response.text();
-            console.error("Error de Firestore:", response.status, errorBody);
-            return;
-        }
-
+        const response = await fetch(appointmentUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fields: {
+            date: { stringValue: appDate },
+            time: { stringValue: time },
+            petId: { stringValue: petId },
+            vetId: { stringValue: vetId },
+            createdAt: { stringValue: new Date().toISOString() }, 
+          }
+        }),
+      });   
+         
         const result = await response.json();
-        const vet_pos = randomInt(0, result.length);
-        const vetId = result[vet_pos].document.name.split("/").pop();
-    
-        return vetId; // Cambia esto por la lógica real
+        const appointId = result.name.split("/").pop();
+        console.log(`✅ Cita creada en Firestore con ID: ${appointId}`);
+        return appointId;  
+        
     } catch (error) {
-        console.error("Error al procesar la solicitud de citas:", error);
+        console.error("Error al crear la cita:", error);
         return;
+        
     }
 }
 
-
 export async function getCitasByVetId(ctx: RouterContext<"/api/citas/vet/:vetId">) {
     const vetId = ctx.params.vetId;
-    console.log("vetId", vetId);
 
     if (!vetId) {
         ctx.response.status = 400;
@@ -89,16 +55,14 @@ export async function getCitasByVetId(ctx: RouterContext<"/api/citas/vet/:vetId"
 
     const query = {
         structuredQuery: {
-            from: [{ collectionId: "appointments" }], // Nombre de tu colección de citas
+            from: [{ collectionId: "appointments" }], 
             where: {
                 fieldFilter: {
-                    field: { fieldPath: "vetId" }, // Campo para filtrar por ID de veterinario
+                    field: { fieldPath: "vetId" }, 
                     op: "EQUAL",
                     value: { stringValue: vetId }
                 }
             }
-            // Puedes añadir orderBy aquí si quieres ordenar las citas, por ejemplo, por fecha:
-            // orderBy: [{ field: { fieldPath: "fecha" }, direction: "ASCENDING" }]
         }
     };
 
@@ -124,12 +88,11 @@ export async function getCitasByVetId(ctx: RouterContext<"/api/citas/vet/:vetId"
             .filter((entry: any) => entry.document)
             .map((entry: any) => {
                 const fields = entry.document.fields;
-                console.log("fields", fields);
+                // console.log("fields", fields);
                 const citaData: any = {};
                 for (const fieldName in fields) {
                     if (fieldName != "clinicId") {
                         const valueWrapper = fields[fieldName];
-                        // El valor real está dentro de una clave como stringValue, integerValue, mapValue, etc.
                         const valueType = Object.keys(valueWrapper)[0];
                         citaData[fieldName] = valueWrapper[valueType];
                     }
@@ -149,27 +112,23 @@ export async function getCitasByVetId(ctx: RouterContext<"/api/citas/vet/:vetId"
     }
 }
 
-
-
 export async function newAppointment(ctx: RouterContext<"/api/appointment/:id">) {
-    const clinicId = ctx.params.id; // Renombrado para claridad
+    const clinicId = ctx.params.id; 
     let requestPayload;
 
     try {
-        // El cuerpo de la solicitud se espera que sea JSON.
         const body = ctx.request.body({ type: "json" });
-        requestPayload = await body.value; // Esto puede lanzar un error si el cuerpo no es JSON válido.
+        requestPayload = await body.value; 
     } catch (e) {
-        // Registrar el error y devolver una respuesta 400 si falla el análisis JSON.
         console.error("Failed to parse JSON body:", e.message);
-        ctx.response.status = 400; // Bad Request
+        ctx.response.status = 400; 
         ctx.response.body = { 
             error: "Invalid JSON payload.",
-            details: `Failed to parse JSON: ${e.message}` // Proporcionar detalles del analizador.
+            details: `Failed to parse JSON: ${e.message}` 
         };
         return;
     }
-    const { day, month, year, buttonId, petId } = requestPayload; // Desestructuración del payload
+    const { day, month, year, buttonId, petId } = requestPayload; 
     const buttonID = parseInt(buttonId);
     if (!day || !month || !year || !clinicId) {
         ctx.response.status = 400;
@@ -181,7 +140,7 @@ export async function newAppointment(ctx: RouterContext<"/api/appointment/:id">)
         ctx.response.body = { error: "Debe proporcionar buttonId o petId para el bloqueo" };
         return;
     }
-    console.log("Received request payload:", clinicId, day, month, year, buttonID, petId);
+    // console.log("Received request payload:", clinicId, day, month, year, buttonID, petId);
     const databaseIndex = getDatabaseDate(month, year);
     const vetId = await getVetIdFromClinics(clinicId);
     if (!vetId) {
@@ -195,10 +154,10 @@ export async function newAppointment(ctx: RouterContext<"/api/appointment/:id">)
     
     const query = {
         structuredQuery: {
-            from: [{ collectionId: documentPath }], // Nombre de tu colección de citas
+            from: [{ collectionId: documentPath }], 
             where: {
                 fieldFilter: {
-                    field: { fieldPath: "clinicId" }, // Campo para filtrar por ID de veterinario
+                    field: { fieldPath: "clinicId" }, 
                     op: "EQUAL",
                     value: { stringValue: clinicId }
                 }
@@ -223,22 +182,18 @@ export async function newAppointment(ctx: RouterContext<"/api/appointment/:id">)
         const queryResult = await response.json();
         console.log("Firestore result:", result);
 
-        // documentId= result[0].document.name.split("/").pop();
-        
-        // console.log("Document ID:", documentId);
-
         if (queryResult && queryResult.length > 0 && queryResult[0].document) {
-            // Documento existente encontrado
-            result = queryResult; // Asignar para uso posterior (monthsInDatabase)
+
+            result = queryResult; 
             documentId = result[0].document.name.split("/").pop();
             console.log("Document ID found:", documentId);
         } else {
-            // Documento no encontrado, proceder a crearlo
+
             console.log(`No document found for clinicId ${clinicId} in ${documentPath}. Creating new document.`);
-            const createDocUrl = `${FirestoreBaseUrl}/${documentPath}`; // URL para crear en la colección 'blocked_date'
+            const createDocUrl = `${FirestoreBaseUrl}/${documentPath}`; 
             
             const createResponse = await fetch(createDocUrl, {
-                method: "POST", // POST para crear con ID autogenerado por Firestore
+                method: "POST", 
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     fields: {
@@ -249,7 +204,7 @@ export async function newAppointment(ctx: RouterContext<"/api/appointment/:id">)
             });
 
             if (!createResponse.ok) {
-                const errorBody = await createResponse.text(); // Usar .text() o .json() según el tipo de error esperado
+                const errorBody = await createResponse.text(); 
                 console.error("Error creating document in Firestore:", createResponse.status, errorBody);
                 ctx.response.status = createResponse.status;
                 ctx.response.body = { error: "Error al crear el documento de fechas bloqueadas en Firestore", details: errorBody };
@@ -268,86 +223,47 @@ export async function newAppointment(ctx: RouterContext<"/api/appointment/:id">)
     }
     const existingDocFields = (result && result[0] && result[0].document && result[0].document.fields)
                               ? JSON.parse(JSON.stringify(result[0].document.fields))
-                              : { clinicId: { stringValue: clinicId } }; // Valor por defecto si es un doc nuevo o no tiene campos
+                              : { clinicId: { stringValue: clinicId } }; 
 
-    // Asegurar que la estructura anidada exista hasta el nivel de 'buttonId'
-    // Crear databaseIndex (mes-año) si no existe
     if (!existingDocFields[databaseIndex]) {
         existingDocFields[databaseIndex] = { mapValue: { fields: {} } };
-    } else if (!existingDocFields[databaseIndex].mapValue) { // Consistencia
+    } else if (!existingDocFields[databaseIndex].mapValue) { 
         existingDocFields[databaseIndex].mapValue = { fields: {} };
-    } else if (!existingDocFields[databaseIndex].mapValue.fields) { // Consistencia
+    } else if (!existingDocFields[databaseIndex].mapValue.fields) { 
          existingDocFields[databaseIndex].mapValue.fields = {};
     }
 
-    // Acceder a los campos del mes
     const monthFields = existingDocFields[databaseIndex].mapValue.fields;
 
-    // Crear el día si no existe dentro del mes
-    const dayString = String(day); // Las claves de mapa de Firestore son strings
+    const dayString = String(day); 
     if (!monthFields[dayString]) {
         monthFields[dayString] = { mapValue: { fields: {} } };
-    } else if (!monthFields[dayString].mapValue) { // Consistencia
+    } else if (!monthFields[dayString].mapValue) { 
         monthFields[dayString].mapValue = { fields: {} };
-    } else if (!monthFields[dayString].mapValue.fields) { // Consistencia
+    } else if (!monthFields[dayString].mapValue.fields) {
         monthFields[dayString].mapValue.fields = {};
     }
 
-    // Acceder a los campos del día
     const dayFields = monthFields[dayString].mapValue.fields;
 
-    // Agregar o actualizar el buttonId (slot de la cita)
-    // buttonId ya es un string del payload. appointmentId debe ser un string.
     dayFields[buttonId] = { stringValue: String(appointmentId) };
     
-    // documentPath y commitUrl
-    documentPath = `blocked_date/${documentId}`; // documentId fue obtenido previamente
+    documentPath = `blocked_date/${documentId}`; 
     console.log("Document path for commit:", documentPath);
     const commitUrl = `${FirestoreBaseUrl}:commit`;
 
-    // El nombre completo del recurso del documento para el payload
-    // documentName se importa de utils.ts y es `projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`
     const documentResourceName = `${documentName}/${documentPath}`;
 
     const commitPayload = {
         writes: [
             {
                 update: {
-                    name: documentResourceName, // Nombre completo del recurso del documento
-                    // fields ahora contiene todos los campos del documento, fusionados con los nuevos datos.
-                    // Esto reemplazará los campos del documento con esta nueva estructura completa.
+                    name: documentResourceName, 
                     fields: existingDocFields 
                 },
-                // No se usa updateMask aquí; estamos configurando todos los campos.
             }
         ],
     };
-
-    // const commitPayload = {
-    //     writes: [
-    //         {
-    //             update: {
-    //                 name: `${documentName}/${documentPath}`,
-    //                 fields:{
-    //                     [databaseIndex]: {
-    //                         mapValue: {
-    //                             fields: {
-    //                                 [day]: {
-    //                                     mapValue: {
-    //                                         fields: {
-    //                                             [buttonId]: {stringValue: appointmentId}
-    //                                         }
-    //                                     }
-    //                                 }
-    //                             }
-    //                         }
-    //                     }
-    //                 }
-    //             },
-                
-    //         }
-    //     ],
-    // };
     
     console.log("Commit payload done");
     try {
@@ -362,12 +278,190 @@ export async function newAppointment(ctx: RouterContext<"/api/appointment/:id">)
             console.error("Error al registrar fecha bloqueada:", errorBody);
             ctx.response.status = response.status;
             ctx.response.body = { error: 'Error al registrar la fecha bloqueada', details: errorBody };
+            return;
         } else {
             ctx.response.status = 200;
             ctx.response.body = { message: 'Fecha bloqueada registrada correctamente' };
         }
     } catch (error) {
         console.error("Excepción al registrar fecha bloqueada:", error);
+        ctx.response.status = 500;
+        ctx.response.body = { error: 'Excepción interna del servidor' };
+    }
+}
+
+export async function deleteAppointment(ctx: RouterContext<"/api/appointment/:id">) {
+    const appointmentId = ctx.params.id; 
+    if (!appointmentId) {
+        ctx.response.status = 400;
+        ctx.response.body = { error: "ID de cita no proporcionado" };
+        return;
+    }
+    const appointmentUrl = `${FirestoreBaseUrl}/appointments/${appointmentId}`;
+    try {
+        //Fetching Appointment
+        const responseGET = await fetch(appointmentUrl, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        });
+        if (!responseGET.ok) {
+            const errorBody = await responseGET.json();
+            console.error("Error al obtener la cita:", errorBody);
+            ctx.response.status = responseGET.status;
+            ctx.response.body = { error: 'Error al obtener la cita', details: errorBody };
+            return;
+        }
+        const result = await responseGET.json();
+        const date = result.fields.date.stringValue;
+        const time = result.fields.time.stringValue;
+        const vetId = result.fields.vetId.stringValue;
+        console.log("time:", date, time);
+        const {databaseIndex, buttonId, day} = getDateInfoForDelete(date, time); 
+        console.log("databaseIndex:", databaseIndex, "buttonId:", buttonId, "day:", day);
+        
+        //Fetching Vet
+        const vetUrl = `${FirestoreBaseUrl}/vets/${vetId}`;
+            const response = await fetch(vetUrl, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        });
+        const resultVet = await response.json();
+        
+        if (!response.ok) {
+            const errorBody = await response.json();
+            console.error("Error al obtener la clínica del veterinario:", errorBody);
+            ctx.response.status = response.status;
+            ctx.response.body = { error: 'Error al obtener la clínica del veterinario', details: errorBody };
+            return;
+        }
+        const clinicId:string = resultVet.fields.clinicId.stringValue;
+        const documentPath = `blocked_date`;
+        const query = {
+            structuredQuery: {
+                from: [{ collectionId: documentPath }], // Nombre de tu colección de citas
+                where: {
+                    fieldFilter: {
+                        field: { fieldPath: "clinicId" }, // Campo para filtrar por ID de veterinario
+                        op: "EQUAL",
+                        value: { stringValue: clinicId }
+                    }
+                }
+
+            }
+        };
+        //Fetching Blocked Dates
+        const responseApp = await fetch(FirestoreQueryUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(query)
+        });
+        if (!response.ok) {
+            const errorBody = await response.json();
+            console.error("Error al procesar la solicitud de calendario:", errorBody);
+            ctx.response.status = response.status;
+            ctx.response.body = { error: "Error interno del servidor al obtener calendario" };
+            return;
+        }
+        const resultApp = await responseApp.json();
+        // console.log("Firestore result:", resultApp);
+        const documentId = resultApp[0].document.name.split("/").pop();
+
+        const existingDocFields = (resultApp && resultApp[0] && resultApp[0].document && resultApp[0].document.fields)
+                              ? JSON.parse(JSON.stringify(resultApp[0].document.fields))
+                              : { clinicId: { stringValue: clinicId } };
+        console.log("Existing document fields:", existingDocFields);
+        
+        // if (existingDocFields[databaseIndex].mapValue.fields[day].mapValue.fields.length() > 1) 
+        //     delete existingDocFields[databaseIndex].mapValue.fields[day].mapValue.fields[buttonId];
+        // else if (existingDocFields[databaseIndex].mapValue.fields.length() > 1) 
+        //     delete existingDocFields[databaseIndex].mapValue.fields[day];
+        // else 
+        //     delete existingDocFields[databaseIndex];
+
+        // --------------------------------------
+        const buttonIdString = String(buttonId);
+        if (existingDocFields && existingDocFields[databaseIndex] &&
+            existingDocFields[databaseIndex].mapValue && existingDocFields[databaseIndex].mapValue.fields &&
+            existingDocFields[databaseIndex].mapValue.fields[day] &&
+            existingDocFields[databaseIndex].mapValue.fields[day].mapValue &&
+            existingDocFields[databaseIndex].mapValue.fields[day].mapValue.fields &&
+            existingDocFields[databaseIndex].mapValue.fields[day].mapValue.fields[buttonIdString]) {
+
+            // Eliminar el buttonId específico
+            delete existingDocFields[databaseIndex].mapValue.fields[day].mapValue.fields[buttonIdString];
+            console.log(`Deleted buttonId: ${buttonIdString} from day: ${day}, month: ${databaseIndex}`);
+
+            // Si el día queda vacío después de eliminar el buttonId, eliminar el día
+            if (Object.keys(existingDocFields[databaseIndex].mapValue.fields[day].mapValue.fields).length === 0) {
+                delete existingDocFields[databaseIndex].mapValue.fields[day];
+                console.log(`Deleted empty day: ${day} from month: ${databaseIndex}`);
+
+                // Si el mes queda vacío después de eliminar el día, eliminar el mes
+                if (Object.keys(existingDocFields[databaseIndex].mapValue.fields).length === 0) {
+                    delete existingDocFields[databaseIndex];
+                    console.log(`Deleted empty month: ${databaseIndex}`);
+                }
+            }
+        } else {
+            console.log(`No buttonId: ${buttonIdString} found for day: ${day}, month: ${databaseIndex}`);
+            ctx.response.status = 404;
+            ctx.response.body = { error: 'No se encontró el buttonId para eliminar' };
+            return;
+        }
+        //-------------------------------------------
+        console.log("Existing document fields after deletion:", existingDocFields);
+        
+
+        const documentPathCommit = `blocked_date/${documentId}`;
+        const commitUrl = `${FirestoreBaseUrl}:commit`;
+        const documentResourceName = `${documentName}/${documentPathCommit}`;
+        console.log("Document path for commit:", documentPathCommit);
+        
+        const commitPayload = {
+            writes: [
+                {
+                    update: {
+                        name: documentResourceName, 
+                        fields: existingDocFields 
+                    },
+                }
+            ],
+        };
+        
+        console.log("Commit payload done");
+        
+        const responseDelCal = await fetch(commitUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(commitPayload),
+        });
+
+        if (!responseDelCal.ok) {
+            const errorBody = await responseDelCal.json();
+            console.error("Error al eliminat fecha bloqueada en calendario:", errorBody);
+            ctx.response.status = responseDelCal.status;
+            ctx.response.body = { error: 'Error al eliminar la fecha bloqueada en calendario', details: errorBody };
+            return;
+        }
+         //Deleting Appointment
+        const responseDEL = await fetch(appointmentUrl, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+        });
+
+        if (!responseDEL.ok) {
+            const errorBody = await responseDEL.json();
+            console.error("Error al eliminar la cita:", errorBody);
+            ctx.response.status = responseDEL.status;
+            ctx.response.body = { error: 'Error al eliminar la cita', details: errorBody };
+            return;
+        }
+
+        ctx.response.status = 200;
+        ctx.response.body = { message: 'Cita eliminada correctamente' };
+
+    } catch (error) {
+        console.error("Excepción al eliminar la cita:", error);
         ctx.response.status = 500;
         ctx.response.body = { error: 'Excepción interna del servidor' };
     }

@@ -14,7 +14,7 @@ import { createVet, deleteVet, getVetById , getVetsByClinic} from "./api-functio
 import { createNews, getAllNews, deleteNews } from "./api-functions/news.ts";
 import { updateUser, deleteUser, getUserDataById } from "./api-functions/gestion.usuarios.ts";
 import { monthBlockedRequest } from './api-functions/blocked-request.ts';
-import { getCitasByVetId, newAppointment } from './api-functions/appointments.ts';
+import { deleteAppointment, getCitasByVetId, newAppointment } from './api-functions/appointments.ts';
 
 
 await load({ export: true });
@@ -34,6 +34,7 @@ app.use(oakCors({
 // ---- Endpoints de USERS ----
 router
   .post("/api/appointment/:id", newAppointment)
+  .delete("/api/appointment/:id", deleteAppointment)
   .post("/blocked/month/:id", monthBlockedRequest)
   .post("/api/citas/vet/:vetId", getCitasByVetId)
   

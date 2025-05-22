@@ -1,30 +1,35 @@
-import { FirestoreBaseUrl, getDatabaseDate } from "./utils.ts"; // Asegúrate de que la ruta sea correcta
+import { FirestoreBaseUrl, getDatabaseDate } from "./utils.ts"; 
 import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
 
+/**
+ * Maneja las solicitudes para obtener los días bloqueados para una clínica en un mes y año específicos.
+ * @param ctx El contexto del enrutador de Oak.
+ */
 export async function monthBlockedRequest(ctx: RouterContext<"/blocked/month/:id">) {
-    const clinicId = ctx.params.id; // Renombrado para claridad
+    const clinicId = ctx.params.id; 
     let requestPayload;
     console.log("Received request payload:", clinicId);
 
     try {
-        // El cuerpo de la solicitud se espera que sea JSON.
+
         const body = ctx.request.body({ type: "json" });
-        requestPayload = await body.value; // Esto puede lanzar un error si el cuerpo no es JSON válido.
+        requestPayload = await body.value; 
+        
     } catch (e) {
-        // Registrar el error y devolver una respuesta 400 si falla el análisis JSON.
-        console.error("Failed to parse JSON body:", e.message);
-        ctx.response.status = 400; // Bad Request
+
+        console.error("Failed to parse JSON body:", (e as Error).message);
+        ctx.response.status = 400; 
         ctx.response.body = { 
             error: "Invalid JSON payload.",
-            details: `Failed to parse JSON: ${e.message}` // Proporcionar detalles del analizador.
+            details: `Failed to parse JSON: ${(e as Error).message}` 
         };
         return;
     }
 
     const { month, year } = requestPayload; 
 
-    if (!month || !year || !clinicId) { // Manteniendo la verificación de clinicId como en la lógica original
-        ctx.response.status = 400; // Bad Request
+    if (!month || !year || !clinicId) { 
+        ctx.response.status = 400; 
         const missingParams = [];
         if (!month) missingParams.push("month");
         if (!year) missingParams.push("year");
@@ -41,15 +46,14 @@ export async function monthBlockedRequest(ctx: RouterContext<"/blocked/month/:id
     const documentUrl = `${FirestoreBaseUrl}:runQuery`;
     const query = {
         structuredQuery: {
-            from: [{ collectionId: "blocked_date" }], // Nombre de tu colección de citas
+            from: [{ collectionId: "blocked_date" }], 
             where: {
                 fieldFilter: {
-                    field: { fieldPath: "clinicId" }, // Campo para filtrar por ID de veterinario
+                    field: { fieldPath: "clinicId" }, 
                     op: "EQUAL",
                     value: { stringValue: clinicId }
                 }
             }
-            
         }
     };
 
@@ -62,8 +66,8 @@ export async function monthBlockedRequest(ctx: RouterContext<"/blocked/month/:id
 
         if (!response.ok) {
             if (response.status === 404) {
-                ctx.response.status = 200; // O 404 si prefieres indicar que no hay datos
-                ctx.response.body = { clinicId, month, year, blockedDays: {} }; // No hay documento, por lo tanto no hay bloqueos para esta clínica este mes
+                ctx.response.status = 200; 
+                ctx.response.body = { clinicId, month, year, blockedDays: {} }; 
                 return;
             }
             const errorBody = await response.json();
@@ -73,26 +77,20 @@ export async function monthBlockedRequest(ctx: RouterContext<"/blocked/month/:id
             return;
         }
 
-        const result = await response.json();
-        
-        // const clinicData = result.document.fields; // Acceder a los campos del documento
-        // console.log("Clinic data:", clinicData);
+        const result = await response.json();        
         const citas = result
-            .filter((entry: any) => entry.document)
-            .map((entry: any) => {
+            .filter((entry: { document: unknown }) => entry.document) // Assuming entry has a document property
+            .map((entry: { document: { fields: Record<string, any> } }) => { // Assuming document has fields
                 const fields = entry.document.fields;
-                console.log("Fields:", fields.January_2025.mapValue.fields);
-                const citaData: any = {};
+                const citaData: Record<string, string[]> = {}; // More specific type for citaData
                 for (const fieldName in fields) {
                     if (fieldName != "clinicId" && fieldName === databaseIndex) {
                         const valueWrapper = fields[fieldName];
                         const appoint_day = valueWrapper.mapValue.fields;
-                        // El valor real está dentro de una clave como stringValue, integerValue, mapValue, etc.
                         const day = Object.keys(appoint_day)[0];
                         citaData[day] = [];
-                        // citaData[day] = appoint_day[day].mapValue.fields;
-                        for (const fieldName in appoint_day[day].mapValue.fields) {
-                            citaData[day].push(fieldName);
+                        for (const innerFieldName in appoint_day[day].mapValue.fields) {
+                            citaData[day].push(innerFieldName);
                         }
                     }
                 }
@@ -100,7 +98,6 @@ export async function monthBlockedRequest(ctx: RouterContext<"/blocked/month/:id
                 return citaData;
              
             });
-        console.log("Citas:", citas);
 
         ctx.response.status = 200;
         ctx.response.body = { blockedDays: citas };
