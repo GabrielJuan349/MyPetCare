@@ -34,9 +34,41 @@ export async function getClinics(ctx: RouterContext<"/api/getClinics/:id">) {
 
 export async function createClinic(ctx: RouterContext<"/api/createClinic">) {
   console.log("Creando clínica");
+
   const { value } = await ctx.request.body({ type: "json" });
   const clinic: Clinic = await value;
 
+  // 1. Verificar si ya existe una clínica con el mismo name
+  const queryUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents:runQuery`;
+  const queryBody = {
+    structuredQuery: {
+      from: [{ collectionId: "clinic" }],
+      where: {
+        fieldFilter: {
+          field: { fieldPath: "name" },
+          op: "EQUAL",
+          value: { stringValue: clinic.name }
+        }
+      }
+    }
+  };
+
+  const checkRes = await fetch(queryUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(queryBody),
+  });
+
+  const checkResult = await checkRes.json();
+  const alreadyExists = checkResult.some((entry: any) => entry.document);
+
+  if (alreadyExists) {
+    ctx.response.status = 409;
+    ctx.response.body = { error: "Ya existe una clínica con ese nombre" };
+    return;
+  }
+
+  // 2. Crear la nueva clínica si no existe duplicado
   const response = await fetch(FirestorePrescriptionURL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -64,6 +96,7 @@ export async function createClinic(ctx: RouterContext<"/api/createClinic">) {
   ctx.response.status = response.ok ? 200 : 500;
   ctx.response.body = result;
 }
+
 
 
 // Eliminar clínica
