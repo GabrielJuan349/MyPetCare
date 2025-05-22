@@ -1,5 +1,5 @@
 import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
-import { FirestoreBaseUrl, FirestoreQueryUrl, getDatabaseDate } from "./utils.ts"; // Asegúrate de que la ruta sea correcta
+import { documentName, FirestoreBaseUrl, FirestoreQueryUrl, getDatabaseDate } from "./utils.ts"; // Asegúrate de que la ruta sea correcta
 import console from 'node:console';
 import { randomInt } from 'node:crypto';
 
@@ -220,12 +220,45 @@ export async function newAppointment(ctx: RouterContext<"/api/appointment/:id">)
             ctx.response.body = { error: "Error al obtener las citas de Firestore", details: errorBody };
             return;
         }
-        result = await response.json();
+        const queryResult = await response.json();
         console.log("Firestore result:", result);
 
-        documentId= result[0].document.name.split("/").pop();
+        // documentId= result[0].document.name.split("/").pop();
         
-        console.log("Document ID:", documentId);
+        // console.log("Document ID:", documentId);
+
+        if (queryResult && queryResult.length > 0 && queryResult[0].document) {
+            // Documento existente encontrado
+            result = queryResult; // Asignar para uso posterior (monthsInDatabase)
+            documentId = result[0].document.name.split("/").pop();
+            console.log("Document ID found:", documentId);
+        } else {
+            // Documento no encontrado, proceder a crearlo
+            console.log(`No document found for clinicId ${clinicId} in ${documentPath}. Creating new document.`);
+            const createDocUrl = `${FirestoreBaseUrl}/${documentPath}`; // URL para crear en la colección 'blocked_date'
+            
+            const createResponse = await fetch(createDocUrl, {
+                method: "POST", // POST para crear con ID autogenerado por Firestore
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    fields: {
+                        clinicId: { stringValue: clinicId }
+
+                    }
+                })
+            });
+
+            if (!createResponse.ok) {
+                const errorBody = await createResponse.text(); // Usar .text() o .json() según el tipo de error esperado
+                console.error("Error creating document in Firestore:", createResponse.status, errorBody);
+                ctx.response.status = createResponse.status;
+                ctx.response.body = { error: "Error al crear el documento de fechas bloqueadas en Firestore", details: errorBody };
+                return;
+            }
+            const newDocument = await createResponse.json();
+            documentId = newDocument.name.split("/").pop();
+            console.log("New document created with ID:", documentId);
+        }
         
     }catch (error) {
         console.error("Error al procesar la solicitud de citas:", error);
@@ -233,57 +266,90 @@ export async function newAppointment(ctx: RouterContext<"/api/appointment/:id">)
         ctx.response.body = { error: "Error interno del servidor al obtener citas" };
         return;
     }
-    const monthsInDatabase = result[0].document.fields;
-    let fieldPathToUpdate:string, newData:any;
-    if (!(databaseIndex in monthsInDatabase)) {
-        console.log("El mes no existe en la base de datos, creando nuevo mes");
-        newData = {
-            [databaseIndex]: {
-                mapValue: {
-                    values: []
-                }
-            }
-        };
-        fieldPathToUpdate = "";
-    }else if (!(day in monthsInDatabase[databaseIndex].mapValue.fields) ) {
-        console.log("El día no existe en la base de datos, creando nuevo día");
-        newData = {
-            [day]: {
-                mapValue: {
-                    values: []
-                }
-            }
-        };
-        fieldPathToUpdate = `${databaseIndex}`;
-    } else {
-        newData = {
-            [buttonId]: {stringValue: appointmentId}
-        }
+    const existingDocFields = (result && result[0] && result[0].document && result[0].document.fields)
+                              ? JSON.parse(JSON.stringify(result[0].document.fields))
+                              : { clinicId: { stringValue: clinicId } }; // Valor por defecto si es un doc nuevo o no tiene campos
 
-        fieldPathToUpdate = `${databaseIndex}.${day}`;
+    // Asegurar que la estructura anidada exista hasta el nivel de 'buttonId'
+    // Crear databaseIndex (mes-año) si no existe
+    if (!existingDocFields[databaseIndex]) {
+        existingDocFields[databaseIndex] = { mapValue: { fields: {} } };
+    } else if (!existingDocFields[databaseIndex].mapValue) { // Consistencia
+        existingDocFields[databaseIndex].mapValue = { fields: {} };
+    } else if (!existingDocFields[databaseIndex].mapValue.fields) { // Consistencia
+         existingDocFields[databaseIndex].mapValue.fields = {};
     }
 
-    documentPath = `blocked_date/${documentId}`;
-    const commitUrl = `${FirestoreBaseUrl}:commit`;
+    // Acceder a los campos del mes
+    const monthFields = existingDocFields[databaseIndex].mapValue.fields;
+
+    // Crear el día si no existe dentro del mes
+    const dayString = String(day); // Las claves de mapa de Firestore son strings
+    if (!monthFields[dayString]) {
+        monthFields[dayString] = { mapValue: { fields: {} } };
+    } else if (!monthFields[dayString].mapValue) { // Consistencia
+        monthFields[dayString].mapValue = { fields: {} };
+    } else if (!monthFields[dayString].mapValue.fields) { // Consistencia
+        monthFields[dayString].mapValue.fields = {};
+    }
+
+    // Acceder a los campos del día
+    const dayFields = monthFields[dayString].mapValue.fields;
+
+    // Agregar o actualizar el buttonId (slot de la cita)
+    // buttonId ya es un string del payload. appointmentId debe ser un string.
+    dayFields[buttonId] = { stringValue: String(appointmentId) };
     
+    // documentPath y commitUrl
+    documentPath = `blocked_date/${documentId}`; // documentId fue obtenido previamente
+    console.log("Document path for commit:", documentPath);
+    const commitUrl = `${FirestoreBaseUrl}:commit`;
+
+    // El nombre completo del recurso del documento para el payload
+    // documentName se importa de utils.ts y es `projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`
+    const documentResourceName = `${documentName}/${documentPath}`;
+
     const commitPayload = {
         writes: [
             {
                 update: {
-                    name: `${FirestoreBaseUrl}/${documentPath}`
+                    name: documentResourceName, // Nombre completo del recurso del documento
+                    // fields ahora contiene todos los campos del documento, fusionados con los nuevos datos.
+                    // Esto reemplazará los campos del documento con esta nueva estructura completa.
+                    fields: existingDocFields 
                 },
-                updateTransforms: [
-                    {
-                        fieldPath: fieldPathToUpdate,
-                        appendMissingElements: {
-                            values: [newData]
-                        }
-                    }
-                ],
+                // No se usa updateMask aquí; estamos configurando todos los campos.
             }
         ],
     };
 
+    // const commitPayload = {
+    //     writes: [
+    //         {
+    //             update: {
+    //                 name: `${documentName}/${documentPath}`,
+    //                 fields:{
+    //                     [databaseIndex]: {
+    //                         mapValue: {
+    //                             fields: {
+    //                                 [day]: {
+    //                                     mapValue: {
+    //                                         fields: {
+    //                                             [buttonId]: {stringValue: appointmentId}
+    //                                         }
+    //                                     }
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+    //             },
+                
+    //         }
+    //     ],
+    // };
+    
+    console.log("Commit payload done");
     try {
         const response = await fetch(commitUrl, {
             method: "POST",
