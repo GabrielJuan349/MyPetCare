@@ -9,56 +9,94 @@ import 'package:lis_project/inbox_message.dart';
 import 'package:lis_project/map.dart';
 import 'package:lis_project/FAQs.dart';
 import 'dart:async';
-import 'package:lis_project/pet.dart';
+import 'package:lis_project/pet_test.dart';
+import 'package:lis_project/firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 late int numOfPets;
 late int numOfInboxMessages;
+late String userEmail;
 IconData inboxIcon = Icons.inbox;
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(const MyApp());
+
   numOfPets = pets.length;
   numOfInboxMessages = myMessages.length;
-  startSnackBarTimer();
+  //startSnackBarTimer();
+  startFirestoreListeners();
 }
 
-void startSnackBarTimer() {
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    scaffoldMessengerKey.currentState?.showSnackBar(
-      const SnackBar(
-        content: Text('Este es un mensaje de ejemplo.'),
-        duration: Duration(seconds: 4),
-      ),
+void startFirestoreListeners() {
+  List<String> collections = ['treatment', 'prescription', 'appointments', 'report'];
+  //List<String> collections = ['inbox_test'];
+
+  for (var collection in collections) {
+    FirebaseFirestore.instance.collection(collection).snapshots().listen(
+          (QuerySnapshot snapshot) async {
+        for (var change in snapshot.docChanges) {
+          final id = change.doc.id;
+
+          if (change.type == DocumentChangeType.added) {
+            /*
+            await FirebaseFirestore.instance.collection('inbox').add({
+              'title': 'Nuevo en $collection',
+              'msg': 'Se ha añadido un nuevo registro',
+              'type': '$collection',
+              'id': '$id',
+              'read': false,
+            });*/
+
+            myMessages.insert(
+              0,
+              InboxMessage(
+                'Nuevo en $collection',
+                'Se ha añadido un nuevo registro',
+                '$collection',
+                "$id",
+                false,
+              ),
+            );
+            inboxIcon = Icons.notification_important;
+          } else if (change.type == DocumentChangeType.removed) {
+            /*
+            await FirebaseFirestore.instance.collection('inbox').add({
+              'title': 'Eliminado de $collection',
+              'msg': 'Se ha eliminado un registro',
+              'type': '$collection',
+              'id': '$id',
+              'read': false,
+            });*/
+
+            myMessages.insert(
+              0,
+              InboxMessage(
+                'Eliminado de $collection',
+                'Se ha eliminado un registro',
+                '$collection',
+                "$id",
+                false,
+              ),
+            );
+            inboxIcon = Icons.notification_important;
+          }
+
+          numOfInboxMessages = myMessages.length;
+        }
+      },
     );
-  });
-
-  Timer.periodic(const Duration(seconds: 20), (timer) {
-    if (pets.length > numOfPets) {
-      int numOfNewPets = pets.length - numOfPets;
-      numOfPets = pets.length;
-      scaffoldMessengerKey.currentState?.showSnackBar(
-        SnackBar(
-          content: Text('You have added $numOfNewPets new pets'),
-          duration: Duration(seconds: 4),
-        ),
-      );
-    } else if (pets.length < numOfPets) {
-      int numOfLostPets = numOfPets - pets.length;
-      numOfPets = pets.length;
-      scaffoldMessengerKey.currentState?.showSnackBar(
-        SnackBar(
-          content: Text('You have deleted $numOfLostPets pets'),
-          duration: Duration(seconds: 4),
-        ),
-      );
-    }
-
-    if (myMessages.length > numOfInboxMessages) {
-      inboxIcon = Icons.notification_important;
-    }
-  });
+  }
 }
+
+
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
