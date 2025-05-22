@@ -162,6 +162,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _buildEditableField("Surname", _surnameController),
               _buildEditableField("Phone", _phoneController, keyboardType: TextInputType.phone),
               _buildEditableField("Location",_localityController),
+              _buildReadonlyField("Clinic", user.clinicInfo),
               _buildReadonlyField("Email", user.firebaseUser.email!),
 
               Align(
@@ -245,19 +246,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildReadonlyField(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextFormField(
-        initialValue: value,
-        readOnly: true,
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
+Widget _buildReadonlyField(String label, String value) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0),
+    child: TextFormField(
+      initialValue: value,
+      readOnly: true,
+      enabled: false, // <- deshabilitado visualmente
+      decoration: InputDecoration(
+        labelText: label,
+        filled: true,
+        fillColor: Colors.grey.shade200,
+        border: const OutlineInputBorder(),
+        disabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey.shade400),
         ),
       ),
-    );
-  }
+      style: TextStyle(color: Colors.grey.shade700),
+    ),
+  );
+}
+
 
   Future<void> _buildChangePasswordPopUp(BuildContext context) async{
     return showDialog(

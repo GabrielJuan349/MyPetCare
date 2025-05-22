@@ -21,7 +21,7 @@ class _RegisterFormScreenState extends State<RegisterFormScreen> {
 
   bool _isLoading = false;
   String? _selectedValue;
-  final List<String> _options = ['Pet owner', 'Vet', 'Vet clinic', 'Admin'];
+  //final List<String> _options = ['Pet owner', 'Vet', 'Vet clinic', 'Admin'];
   List<String> _clinics = [];
 String? _selectedClinic;
 
@@ -29,7 +29,7 @@ String? _selectedClinic;
   @override
 void initState() {
   super.initState();
-  _selectedValue = _options.isNotEmpty ? _options[0] : null;
+  _selectedValue = 'Pet  owner';
   _loadClinics();
 }
 
@@ -120,7 +120,6 @@ Future<void> _loadClinics() async {
                                _buildClinicDropdown(),
                               _buildTextField('Phone Number', _phoneController),
                               _buildTextField('Locality', _localityController),
-                              _buildUserTypeSelector(),
                               _buildButton(firebaseUser)
                             ],
                           )
@@ -157,40 +156,7 @@ Future<void> _loadClinics() async {
     );
   }
 
-  Widget _buildUserTypeSelector() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Select an option:',
-              style: TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 10),
-            DropdownButton<String>(
-              value: _selectedValue,
-              hint: const Text('Choose an option'),
-              isExpanded: true,
-              items: _options.map((String option) {
-                return DropdownMenuItem<String>(
-                  value: option,
-                  child: Text(option),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedValue = newValue;
-                });
-              },
-            ),
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
-    );
-  }
+
 
   Widget _buildTextField(String label, TextEditingController textController,{bool obscureText = false}) {
     return Padding(
