@@ -164,15 +164,7 @@ class _LoginState extends State<Login> {
                   alignment: WrapAlignment.center,
                   spacing: 6,
                   children: [
-                    const Text("¿Eres una clínica?"),
-                    InkWell(
-                      onTap: () => Navigator.pushNamed(context, '/clinic-login'),
-                      child: const Text(
-                        "Inicia sesión",
-                        style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
-                      ),
-                    ),
-                    const Text("o"),
+                    const Text("¿Eres una clínica sin cuenta?"),
                     InkWell(
                       onTap: () => Navigator.pushNamed(context, '/clinic-register'),
                       child: const Text(

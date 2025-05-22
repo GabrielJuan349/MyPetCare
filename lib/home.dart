@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'clients.dart';
 import 'patients.dart';
 import 'schedule.dart';
+import 'login.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -49,6 +52,8 @@ class _HomePageState extends State<HomePage> {
           _buildTitle(),
           const Spacer(),
           _buildMenu(),
+          const SizedBox(width: 20),
+          _buildProfileMenu(),
         ],
       ),
     );
@@ -81,6 +86,47 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ],
+    );
+  }
+  Widget _buildProfileMenu() {
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) return const SizedBox();
+
+    return FutureBuilder<DocumentSnapshot>(
+      future: FirebaseFirestore.instance.collection('users').doc(currentUser.uid).get(),
+      builder: (context, snapshot) {
+        final nameOrEmail = snapshot.data?.get('firstName') ?? currentUser.email ?? 'Perfil';
+
+        return PopupMenuButton<String>(
+          icon: const Icon(Icons.account_circle, color: Colors.orange, size: 30),
+          onSelected: (value) async {
+            if (value == 'logout') {
+              await FirebaseAuth.instance.signOut();
+              if (!context.mounted) return;
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const Login(),
+                ),
+              );
+            }
+          },
+          itemBuilder: (context) => [
+            PopupMenuItem<String>(
+              value: 'name',
+              enabled: false,
+              child: Text('Hola, $nameOrEmail',
+                  style: const TextStyle(fontWeight: FontWeight.w500)),
+            ),
+            const PopupMenuDivider(),
+            const PopupMenuItem<String>(
+              value: 'logout',
+              child: Text('Cerrar sesión'),
+            ),
+          ],
+        );
+      },
     );
   }
 

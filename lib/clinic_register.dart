@@ -62,7 +62,7 @@ class _ClinicRegisterScreenState extends State<ClinicRegisterScreen> {
         'longitude': longitude,     // como número
       };
 
-      await FirebaseFirestore.instance.collection('clinics').add(clinicData);
+      await FirebaseFirestore.instance.collection('clinic').add(clinicData);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Clinic created successfully!')),
