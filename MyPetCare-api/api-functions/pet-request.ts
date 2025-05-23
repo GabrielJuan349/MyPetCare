@@ -1,29 +1,28 @@
-
-import { RouterContext } from "oak";
+import { RouterContext } from 'oak';
 import { FirestoreBaseUrl } from './utils.ts';
 
 // Obtén la clave de la API desde las variables de entorno
 
 //const FIREBASE_PRIVATE_KEY = Deno.env.get("FIREBASE_PROJECT_ID");
-const FIREBASE_PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID") // Asegúrate de que sea el ID del proyecto de Firebase
+const FIREBASE_PROJECT_ID = Deno.env.get('FIREBASE_PROJECT_ID'); // Asegúrate de que sea el ID del proyecto de Firebase
 
 // URL de registro de Firebase
-const FireStoreUrl = FirestoreBaseUrl + "/pets";
+const FireStoreUrl = FirestoreBaseUrl + '/pets';
 
 //Create
-export async function createPet(ctx: RouterContext<"/api/pet">) {
-  console.log("🐶 createPet endpoint called");
+export async function createPet(ctx: RouterContext<'/api/pet'>) {
+  console.log('🐶 createPet endpoint called');
   console.log(FireStoreUrl);
   console.log(FIREBASE_PROJECT_ID);
 
-  const { value } = await ctx.request.body({ type: "json" });
+  const { value } = await ctx.request.body({ type: 'json' });
   console.log(value);
   const Pet = await value;
   //const birthDate = calculateAgeFromBirthDate(birthDateJSon);
 
   const response = await fetch(FireStoreUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       fields: {
         age: { doubleValue: Pet.age },
@@ -36,22 +35,22 @@ export async function createPet(ctx: RouterContext<"/api/pet">) {
         photoUrls: { stringValue: Pet.image },
         chip: { stringValue: Pet.chip },
         gender: { stringValue: Pet.gender },
-      }
+      },
     }),
   });
 
-  console.log("Response from Firestore:", response);
+  console.log('Response from Firestore:', response);
 
   const result = await response.json();
   if (!response.ok) {
-    throw new Error(result.error?.message || "Error al registrar mascota");
+    throw new Error(result.error?.message || 'Error al registrar mascota');
   }
 
   ctx.response.status = 200;
   ctx.response.body = 'Pet created successfully!';
-  const fullDocPath = result.name; 
-  const segments = fullDocPath.split("/");
-  const documentId = segments[segments.length - 1]; 
+  const fullDocPath = result.name;
+  const segments = fullDocPath.split('/');
+  const documentId = segments[segments.length - 1];
 
   ctx.response.body = { id: documentId }; // Conseguir petID
 
@@ -59,14 +58,14 @@ export async function createPet(ctx: RouterContext<"/api/pet">) {
 }
 
 //Delete
-export async function deletePet(ctx: RouterContext<"/api/pet/:id">) {
+export async function deletePet(ctx: RouterContext<'/api/pet/:id'>) {
   const id = ctx.params.id;
   const deleteUrl = `${FireStoreUrl}/${id}`;
-  const response = await fetch(deleteUrl, { method: "DELETE" });
+  const response = await fetch(deleteUrl, { method: 'DELETE' });
 
   if (!response.ok) {
     ctx.response.status = 500;
-    ctx.response.body = { error: "Error eliminando la mascota" };
+    ctx.response.body = { error: 'Error eliminando la mascota' };
   } else {
     ctx.response.status = 200;
     ctx.response.body = { success: true };
@@ -74,15 +73,15 @@ export async function deletePet(ctx: RouterContext<"/api/pet/:id">) {
 }
 
 // Update
-export async function updatePet(ctx: RouterContext<"/api/pet/:id">) {
+export async function updatePet(ctx: RouterContext<'/api/pet/:id'>) {
   const id = ctx.params.id;
   if (!id) {
     ctx.response.status = 400;
-    ctx.response.body = { error: "ID de mascota no proporcionado" };
+    ctx.response.body = { error: 'ID de mascota no proporcionado' };
     return;
   }
 
-  const { value } = await ctx.request.body({ type: "json" });
+  const { value } = await ctx.request.body({ type: 'json' });
   const pet = await value;
 
   const fields: any = {
@@ -93,25 +92,31 @@ export async function updatePet(ctx: RouterContext<"/api/pet/:id">) {
   };
 
   const updateMask = [
-    "age", "birthDate", "breed", "name", "owner", "type", "weight"
+    'age',
+    'birthDate',
+    'breed',
+    'name',
+    'owner',
+    'type',
+    'weight',
   ];
 
   if (pet.photoUrls && Array.isArray(pet.photoUrls)) {
     fields.photoUrls = {
       arrayValue: {
-        values: pet.photoUrls.map((url: string) => ({ stringValue: url }))
-      }
+        values: pet.photoUrls.map((url: string) => ({ stringValue: url })),
+      },
     };
-    updateMask.push("photoUrls");
+    updateMask.push('photoUrls');
   }
 
   const updateUrl = `${FireStoreUrl}/${id}?` +
-    updateMask.map((field) => `updateMask.fieldPaths=${field}`).join("&");
+    updateMask.map((field) => `updateMask.fieldPaths=${field}`).join('&');
 
   const response = await fetch(updateUrl, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ fields })
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fields }),
   });
 
   const rawText = await response.text();
@@ -125,8 +130,8 @@ export async function updatePet(ctx: RouterContext<"/api/pet/:id">) {
   if (!response.ok) {
     ctx.response.status = 500;
     ctx.response.body = {
-      error: "Error actualizando la mascota",
-      details: result
+      error: 'Error actualizando la mascota',
+      details: result,
     };
     return;
   }
@@ -135,9 +140,8 @@ export async function updatePet(ctx: RouterContext<"/api/pet/:id">) {
   ctx.response.body = { success: true, updated: result };
 }
 
-
 //GetPetById
-export async function getPetById(ctx: RouterContext<"/api/pet/:id">) {
+export async function getPetById(ctx: RouterContext<'/api/pet/:id'>) {
   const id = ctx.params.id;
   const getUrl = `${FireStoreUrl}/${id}`;
 
@@ -146,7 +150,7 @@ export async function getPetById(ctx: RouterContext<"/api/pet/:id">) {
 
   if (!response.ok || result.error) {
     ctx.response.status = 404;
-    ctx.response.body = { error: "Pet not found" };
+    ctx.response.body = { error: 'Pet not found' };
     return;
   }
 
@@ -155,8 +159,10 @@ export async function getPetById(ctx: RouterContext<"/api/pet/:id">) {
   const pet = {
     id,
     ...Object.fromEntries(
-      Object.entries(fields).map(([key, value]) => [key, Object.values(value as { [key: string]: any })[0]])
-    )    
+      Object.entries(fields).map((
+        [key, value],
+      ) => [key, Object.values(value as { [key: string]: any })[0]]),
+    ),
   };
 
   ctx.response.status = 200;
@@ -164,27 +170,27 @@ export async function getPetById(ctx: RouterContext<"/api/pet/:id">) {
 }
 
 //GetPetsByOwner
-export async function getPetsByOwner(ctx: RouterContext<"/api/getPet/:owner">) {
-  console.log("📥 Endpoint getPetsByOwner llamado");
-  
+export async function getPetsByOwner(ctx: RouterContext<'/api/getPet/:owner'>) {
+  console.log('📥 Endpoint getPetsByOwner llamado');
+
   const ownerId = ctx.params.owner;
 
   if (!ownerId) {
     ctx.response.status = 400;
-    ctx.response.body = { error: "ownerId no proporcionado" };
+    ctx.response.body = { error: 'ownerId no proporcionado' };
     return;
   }
 
   const ownerPath = `/users/${ownerId}`;
   // const url = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/pets`;
   // console.log("ownerpath: ", ownerPath, " y url: ", url)
-  console.log("ownerpath: ", ownerPath, " y url: ", FireStoreUrl)
+  console.log('ownerpath: ', ownerPath, ' y url: ', FireStoreUrl);
 
   const response = await fetch(FireStoreUrl, {
-    method: "GET",
+    method: 'GET',
     headers: {
-      "Content-Type": "application/json"
-    }
+      'Content-Type': 'application/json',
+    },
   });
 
   const result = await response.json();
@@ -192,8 +198,8 @@ export async function getPetsByOwner(ctx: RouterContext<"/api/getPet/:owner">) {
   if (result.error) {
     ctx.response.status = 500;
     ctx.response.body = {
-      error: "Error al obtener mascotas",
-      details: result.error
+      error: 'Error al obtener mascotas',
+      details: result.error,
     };
     return;
   }
@@ -201,22 +207,21 @@ export async function getPetsByOwner(ctx: RouterContext<"/api/getPet/:owner">) {
     console.log(JSON.stringify(doc, null, 2));
   });
 
-
   const pets = (result.documents || [])
     .map((doc: any) => {
       const data = doc.fields;
       return {
-        id: doc.name.split("/").pop(),
+        id: doc.name.split('/').pop(),
         ...Object.fromEntries(
           Object.entries(data).map(
-            ([k, v]) => [k, Object.values(v as { [key: string]: any })[0]]
-          )
-        )
+            ([k, v]) => [k, Object.values(v as { [key: string]: any })[0]],
+          ),
+        ),
       };
     })
     .filter((pet) => pet.owner === ownerId);
 
-  console.log(pets)
+  console.log(pets);
   ctx.response.status = 200;
   ctx.response.body = pets;
 }

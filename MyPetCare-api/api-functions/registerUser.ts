@@ -1,9 +1,9 @@
-import { RouterContext } from "oak";
-import "https://deno.land/std@0.213.0/dotenv/load.ts";
-import {User} from "../interfaces/user.interface.ts";
+import { RouterContext } from 'oak';
+import 'https://deno.land/std@0.213.0/dotenv/load.ts';
+import { User } from '../interfaces/user.interface.ts';
 import { FirestoreBaseUrl } from './utils.ts';
 
- // Asegúrate de que sea la API Key de Firebase
+// Asegúrate de que sea la API Key de Firebase
 // const FIREBASE_PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID"); // Asegúrate de que sea el ID del proyecto de Firebase
 
 const FireStoreUrl = `${FirestoreBaseUrl}/users`;
@@ -12,45 +12,43 @@ async function saveUserToFirestore(user: User) {
   const firestoreData = {
     fields: {
       email: user.email,
-      firstName: user.firstName ,
+      firstName: user.firstName,
       lastName: user.lastName,
       phone: user.phone,
       accountType: user.accountType,
       locality: user.locality,
-      clinicInfo: user.clinicInfo 
-        ? user.clinicInfo: { nullValue: null },
+      clinicInfo: user.clinicInfo ? user.clinicInfo : { nullValue: null },
     },
   };
 
   // Use firebase auth uid as Document ID in firestore
   const response = await fetch(`${FireStoreUrl}?documentId=${user.userId}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(firestoreData),
   });
 
   const result = await response.json();
   if (!response.ok) {
-    throw new Error(result.error?.message || "Error al guardar datos en Firestore");
+    throw new Error(result.error?.message || 'Error al guardar datos en Firestore');
   }
 
   return result;
 }
 
-
 // 👉 Handler principal
-export async function registerUser(ctx: RouterContext<"/api/registerUser">) {
+export async function registerUser(ctx: RouterContext<'/api/registerUser'>) {
   try {
-    const { value } = await ctx.request.body({ type: "json" });
+    const { value } = await ctx.request.body({ type: 'json' });
 
     const userData: User = await value;
 
-    console.log("💾 Guardando usuario en Firestore...");
+    console.log('💾 Guardando usuario en Firestore...');
     await saveUserToFirestore(userData);
 
     ctx.response.status = 200;
     ctx.response.body = {
-      message: "Usuario registrado con éxito en Firebase y Firestore",
+      message: 'Usuario registrado con éxito en Firebase y Firestore',
       userId: userData.userId,
       email: userData.email,
       phone: userData.phone,
@@ -61,7 +59,7 @@ export async function registerUser(ctx: RouterContext<"/api/registerUser">) {
       clinicInfo: userData.clinicInfo,
     };
   } catch (error) {
-    console.error("❌ Error al registrar el usuario:", error);
+    console.error('❌ Error al registrar el usuario:', error);
     ctx.response.status = 500;
   }
 }
