@@ -70,7 +70,7 @@ Future<Map<String, dynamic>?> validateUser(String uid) async {
     final Map<String, dynamic> userMap = json.decode(responseBody);
 
     final accountType = userMap['accountType'];
-    if (accountType != 'owner') {
+    if (accountType != 'Pet owner') {
       return null; // Usuario no válido
     }
 
