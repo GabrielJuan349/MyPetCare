@@ -89,6 +89,10 @@ class OwnerModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  List<String> getPetNames() {
+    return _pets?.map((pet) => pet.name).toList() ?? [];
+  }
+
   void clearOwner() {
     _owner = null;
     _pets = null;
