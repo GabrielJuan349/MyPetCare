@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lis_project/register_screen.dart';
 import 'package:lis_project/data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'requests.dart';
 
 class IniciarSesion extends StatefulWidget {
   const IniciarSesion({super.key});
@@ -27,7 +28,21 @@ class _IniciarSesionState extends State<IniciarSesion> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-
+      final user = userCredential.user;
+      if (user == null) {
+        setState(() {
+          _errorMessage = 'User could not be authenticated.';
+        });
+        return;
+      }
+      final userMap = await validateUser(user.uid);
+      if (userMap == null) {
+        await FirebaseAuth.instance.signOut();
+        setState(() {
+          _errorMessage = 'Only owner accounts can log in.';
+        });
+        return;
+      }
       await setGlobalUser(context);
 
       Navigator.pushReplacementNamed(
