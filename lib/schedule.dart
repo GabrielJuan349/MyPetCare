@@ -16,6 +16,20 @@ class ScheduleScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFF6F6F6),
+        elevation: 0,
+        centerTitle: true,
+        title: Text(
+          'Agenda Semanal',
+          style: GoogleFonts.inter(
+            color: Colors.orange,
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.orange),
+      ),
       body: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         itemCount: 7,

@@ -185,7 +185,7 @@ class HomeContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title
+
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               color: Colors.orange.shade300,
@@ -198,7 +198,7 @@ class HomeContent extends StatelessWidget {
               ),
             ),
 
-            // Body
+
             Container(
               height: 400,
               color: Colors.grey.shade100,

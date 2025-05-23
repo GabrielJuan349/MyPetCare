@@ -3,10 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lis_web/report_list.dart';
 
-import 'report.dart';
+import 'prescriptionList.dart';
 import 'schedule.dart';
 import 'treatment.dart';
-import 'prescription.dart';
+
 
 class PetDetailsScreen extends StatelessWidget {
   final String petId;
@@ -142,7 +142,7 @@ class PetDetailsScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => PrescriptionUploadScreen(petId: petId),
+                        builder: (_) => PrescriptionListScreen(petId: petId),
                       ),
                     );
 

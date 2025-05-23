@@ -91,7 +91,6 @@ class _PatientsPageState extends State<Patients> {
 
         return ListView(
           children: [
-            // Header row
             Container(
               padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
               color: _highlightColor,
@@ -105,7 +104,6 @@ class _PatientsPageState extends State<Patients> {
               ),
             ),
             const Divider(height: 0, thickness: 1),
-            // Data rows
             ...filteredPets.map((pet) {
               return InkWell(
                 onTap: () => _openPetDetails(pet['petId']),
