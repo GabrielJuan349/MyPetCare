@@ -1,6 +1,6 @@
 import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
 import { documentName, FirestoreBaseUrl, FirestoreQueryUrl, getDatabaseDate, getDateInfoForDelete, getVetIdFromClinics } from "./utils.ts"; 
-import console from 'node:console';
+import { AppointmentsInfoAll,AppointmentsIdAll, AppDataById } from '../interfaces/appointments.interface.ts';
 
 async function createAppointmenInDatabase(day:number, month:number, year:number, buttonId:number, petId:String, vetId:String) {
 
@@ -541,7 +541,7 @@ export async function getAppointmentById(ctx: RouterContext<"/api/getAppointment
         const vetName = resultVet.fields.firstName.stringValue + " " + resultVet.fields.lastName.stringValue;
         const ownerName = resultOwner.fields.firstName.stringValue + " " + resultOwner.fields.lastName.stringValue;
 
-        const appointmentData = {
+        const appointmentData:AppDataById = {
             id: appointmentId,
             date: result.fields.date.stringValue,
             time: result.fields.time.stringValue,
@@ -566,5 +566,192 @@ export async function getAppointmentById(ctx: RouterContext<"/api/getAppointment
         console.error("⚠️ Excepción al obtener la cita:", error);
         ctx.response.status = 500;
         ctx.response.body = { error: 'Excepción interna del servidor' };
+    }
+}
+
+export async function getAllAppointmentsFromOwner(ctx: RouterContext<"/api/appointment/owner/:id">) {
+    const ownerId = ctx.params.id; 
+    if (!ownerId) {
+        ctx.response.status = 400;
+        ctx.response.body = { error: "ID de propietario no proporcionado" };
+        return;
+    }
+    const query = {
+        structuredQuery: {
+            from: [{ collectionId: "pets" }], 
+            where: {
+                fieldFilter: {
+                    field: { fieldPath: "owner" }, 
+                    op: "EQUAL",
+                    value: { stringValue: ownerId }
+                }
+            }
+        }
+    };
+
+    try {
+        const response = await fetch(FirestoreQueryUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(query)
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.text();
+            console.error("⚠️ Error de Firestore:", response.status, errorBody);
+            ctx.response.status = response.status;
+            ctx.response.body = { error: "Error al obtener las citas de Firestore", details: errorBody };
+            return;
+        }
+
+        const resultPets = await response.json();
+        const petsIds:Array<string> = [];
+        for (const entry of resultPets) {
+            if (entry.document)
+                petsIds.push(entry.document.name.split("/").pop());
+        }
+        console.log("✅ IDs de mascotas encontradas");
+        const queryApp = {
+            structuredQuery: {
+                from: [{ collectionId: "appointments" }], 
+                where: {
+                    fieldFilter: {
+                        field: { fieldPath: "petId" }, 
+                        op: "IN",
+                        value: { arrayValue: { values: petsIds.map(id => ({ stringValue: id })) } }
+                    }
+                }
+            }
+        };
+        const responseApp = await fetch(FirestoreQueryUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(queryApp)
+        });
+        if (!responseApp.ok) {
+            const errorBody = await responseApp.text();
+            console.error("⚠️ Error de Firestore:", responseApp.status, errorBody);
+            ctx.response.status = responseApp.status;
+            ctx.response.body = { error: "Error al obtener las citas de Firestore", details: errorBody };
+            return;
+        }
+        const resultApp = await responseApp.json();
+        console.log("✅ Citas encontradas para el propietario");
+        const appointmentsArray:Array<AppointmentsInfoAll> = [];
+        const appointmentsIds:Array<AppointmentsIdAll> = [];
+
+        for (const entry of resultApp) {
+            if (entry.document) {
+                const fields = entry.document.fields;
+                const appointmentData: AppointmentsInfoAll = {id: "", date: "", time: "" };
+                const appIds:AppointmentsIdAll = {petId: "", vetId: ""};
+                appointmentData.id = entry.document.name.split("/").pop();
+                for (const fieldName in fields) {
+                    if (fieldName != "createdAt" && fieldName != "petId" && fieldName != "vetId") {
+                        const valueWrapper = fields[fieldName];
+                        const valueType = Object.keys(valueWrapper)[0];
+                        appointmentData[fieldName as keyof AppointmentsInfoAll] = valueWrapper[valueType];
+                    }else if (fieldName == "petId" || fieldName == "vetId") {
+                        const valueWrapper = fields[fieldName];
+                        const valueType = Object.keys(valueWrapper)[0];
+                        appIds[fieldName as keyof AppointmentsIdAll] = valueWrapper[valueType];
+                    }
+                }
+                appointmentsArray.push(appointmentData);
+                appointmentsIds.push(appIds);
+            }
+        }
+        console.log("✅ Citas obtenidas");
+        console.log("✅ IDs de citas obtenidas");
+
+        const appPetsInfo:any = {}; 
+        const appVetsInfo:any = {}; 
+        const vetforClinic:any = {};
+        const appClinicsInfo:any = {}; 
+        
+        for (let index = 0; index < appointmentsIds.length; index++) {
+            const appointment = appointmentsIds[index];
+
+            if (appPetsInfo[appointment.petId]){
+                appointmentsArray[index].petName = appPetsInfo[appointment.petId];
+            }else{
+                const petId = appointment.petId;
+                const petUrl = `${FirestoreBaseUrl}/pets/${petId}`;
+                const responsePet = await fetch(petUrl, {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" },
+                });
+                if (!responsePet.ok) {
+                    const errorBody = await responsePet.json();
+                    console.error("⚠️ Error al obtener la mascota:", errorBody);
+                    ctx.response.status = responsePet.status;
+                    ctx.response.body = { error: 'Error al obtener la mascota', details: errorBody };
+                    return;
+                }
+                const resultPet = await responsePet.json();
+                appointmentsArray[index].petName = resultPet.fields.name.stringValue;
+                console.log("✅ Mascota encontrada");
+            }
+
+            if (appVetsInfo[appointment.vetId]){
+                appointmentsArray[index].vetName = appVetsInfo[appointment.vetId];
+            }
+            else{
+
+                const vetId = appointment.vetId;
+                const vetUrl = `${FirestoreBaseUrl}/vets/${vetId}`;
+                const responseVet = await fetch(vetUrl, {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" },
+                });
+                if (!responseVet.ok) {
+                    const errorBody = await responseVet.json();
+                    console.error("⚠️ Error al obtener el veterinario:", errorBody);
+                    ctx.response.status = responseVet.status;
+                    ctx.response.body = { error: 'Error al obtener el veterinario', details: errorBody };
+                    return;
+                }
+                const resultVet = await responseVet.json();
+                const VetName = resultVet.fields.firstName.stringValue + " " + resultVet.fields.lastName.stringValue;
+                appointmentsArray[index].vetName = VetName;
+                appVetsInfo[vetId] = VetName;
+                vetforClinic[vetId] = resultVet.fields.clinicId.stringValue;
+                console.log("✅ Veterinario encontrado");
+            }
+
+            const clinicId = vetforClinic[appointment.vetId];
+            if (appClinicsInfo[vetforClinic[appointment.vetId]]){
+                appointmentsArray[index].clinicName = appClinicsInfo[clinicId];
+            }
+            else{
+                const clinicUrl = `${FirestoreBaseUrl}/clinic/${clinicId}`;
+                const responseClinic = await fetch(clinicUrl, {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" },
+                });
+                if (!responseClinic.ok) {
+                    const errorBody = await responseClinic.json();
+                    console.error("⚠️ Error al obtener la clínica:", errorBody);
+                    ctx.response.status = responseClinic.status;
+                    ctx.response.body = { error: 'Error al obtener la clínica', details: errorBody };
+                    return;
+                }
+                const resultClinic = await responseClinic.json();
+                appointmentsArray[index].clinicName = resultClinic.fields.name.stringValue;
+                appClinicsInfo[clinicId] = resultClinic.fields.name.stringValue;
+                console.log("✅ Clínica encontrada");
+            }
+        
+        }
+        
+        
+        console.log("✅ Citas obtenidas");
+        ctx.response.status = 200;
+        ctx.response.body = appointmentsArray;
+    }
+    catch (error) {
+        console.error("⚠️ Error al procesar la solicitud de citas:", error);
+        ctx.response.status = 500;
+        ctx.response.body = { error: "Error interno del servidor al obtener citas" };
     }
 }

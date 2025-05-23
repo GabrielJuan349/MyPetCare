@@ -14,7 +14,7 @@ import { createVet, deleteVet, getVetById , getVetsByClinic} from "./api-functio
 import { createNews, getAllNews, deleteNews } from "./api-functions/news.ts";
 import { updateUser, deleteUser, getUserDataById } from "./api-functions/gestion.usuarios.ts";
 import { monthBlockedRequest } from './api-functions/blocked-request.ts';
-import { deleteAppointment, getCitasByVetId, newAppointment, getAppointmentById } from './api-functions/appointments.ts';
+import { deleteAppointment, getCitasByVetId, newAppointment, getAppointmentById, getAllAppointmentsFromOwner } from './api-functions/appointments.ts';
 import { createReport, getReportById, getReportsByVet, getReportsByPet, deleteReport } from "./api-functions/report.ts";
 import { createTreatment, getTreatmentById, getTreatmentsByVet, getTreatmentsByPet, deleteTreatment } from "./api-functions/treatment.ts";
 import {getVaccineByPetID, createVaccine} from "./api-functions/vaccines.ts";
@@ -167,6 +167,8 @@ router
 
   // GET Appointment by ID
   .get("/api/getAppointment/:id", getAppointmentById)
+
+  .get("/api/appointment/owner/:id", getAllAppointmentsFromOwner)
 
   // GET month blocked days from clinicId
   .post("/calendar/month/:id", monthBlockedRequest)
