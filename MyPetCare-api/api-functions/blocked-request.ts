@@ -6,7 +6,8 @@ import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
  * Maneja las solicitudes para obtener los días bloqueados para una clínica en un mes y año específicos.
  * @param ctx El contexto del enrutador de Oak.
  */
-export async function monthBlockedRequest(ctx: RouterContext<"/calendar/month/:id">) {
+export async function monthBlockedRequest(ctx: RouterContext<"/api/calendar/:id">) {
+    console.log("🚧 Obteniendo fechas bloqueadas")
     const clinicId = ctx.params.id; 
     let requestPayload;
 
@@ -77,7 +78,9 @@ export async function monthBlockedRequest(ctx: RouterContext<"/calendar/month/:i
             return;
         }
 
-        const result = await response.json();        
+        const result = await response.json();
+        console.log("✅ Fechas bloqueadas obtenidas con éxito");   
+
         const citas = result
             .filter((entry: { document: unknown }) => entry.document) // Assuming entry has a document property
             .map((entry: { document: { fields: Record<string, any> } }) => { // Assuming document has fields
@@ -90,7 +93,12 @@ export async function monthBlockedRequest(ctx: RouterContext<"/calendar/month/:i
                         const day = Object.keys(appoint_day)[0];
                         citaData[day] = [];
                         for (const innerFieldName in appoint_day[day].mapValue.fields) {
-                            citaData[day].push(innerFieldName);
+                            const buttonId = parseInt(innerFieldName);
+                            const minutes = (buttonId%4)*15;
+                            const hour = Math.floor(buttonId/4)+9;
+                            const formatedHour = hour.toString().padStart(2, '0') + ":" + minutes.toString().padStart(2, '0');
+
+                            citaData[day].push(formatedHour);
                         }
                     }
                 }

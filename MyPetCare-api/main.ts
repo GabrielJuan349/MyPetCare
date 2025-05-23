@@ -171,9 +171,9 @@ router
   .get("/api/appointment/owner/:id", getAllAppointmentsFromOwner)
 
   // GET month blocked days from clinicId
-  .post("/calendar/month/:id", monthBlockedRequest)
+  .post("/api/calendar/:id", monthBlockedRequest)
   // GET dates from vetId
-  .post("/api/appointment/vet/:vetId", getCitasByVetId)
+  .get("/api/appointment/vet/:vetId", getCitasByVetId)
 
 // ---- Endpoints de TREATMENT ----
   // CREATE treatment info
