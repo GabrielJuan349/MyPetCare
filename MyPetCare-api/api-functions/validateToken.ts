@@ -1,6 +1,5 @@
 // validateToken.ts
-import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
-import "https://deno.land/std@0.213.0/dotenv/load.ts";
+import { RouterContext } from "oak";
 import {firebaseAdmin} from "../firebaseconfig/firebase.ts";
 
 // Asegúrate de que sea la API Key de Firebase

@@ -1,5 +1,6 @@
 
-import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
+import { RouterContext } from "oak";
+import { FirestoreBaseUrl } from './utils.ts';
 
 // Obtén la clave de la API desde las variables de entorno
 
@@ -7,7 +8,7 @@ import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
 const FIREBASE_PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID") // Asegúrate de que sea el ID del proyecto de Firebase
 
 // URL de registro de Firebase
-const FireStoreUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/pets`;
+const FireStoreUrl = FirestoreBaseUrl + "/pets";
 
 //Create
 export async function createPet(ctx: RouterContext<"/api/pet">) {
@@ -175,10 +176,11 @@ export async function getPetsByOwner(ctx: RouterContext<"/api/getPet/:owner">) {
   }
 
   const ownerPath = `/users/${ownerId}`;
-  const url = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/pets`;
-  console.log("ownerpath: ", ownerPath, " y url: ", url)
+  // const url = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/pets`;
+  // console.log("ownerpath: ", ownerPath, " y url: ", url)
+  console.log("ownerpath: ", ownerPath, " y url: ", FireStoreUrl)
 
-  const response = await fetch(url, {
+  const response = await fetch(FireStoreUrl, {
     method: "GET",
     headers: {
       "Content-Type": "application/json"

@@ -1,8 +1,8 @@
-import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
+import { RouterContext } from "oak";
+import { FirestoreBaseUrl } from './utils.ts';
 
-
-const PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID");
-const FireStoreVaccineUrl = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/vaccines`;
+// const PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID");
+const FireStoreVaccineUrl = `${FirestoreBaseUrl}/vaccines`;
 
 export async function createVaccine(ctx: RouterContext<"/api/vaccine">) {
   console.log("💉 createVaccine endpoint called");

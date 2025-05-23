@@ -1,6 +1,5 @@
-import console from 'node:console';
 import { FirestoreBaseUrl, getDatabaseDate } from "./utils.ts"; 
-import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
+import { RouterContext } from "oak";
 
 /**
  * Maneja las solicitudes para obtener los días bloqueados para una clínica en un mes y año específicos.

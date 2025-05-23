@@ -1,6 +1,6 @@
 import { cert, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-import { dirname, fromFileUrl, join } from 'https://deno.land/std/path/mod.ts';
+import { dirname, fromFileUrl, join } from "paths";
 
 // Construir una ruta absoluta utilizando import.meta.url
 const currentDir = dirname(fromFileUrl(import.meta.url));

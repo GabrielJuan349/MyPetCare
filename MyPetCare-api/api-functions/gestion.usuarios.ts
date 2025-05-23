@@ -1,9 +1,10 @@
-import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
+import { RouterContext } from "oak";
+import { FirestoreBaseUrl } from './utils.ts';
 // Obtén la clave de la API desde las variables de entorno
-const FIREBASE_PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID"); // Asegúrate de que sea el ID del proyecto de Firebase
+// const FIREBASE_PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID"); // Asegúrate de que sea el ID del proyecto de Firebase
 
 // URL de registro de Firebase
-const FireStoreUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/users`;
+const FireStoreUrl = FirestoreBaseUrl+"/users";
 
 
 function formatToFirestore(fields: Record<string, any>) {

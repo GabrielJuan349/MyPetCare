@@ -1,4 +1,4 @@
-import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
+import { RouterContext } from "oak";
 import { documentName, FirestoreBaseUrl, FirestoreQueryUrl, getDateInfo, createAppointmenInDatabase, updateBlockedDate } from "./utils.ts"; 
 import { AppointmentsInfoAll,AppointmentsIdAll, AppDataById } from '../interfaces/appointments.interface.ts';
 

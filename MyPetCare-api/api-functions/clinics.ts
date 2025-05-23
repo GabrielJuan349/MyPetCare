@@ -1,8 +1,9 @@
-import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
+import { RouterContext } from "oak";
 import { Clinic } from '../interfaces/clinic.interface.ts';
+import { FirestoreBaseUrl, FirestoreQueryUrl } from './utils.ts';
 
-const FIREBASE_PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID");
-const FirestorePrescriptionURL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/clinic`;
+// const FIREBASE_PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID");
+const FirestorePrescriptionURL = FirestoreBaseUrl + "/clinic";
 
 
 export async function getClinics(ctx: RouterContext<"/api/getClinics/:id">) {
@@ -39,7 +40,7 @@ export async function createClinic(ctx: RouterContext<"/api/createClinic">) {
   const clinic: Clinic = await value;
 
   // 1. Verificar si ya existe una clínica con el mismo name
-  const queryUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents:runQuery`;
+  // const queryUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents:runQuery`;
   const queryBody = {
     structuredQuery: {
       from: [{ collectionId: "clinic" }],
@@ -53,7 +54,7 @@ export async function createClinic(ctx: RouterContext<"/api/createClinic">) {
     }
   };
 
-  const checkRes = await fetch(queryUrl, {
+  const checkRes = await fetch(FirestoreQueryUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(queryBody),
@@ -124,9 +125,9 @@ export async function deleteClinic(ctx: RouterContext<"/api/deleteClinic/:id">) 
 export async function getAllClinics(ctx: RouterContext<"/api/getClinics">) {
   console.log("📋 getAllClinics endpoint called");
 
-  const getUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/clinic`;
+  // const getUrl = FirestoreBaseUrl+"/clinic";
 
-  const response = await fetch(getUrl, {
+  const response = await fetch(FirestorePrescriptionURL, {
     method: "GET",
     headers: { "Content-Type": "application/json" }
   });

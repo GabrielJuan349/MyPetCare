@@ -1,6 +1,6 @@
 // authenticate.ts
-import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
-import "https://deno.land/std@0.213.0/dotenv/load.ts";
+import { RouterContext } from "oak";
+// import "https://deno.land/std@0.213.0/dotenv/load.ts";
 
 
 const FIREBASE_API_KEY = Deno.env.get("FIREBASE_API_KEY");

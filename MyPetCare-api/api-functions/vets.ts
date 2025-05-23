@@ -1,8 +1,9 @@
-import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
+import { RouterContext } from "oak";
 import { Vet } from "../interfaces/vets.interface.ts";
+import { FirestoreBaseUrl, FirestoreQueryUrl } from './utils.ts';
 
-const FIREBASE_PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID");
-const FirestoreVetURL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/vets`;
+// const PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID");
+const FirestoreVetURL = `${FirestoreBaseUrl}/vets`;
 
 export async function createVet(ctx: RouterContext<"/api/createVet">) {
     console.log("Creando veterinario");
@@ -97,8 +98,8 @@ export async function getVetsByClinic(ctx: RouterContext<"/api/getVetsByClinic/:
       }
     };
   
-    const queryUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents:runQuery`;
-    const response = await fetch(queryUrl, {
+    // const queryUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents:runQuery`;
+    const response = await fetch(FirestoreQueryUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(query)

@@ -1,10 +1,11 @@
 // api-functions/news.ts
 
-import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
+import { RouterContext } from "oak";
 import { News } from "../interfaces/news.interface.ts";
+import { FirestoreBaseUrl } from './utils.ts';
 
-const FIREBASE_PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID");
-const FirestoreNewsURL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/news`;
+// const FIREBASE_PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID");
+const FirestoreNewsURL = FirestoreBaseUrl +"/news";
 
 // Crear noticia
 export async function createNews(ctx: RouterContext<"/api/createNews">) {

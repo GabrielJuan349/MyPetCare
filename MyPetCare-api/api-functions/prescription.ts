@@ -1,8 +1,9 @@
-import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
+import { RouterContext } from "oak";
 import {Prescription} from "../interfaces/prescription.interface.ts";
+import { FirestoreBaseUrl } from './utils.ts';
 
-const FIREBASE_PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID");
-const FirestorePrescriptionURL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/prescription`;
+// const FIREBASE_PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID");
+const FirestorePrescriptionURL = FirestoreBaseUrl +"/prescription";
 
 
 function mapFirestore(doc: any) {
@@ -100,7 +101,7 @@ export async function updatePrescription(ctx: RouterContext<"/api/putPrescriptio
       return;
     }
   
-    const updateUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/prescription/${id}?` +
+    const updateUrl = `${FirestorePrescriptionURL}/${id}?` +
       updateMask.map((f) => `updateMask.fieldPaths=${f}`).join("&");
   
     console.log("URL:", updateUrl);

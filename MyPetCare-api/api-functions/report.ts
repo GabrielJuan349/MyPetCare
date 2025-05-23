@@ -1,8 +1,9 @@
-import { RouterContext } from "https://deno.land/x/oak@v12.6.1/mod.ts";
+import { RouterContext } from "oak";
 import { Report } from "../interfaces/report.interface.ts";
+import { FirestoreBaseUrl } from './utils.ts';
 
-const PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID");
-const FirestoreReportURL = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/report`;
+// const PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID");
+const FirestoreReportURL = `${FirestoreBaseUrl}/report`;
 
 function mapFirestore(doc: any) {
   const fields = doc.fields || {};
