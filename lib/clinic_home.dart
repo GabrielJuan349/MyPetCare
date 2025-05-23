@@ -6,8 +6,9 @@ import 'login.dart';
 
 class ClinicHomeScreen extends StatefulWidget {
   final String clinicName;
+  final String clinicId;
 
-  const ClinicHomeScreen({super.key, required this.clinicName});
+  const ClinicHomeScreen({super.key, required this.clinicName, required this.clinicId});
 
   @override
   State<ClinicHomeScreen> createState() => _ClinicHomeScreenState();
@@ -44,6 +45,7 @@ class _ClinicHomeScreenState extends State<ClinicHomeScreen> {
         'phone': _phoneController.text.trim(),
         'accountType': 'vet',
         'clinicInfo': widget.clinicName,
+        'clinicId': widget.clinicId,
       });
 
       ScaffoldMessenger.of(context).showSnackBar(

@@ -61,7 +61,7 @@ class _ClinicUserRegisterScreenState extends State<ClinicUserRegisterScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ClinicHomeScreen(clinicName: widget.clinicName,
+          builder: (context) => ClinicHomeScreen(clinicName: widget.clinicName, clinicId: userId
           ),
         ),
       );

@@ -55,11 +55,12 @@ class _LoginState extends State<Login> {
       if (accountType == 'clinic') {
         final clinicInfo = userData['clinicInfo'];
         final clinicName = clinicInfo is Map ? clinicInfo['name'] : clinicInfo;
+        final clinicId = clinicInfo is Map ? clinicInfo['id'] : clinicInfo;
 
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => ClinicHomeScreen(clinicName: clinicName),
+            builder: (context) => ClinicHomeScreen(clinicName: clinicName, clinicId: clinicId),
           ),
         );
       } else if (accountType == 'vet') {
