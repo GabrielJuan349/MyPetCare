@@ -63,6 +63,24 @@ Future<String> addUser(Map<String, dynamic>? body) async{
   return responseBody;
 }
 
+Future<Map<String, dynamic>?> validateUser(String uid) async {
+  try {
+    final uri = Uri.parse("$BASE_URL/user/$uid");
+    final responseBody = await sendRequest(uri, "GET");
+    final Map<String, dynamic> userMap = json.decode(responseBody);
+
+    final accountType = userMap['accountType'];
+    if (accountType != 'owner') {
+      return null; // Usuario no válido
+    }
+
+    return userMap; // Usuario válido
+  } catch (e) {
+    print("Error fetching user info: $e");
+    return null;
+  }
+}
+
 Future<void> getUserInfo(Owner owner) async{
   Uri uri = Uri.parse("$BASE_URL/user/${owner.firebaseUser.uid}");
   print("Parsed url is $uri");
