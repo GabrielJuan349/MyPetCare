@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:lis_project/pet.dart';
 import 'package:lis_project/data.dart';
+import 'prescription.dart';
+import 'report.dart';
 
 // Change to the url of your actual backend
 const String BASE_URL = "http://10.0.2.2:6055";
@@ -141,7 +143,7 @@ Future<List<Map<String, dynamic>>> getClinics() async {
 
 
 Future<void> deletePet(String petId) async {
-  final url = Uri.parse("http://localhost:6055/api/pet/$petId");
+  final url = Uri.parse("$BASE_URL/api/pet/$petId");
   final response = await http.delete(url);
 
   if (response.statusCode != 200) {
@@ -194,5 +196,42 @@ Future<List<Map<String, dynamic>>> getAdoptionsByClinic(String clinicId) async {
     return List<Map<String, dynamic>>.from(json.decode(response.body));
   } else {
     throw Exception("Failed to fetch adoptions from clinic $clinicId");
+  }
+}
+
+Future<List<Prescription>> fetchPrescriptions(String petId) async {
+  final response = await http.get(
+    Uri.parse('$BASE_URL/api/getPrescriptionByPet/pet/$petId'),
+  );
+
+  if (response.statusCode == 200) {
+    final List<dynamic> data = json.decode(response.body);
+    return data.map((json) => Prescription.fromJson(json)).toList();
+  } else {
+    throw Exception('Error al cargar las recetas');
+  }
+}
+
+Future<void> deletePrescription(String id) async {
+  final response = await http.delete(
+    Uri.parse('$BASE_URL/api/deletePrescription/$id'),
+  );
+
+  if (response.statusCode != 200) {
+    print('❌ Error al eliminar la receta con id: $id');
+  } else {
+    print('✅ Receta eliminada: $id');
+  }
+}
+
+Future<List<ReportMessage>> getReportsByPet(String petId) async {
+  final uri = Uri.parse('$BASE_URL/api/getReportsByPet/pet/$petId');
+  final response = await http.get(uri);
+
+  if (response.statusCode == 200) {
+    final List<dynamic> data = json.decode(response.body);
+    return data.map((json) => ReportMessage.fromJson(json)).toList();
+  } else {
+    throw Exception('Error del servidor al obtener los reportes');
   }
 }

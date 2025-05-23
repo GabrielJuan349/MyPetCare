@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'report.dart';
+import 'requests.dart';
 
 class PetReports extends StatefulWidget {
   final String idPet;
@@ -13,36 +12,12 @@ class PetReports extends StatefulWidget {
 }
 
 class _PetReportsState extends State<PetReports> {
-  List<ReportMessage> petReportsList = [];
-  bool isLoading = true;
+  late Future<List<ReportMessage>> petReportsFuture;
 
   @override
   void initState() {
     super.initState();
-    fetchReports();
-  }
-
-  Future<void> fetchReports() async {
-    final uri = Uri.parse(
-        'http://localhost:6055/api/getReportsByPet/pet/${widget.idPet}');
-    try {
-      final response = await http.get(uri);
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        setState(() {
-          petReportsList =
-              data.map((json) => ReportMessage.fromJson(json)).toList();
-          isLoading = false;
-        });
-      } else {
-        throw Exception('Error del servidor');
-      }
-    } catch (e) {
-      print('Error al obtener los reportes: $e');
-      setState(() {
-        isLoading = false;
-      });
-    }
+    petReportsFuture = getReportsByPet(widget.idPet);
   }
 
   @override
@@ -55,63 +30,63 @@ class _PetReportsState extends State<PetReports> {
         backgroundColor: const Color(0xfff59249),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.person, color: Colors.white),
-            onPressed: () {
-              Navigator.pushNamed(context, '/profile');
-            },
+            onPressed: () => Navigator.pushNamed(context, '/profile'),
           ),
         ],
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : petReportsList.isEmpty
-              ? const Center(child: Text("No reports available"))
-              : ListView.builder(
-                  itemCount: petReportsList.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 6),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE9EFFF),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  petReportsList[index].reportName,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  petReportsList[index].message,
-                                  style: const TextStyle(color: Colors.black54),
-                                ),
-                                Text(
-                                  petReportsList[index].formattedDate,
-                                  style: const TextStyle(
-                                      fontSize: 12, color: Colors.grey),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+      body: FutureBuilder<List<ReportMessage>>(
+        future: petReportsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text("Error: ${snapshot.error}"),
+            );
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text("No reports available"));
+          }
+
+          final petReportsList = snapshot.data!;
+          return ListView.builder(
+            itemCount: petReportsList.length,
+            itemBuilder: (context, index) {
+              final report = petReportsList[index];
+              return Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE9EFFF),
+                  borderRadius: BorderRadius.circular(8),
                 ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      report.reportName,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      report.message,
+                      style: const TextStyle(color: Colors.black54),
+                    ),
+                    Text(
+                      report.formattedDate,
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

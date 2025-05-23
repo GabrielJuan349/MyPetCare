@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'requests.dart';
 
 class Prescription {
   final String name;
@@ -35,49 +36,24 @@ class _PrescriptionListPageState extends State<PrescriptionListPage> {
   @override
   void initState() {
     super.initState();
-    prescriptionsFuture = fetchPrescriptions();
+    prescriptionsFuture = fetchPrescriptions(widget.petId);
   }
 
-  Future<List<Prescription>> fetchPrescriptions() async {
-    final response = await http.get(Uri.parse(
-        'http://localhost:6055/api/getPrescriptionByPet/pet/${widget.petId}'));
-
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      return data.map((json) => Prescription.fromJson(json)).toList();
-    } else {
-      throw Exception('Error al cargar las recetas');
-    }
-  }
-
-  Future<void> deletePrescription(String id) async {
-  final response = await http.delete(
-    Uri.parse('http://localhost:6055/api/deletePrescription/$id'),
-  );
-
-  if (response.statusCode != 200) {
-    print('❌ Error al eliminar la receta con id: $id');
-  } else {
-    print('✅ Receta eliminada: $id');
-  }
-}
-
-void toggleShowText(String id) {
-  setState(() {
-    showTextMap[id] = true;
-  });
-
-  Timer(const Duration(seconds: 10), () async {
-    await deletePrescription(id);
+  void toggleShowText(String id) {
     setState(() {
-      showTextMap[id] = false;
-      // Elimina la receta de la lista tras ser eliminada en la BD
-      prescriptionsFuture = prescriptionsFuture.then(
-        (prescriptions) => prescriptions.where((p) => p.id != id).toList(),
-      );
+      showTextMap[id] = true;
     });
-  });
-}
+
+    Timer(const Duration(seconds: 10), () async {
+      await deletePrescription(id);
+      setState(() {
+        showTextMap[id] = false;
+        prescriptionsFuture = prescriptionsFuture.then(
+          (prescriptions) => prescriptions.where((p) => p.id != id).toList(),
+        );
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
