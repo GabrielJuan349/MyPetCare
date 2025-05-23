@@ -3,6 +3,11 @@ export interface AppointmentsIdAll{
     petId:string,
     vetId:string,
 }
+export interface getDateInfoReturn{
+    databaseIndex:string,
+    day:string,  
+    buttonId:number
+}
 export interface AppointmentsInfoAll{
     id: string;
     date: string;
@@ -15,16 +20,21 @@ export interface AppDataById{
     id: string,
     date:string,
     time:string,
-    vetName:string,
-    clinicName:string,
-    petName:string,
-    petType:string,
-    petBreed:string,
-    ownerName:string,
-    ownerEmail:string,
-    ownerPhone:string,
-    ownerId:string,
+    type:string,
+    reason:string,
+    userId:string,
     clinicId:string,
     vetId:string,
     petId:string
+}
+
+export interface functionResponse {
+    error?: {
+        status: number;
+        body: {
+            error: string;
+            details: string|unknown;
+        };
+    };
+    done: boolean;
 }
