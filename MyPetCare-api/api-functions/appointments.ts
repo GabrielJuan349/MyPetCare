@@ -105,7 +105,7 @@ export async function deleteAppointment(ctx: RouterContext<"/api/appointment/:id
         
         
         //Fetching Vet
-        const vetUrl = `${FirestoreBaseUrl}/vets/${vetId}`;
+        const vetUrl = `${FirestoreBaseUrl}/users/${vetId}`;
             const response = await fetch(vetUrl, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -263,7 +263,7 @@ export async function getAppointmentById(ctx: RouterContext<"/api/getAppointment
         console.log("✅ Cita encontrada:", appointmentId);
         
         const vetId = result.fields.vetId.stringValue;
-        const vetUrl = `${FirestoreBaseUrl}/vets/${vetId}`;
+        const vetUrl = `${FirestoreBaseUrl}/users/${vetId}`;
         const responseVet = await fetch(vetUrl, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
