@@ -69,6 +69,50 @@ class _ClinicHomeScreenState extends State<ClinicHomeScreen> {
     }
   }
 
+  Future<void> _deleteClinicAndVets() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return;
+
+    try {
+      final vetDocs = await FirebaseFirestore.instance
+          .collection('users')
+          .where('accountType', isEqualTo: 'vet')
+          .where('clinicInfo', isEqualTo: widget.clinicName)
+          .get();
+
+      for (var doc in vetDocs.docs) {
+        final userId = doc.id;
+
+        await FirebaseFirestore.instance.collection('users').doc(userId).delete();
+
+      }
+
+      final clinicDocs = await FirebaseFirestore.instance
+          .collection('clinic')
+          .where('clinicId', isEqualTo: widget.clinicId)
+          .get();
+
+      for (var doc in clinicDocs.docs) {
+        await FirebaseFirestore.instance.collection('clinic').doc(doc.id).delete();
+      }
+      await FirebaseFirestore.instance.collection('users').doc(currentUser.uid).delete();
+
+      await currentUser.delete();
+
+      await FirebaseAuth.instance.signOut();
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const Login()),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error eliminando cuenta: $e')),
+      );
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,26 +142,63 @@ class _ClinicHomeScreenState extends State<ClinicHomeScreen> {
                   ),
                 );
               }
+              if (value == 'delete_account') {
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Eliminar cuenta'),
+                    content: const Text(
+                      'Esto eliminará tu cuenta, los datos de la clínica y todos los veterinarios asociados. ¿Estás seguro?',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('Cancelar'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        child: const Text('Eliminar'),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirm == true) {
+                  await _deleteClinicAndVets();
+                }
+              }
+
             },
-            itemBuilder: (context) => [
-              PopupMenuItem<String>(
-                value: 'clinic',
-                enabled: false,
-                child: Text('Clínica: ${widget.clinicName}',
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-              ),
-              const PopupMenuDivider(),
-              const PopupMenuItem<String>(
-                value: 'logout',
-                child: Row(
-                  children: [
-                    Icon(Icons.logout, color: Colors.red),
-                    SizedBox(width: 8),
-                    Text('Log out'),
-                  ],
+              itemBuilder: (context) => [
+                PopupMenuItem<String>(
+                  value: 'clinic',
+                  enabled: false,
+                  child: Text('Clínica: ${widget.clinicName}',
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
                 ),
-              ),
-            ],
+                const PopupMenuDivider(),
+                const PopupMenuItem<String>(
+                  value: 'logout',
+                  child: Row(
+                    children: [
+                      Icon(Icons.logout, color: Colors.red),
+                      SizedBox(width: 8),
+                      Text('Cerrar sesión'),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'delete_account',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete_forever, color: Colors.red),
+                      SizedBox(width: 8),
+                      Text('Eliminar cuenta'),
+                    ],
+                  ),
+                ),
+              ],
+
           ),
           const SizedBox(width: 12),
         ],
