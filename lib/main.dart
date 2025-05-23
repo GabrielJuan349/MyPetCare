@@ -18,9 +18,15 @@ import 'firebase_options.dart';
 import 'package:lis_project/reset_password_screen.dart';
 import 'package:lis_project/news.dart';
 import 'package:lis_project/map.dart';
+import 'dart:html' as html;
+import 'package:flutter/foundation.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if(kIsWeb){
+    await html.window.navigator.serviceWorker
+        ?.register('firebase-messaging-sw.js');
+  }
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
