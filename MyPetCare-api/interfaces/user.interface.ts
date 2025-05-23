@@ -14,4 +14,3 @@ export enum AccountType {
   vet,
   clinic,
 }
-

@@ -1,4 +1,3 @@
-
 export interface Clinic {
   address: string;
   categories: string[];

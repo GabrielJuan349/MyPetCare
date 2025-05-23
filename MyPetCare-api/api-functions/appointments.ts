@@ -13,6 +13,7 @@ import {
   AppointmentsInfoAll,
 } from '../interfaces/appointments.interface.ts';
 
+
 export async function getCitasByVetId(ctx: RouterContext<'/api/appointment/vet/:vetId'>) {
   console.log('🚧 Citas por veterinario');
   const vetId = ctx.params.vetId;
