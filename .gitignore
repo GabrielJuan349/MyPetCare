@@ -66,3 +66,5 @@ import_map.json
 
 # .gitignore firebase flutter connection
 lib/firebase_options.dart
+
+web/firebase-messaging-sw.js
