@@ -12,6 +12,7 @@ class Inbox extends StatefulWidget {
 }
 
 class _InboxState extends State<Inbox> {
+  String? _selectedType; // Variable para almacenar el tipo seleccionado
   final String userId = FirebaseAuth.instance.currentUser!.uid;
   final inboxRef = FirebaseFirestore.instance.collection('inbox');
 
@@ -28,6 +29,10 @@ class _InboxState extends State<Inbox> {
 
   @override
   Widget build(BuildContext context) {
+    List<InboxMessage> unreadMessages = myMessages.where((msg) {
+      bool matchesType = _selectedType == null || msg.type == _selectedType;
+      return !msg.read && matchesType;
+    }).toList();
     return Scaffold(
       appBar: AppBar(
         title: Text("Inbox"),
@@ -44,6 +49,39 @@ class _InboxState extends State<Inbox> {
           },
         ),
         actions: [
+          // Botón para filtrar por tipo
+          PopupMenuButton<String>(
+            icon: Icon(Icons.filter_list, color: Colors.white),
+            onSelected: (String type) {
+              setState(() {
+                _selectedType = type == 'All' ? null : type;
+              });
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem<String>(
+                  value: 'All',
+                  child: Text('All Types'),
+                ),
+                PopupMenuItem<String>(
+                  value: 'appointments',
+                  child: Text('Appointments'),
+                ),
+                PopupMenuItem<String>(
+                  value: 'prescription',
+                  child: Text('Prescription'),
+                ),
+                PopupMenuItem<String>(
+                  value: 'report',
+                  child: Text('Report'),
+                ),
+                PopupMenuItem<String>(
+                  value: 'treatment',
+                  child: Text('Treatment'),
+                ),
+              ];
+            },
+          ),
           IconButton(
             icon: Icon(Icons.person, color: Colors.white),
             onPressed: () {
