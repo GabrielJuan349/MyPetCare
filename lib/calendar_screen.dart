@@ -34,7 +34,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ),
               );
             },
-            calendarStyle: CalendarStyle(
+            calendarStyle: const CalendarStyle(
               selectedDecoration: BoxDecoration(
                 color: Colors.blue,
                 shape: BoxShape.circle,

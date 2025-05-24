@@ -23,6 +23,8 @@ class ScheduleScreen extends StatelessWidget {
     final slots = _generateTimeSlots();
     final formatter = DateFormat.Hm();
 
+    print("The selected date times is$date");
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Horario - ${DateFormat.yMMMMd().format(date)}"),

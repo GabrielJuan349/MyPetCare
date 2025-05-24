@@ -69,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
               iconColor: const Color(0xFF627ECB),
               onTap: () {Navigator.pushNamed(
                 context,
-                '/calendar',
+                '/appointmentList',
               );
               },
             ),
