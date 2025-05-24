@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 import 'package:lis_project/pet.dart';
 import 'package:lis_project/data.dart';
@@ -7,6 +6,7 @@ import 'prescription.dart';
 import 'report.dart';
 
 // Change to the url of your actual backend
+//const String BASE_URL = "http://localhost:6055";
 const String BASE_URL = "http://10.0.2.2:6055";
 
 Future<String> sendRequest(Uri uri, String action, {Map<String, dynamic>? req_body}) async{
@@ -252,4 +252,38 @@ Future<List<ReportMessage>> getReportsByPet(String petId) async {
   } else {
     throw Exception('Error del servidor al obtener los reportes');
   }
+}
+
+Future<List<dynamic>> getAppointmentsByUserId(String userId) async{
+  final uri = Uri.parse('$BASE_URL//api/appointments/$userId');
+  final response = await sendRequest(uri, "GET");
+  //TODO: Hardcoded, change linking to back
+  //return json.decode(response);
+  // Hard coded
+  return [
+    {
+      'date': '24/05/2025',
+      'time': '10:15',
+      'reason': 'Moquillo canino',
+      'type': 'Vaccination',
+      'pet': 'Firu',
+      'vet': 'Anna',
+    },
+    {
+      'date': '30/05/2025',
+      'time': '16:30',
+      'reason': 'Vomiting and diarrhea',
+      'type': 'Sick visit',
+      'pet': "Firu",
+      'vet': 'Jacob',
+    },
+    {
+      'date': '03/06/2025',
+      'time': '09:00',
+      'reason': 'Dental cleaning',
+      'type': 'General checkup',
+      'pet': "Firu",
+      'vet': 'Sandy',
+    },
+  ];
 }
