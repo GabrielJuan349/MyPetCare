@@ -6,8 +6,8 @@ import 'prescription.dart';
 import 'report.dart';
 
 // Change to the url of your actual backend
-// const String BASE_URL = "http://localhost:6055";
-const String BASE_URL = "http://10.0.2.2:6055";
+const String BASE_URL = "http://localhost:6055";
+// const String BASE_URL = "http://10.0.2.2:6055";
 
 Future<String> sendRequest(Uri uri, String action, {Map<String, dynamic>? req_body}) async{
   late final http.Response response;
@@ -299,4 +299,11 @@ Future<List<String>> getAppointmentsByClinicId(String clinicId,
     "13:30",
     "16:45",
   ];
+}
+
+Future<List> getVetsById(String clinicId) async{
+  final uri = Uri.parse('$BASE_URL/api/getVetsByClinic/$clinicId');
+  final response = await sendRequest(uri, "GET");
+  final List<dynamic> data = json.decode(response);
+  return data.map((item) => Vet.fromJson(item)).toList();
 }

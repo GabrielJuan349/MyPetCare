@@ -168,3 +168,23 @@ class Clinic {
     );
   }
 }
+
+class Vet{
+  final String clinicInfo, clinicId, name, surname, accountType;
+  Vet({
+    required this.clinicInfo,
+    required this.clinicId,
+    required this.name,
+    required this.surname,
+    required this.accountType
+  });
+  factory Vet.fromJson(Map<String, dynamic> json) {
+    return Vet(
+      name: json['firstName'],
+      surname: json['lastName'],
+      accountType: json['accountType'],
+      clinicInfo: json['clinicInfo'],
+      clinicId: json['clinicId'],
+    );
+  }
+}

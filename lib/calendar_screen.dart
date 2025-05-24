@@ -30,7 +30,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               firstDay: DateTime.now(),
               // Only can book from today
               lastDay: DateTime.now().add(const Duration(
-                // To next two weeks: today(1)+13 = 14(2 weeks)
+                  // To next two weeks: today(1)+13 = 14(2 weeks)
                   days: 13)),
               focusedDay: _focusedDay,
               selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
@@ -56,7 +56,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             padding: EdgeInsets.symmetric(vertical: 10),
             child: Center(
               child: Text(
-                  'Franjas horarias disponibles',
+                'Franjas horarias disponibles',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                 ),
@@ -65,15 +65,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ),
           _selectedDay != null
               ? Expanded(
-            //TODO: Use here real data
-            child: _buildTimeSlots("clinic_123", _selectedDay!),
-          )
+                  //TODO: Use here real data
+                  child: _buildTimeSlots("clinic_123", _selectedDay!),
+                )
               : const Expanded(
-            child: Center(
-              child: Text(
-                  "Seleccione un día para ver los horarios disponibles."),
-            ),
-          )
+                  child: Center(
+                    child: Text(
+                        "Seleccione un día para ver los horarios disponibles."),
+                  ),
+                )
         ],
       ),
     );
@@ -92,8 +92,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return timeSlots;
   }
 
-  Future<List<bool>> getAvailabilityList(List<String> allSlots, clinicId,
-      date) async {
+  Future<List<bool>> getAvailabilityList(
+      List<String> allSlots, clinicId, date) async {
     final bookedSlots = await getAppointmentsByClinicId(clinicId, date);
     // true = available, false = booked
     return allSlots.map((slot) => !bookedSlots.contains(slot)).toList();
@@ -141,18 +141,25 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 child: GestureDetector(
                   onTap: isAvailable
                       ? () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Hora seleccionada: $time")),
-                    );
-                    // TODO: Navigate to open form
-                  }
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Hora seleccionada: $time")),
+                          );
+                          // TODO: Navigate to open form
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => NewAppointmentScreen(
+                                    selectedDate: _selectedDay!,
+                                    selectedTime: time),
+                              ));
+                        }
                       : () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content: Text("La hora seleccionada: $time "
-                              "no está disponible")),
-                    );
-                  },
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text("La hora seleccionada: $time "
+                                    "no está disponible")),
+                          );
+                        },
                   child: Container(
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
@@ -169,7 +176,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       time,
                       style: TextStyle(
                         color:
-                        isAvailable ? Colors.black : Colors.grey.shade600,
+                            isAvailable ? Colors.black : Colors.grey.shade600,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

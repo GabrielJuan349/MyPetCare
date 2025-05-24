@@ -1,13 +1,18 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lis_project/appointment.dart';
 import 'package:provider/provider.dart';
 import 'package:lis_project/data.dart';
 import 'package:lis_project/requests.dart';
+import 'package:intl/intl.dart';
 //import 'package:lis_project/scanAllModule.dart';
 
 class NewAppointmentScreen extends StatefulWidget {
-  final DateTime date;
-  const NewAppointmentScreen({super.key, required this.date});
+  final DateTime selectedDate;
+  final String selectedTime;
+
+  const NewAppointmentScreen(
+      {super.key, required this.selectedDate, required this.selectedTime});
 
   @override
   State<NewAppointmentScreen> createState() => _NewAppointmentScreenState();
@@ -21,25 +26,33 @@ class _NewAppointmentScreenState extends State<NewAppointmentScreen> {
   final TextEditingController timeController = TextEditingController();
   final TextEditingController clinicController = TextEditingController();
   final TextEditingController vetController = TextEditingController();
-  
+
   final appBarColor = const Color(0xfff59249);
 
-
-  List<String> appointmentTypes = ['Sick visit', 'Vaccination', 'General checkup', 'Test (blood, urine, etc)',  'Treatment', 'Other'];
-  late List<String> clinicNames;
+  List<String> appointmentTypes = [
+    'Sick visit',
+    'Vaccination',
+    'General checkup',
+    'Test (blood, urine, etc)',
+    'Treatment',
+    'Other'
+  ];
 
   @override
   void initState() {
     super.initState();
-    loadClinics();
+    // TODO: Missing a getVetsByClinicId
+    dateController.text = DateFormat('dd/MM/yyyy').format(widget.selectedDate);
+    timeController.text = widget.selectedTime;
+    clinicController.text =
+        Provider.of<OwnerModel>(context, listen: false).owner?.clinicInfo ?? '';
   }
 
   @override
   Widget build(BuildContext context) {
     List<String> petNames = Provider.of<OwnerModel>(context).getPetNames();
-    List<String> timeList = ['9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
     List<String> vetNames = ['Vet 1', 'Vet 2', 'Vet 3', 'Vet 4', 'Vet 5'];
-    
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: appBarColor,
@@ -61,40 +74,44 @@ class _NewAppointmentScreenState extends State<NewAppointmentScreen> {
             onPressed: () {
               dispose();
               Navigator.pushNamed(
-                    context,
-                    '/profile',
-                );
+                context,
+                '/profile',
+              );
             },
           ),
         ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            buildDropdown("Pet", petNames, petController),
-            buildDropdown("Type of Appointment", appointmentTypes, typeController),
-            buildField("Reason", reasonController),
-            buildDropdown("Clinic", clinicNames, clinicController),
-            buildDateSelector("Day of the appointment", dateController),
-            buildDropdown("Time", timeList, timeController),
-            buildDropdown("Veterinarian", vetNames, vetController),
-            
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () async{
-                await createAppointment();
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 80),
-                textStyle: const TextStyle(fontSize: 18),
-                backgroundColor: const Color(0xFF627ECB),
-                foregroundColor: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 15),
+          child: Column(
+            children: [
+              buildDropdown("Pet", petNames, petController),
+              buildDropdown(
+                  "Type of Appointment", appointmentTypes, typeController),
+              buildField("Reason", reasonController),
+              buildField("Clinic", clinicController),
+              buildField("Day of the appointment", dateController),
+              buildField("Time", timeController),
+              buildDropdown("Veterinarian", vetNames, vetController),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () async {
+                  await createAppointment();
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 80),
+                  textStyle: const TextStyle(fontSize: 18),
+                  backgroundColor: const Color(0xFF627ECB),
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text("Add Appointment"),
               ),
-              child: const Text("Add Appointment"),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -107,7 +124,8 @@ class _NewAppointmentScreenState extends State<NewAppointmentScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              style:
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
           const SizedBox(height: 4),
           TextField(
             controller: controller,
@@ -125,15 +143,16 @@ class _NewAppointmentScreenState extends State<NewAppointmentScreen> {
     );
   }
 
-
-  Widget buildDropdown(String label, List<String> items, TextEditingController controller) {
+  Widget buildDropdown(
+      String label, List<String> items, TextEditingController controller) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              style:
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
           const SizedBox(height: 4),
           DropdownButtonFormField<String>(
             value: controller.text.isNotEmpty ? controller.text : null,
@@ -162,71 +181,42 @@ class _NewAppointmentScreenState extends State<NewAppointmentScreen> {
     );
   }
 
-  Widget buildDateSelector(String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-          const SizedBox(height: 4),
-          TextField(
-            controller: controller,
-            readOnly: true,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: const Color(0xFFECF1FF),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide.none,
-              ),
-            ),
-            onTap: () async {
-              DateTime? pickedDate = await showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2050),
-              );
-              if (pickedDate != null) {
-                controller.text = "${pickedDate.toLocal()}".split(' ')[0];
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> loadClinics() async {
-    try {
-      final clinics = await getClinics(); 
-      setState(() {
-        clinicNames = clinics.map<String>((clinic) => clinic['name'] as String).toList();
-      });
-    } catch (e) {
-      print('Failed to load clinics: $e');
-    }
-  }
-
   Future<void> createAppointment() async {
     try {
+      final ownerId = Provider.of<OwnerModel>(context, listen: false)
+          .owner!
+          .firebaseUser
+          .uid;
+
+      // Pass date to Datetime? => NNecessary to short in ascending order after
       final appointment = Appointment(
-        id: '',
-        petId: petController.text,
-        date: dateController.text,
-        time: timeController.text,
-        type: typeController.text,
-        reason: reasonController.text,
-        clinicId: clinicController.text,
-      );
+          id: '',
+          ownerId: ownerId,
+          petName: petController.text,
+          date: dateController.text,
+          time: timeController.text,
+          type: typeController.text,
+          reason: reasonController.text,
+          clinicName: clinicController.text,
+          vetName: vetController.text);
+
       print('Appointment created successfully $appointment');
+      /*
+      TODO: Change this to call the API request - now is
+       directly calling firebase
+      */
+      final appointmentRef =
+          await FirebaseFirestore.instance.collection('appointments');
+
+      // Add the new appointment inside firestore
+      final docRef = await appointmentRef.add(appointment.toJson());
+      print(docRef.id);
+
     } catch (e) {
       print('Failed to create appointment: $e');
     }
   }
-  
+
   @override
   void dispose() {
     petController.dispose();
