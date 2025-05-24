@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'login.dart';
+import 'adoption.dart';
 
 class ClinicHomeScreen extends StatefulWidget {
   final String clinicName;
@@ -233,6 +234,16 @@ class _ClinicHomeScreenState extends State<ClinicHomeScreen> {
           ],
         ),
       ),
+            floatingActionButton: FloatingActionButton(
+    child: Icon(Icons.add),
+    onPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => CreateAdoptionScreen(clinicId: widget.clinicName)),
+      );
+    },
+    tooltip: 'Crear nueva adopción',
+  ),
     );
   }
 
