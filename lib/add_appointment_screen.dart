@@ -6,7 +6,8 @@ import 'package:lis_project/requests.dart';
 //import 'package:lis_project/scanAllModule.dart';
 
 class NewAppointmentScreen extends StatefulWidget {
-  const NewAppointmentScreen({super.key});
+  final DateTime date;
+  const NewAppointmentScreen({super.key, required this.date});
 
   @override
   State<NewAppointmentScreen> createState() => _NewAppointmentScreenState();

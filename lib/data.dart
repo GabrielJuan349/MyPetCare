@@ -111,8 +111,10 @@ Future<void> setGlobalUser(BuildContext context) async {
     final firebaseUser = FirebaseAuth.instance.currentUser;
     Owner owner = Owner(firebaseUser!);
     await getUserInfo(owner);
-    // Save user locally with Provider.
+    final pets = await getUserPets(owner.firebaseUser.uid);
+    // Save user data locally with Provider.
     Provider.of<OwnerModel>(context, listen: false).setOwner(owner);
+    Provider.of<OwnerModel>(context, listen: false).setPets(pets);
   }
 }
 

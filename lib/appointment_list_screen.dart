@@ -51,7 +51,7 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
         onPressed: () {
           Navigator.pushNamed(
             context,
-            '/newAppointment',
+            '/calendar',
           );
         },
         backgroundColor: appBarColor,

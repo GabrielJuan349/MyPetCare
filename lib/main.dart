@@ -216,7 +216,6 @@ class MyApp extends StatelessWidget {
         '/help' : (context) => FAQScreen(),
         '/calendar' : (context) => CalendarScreen(),
         '/appointmentList': (context) => const AppointmentListScreen(),
-        '/newAppointment': (context) => const NewAppointmentScreen(),
       },
     );
   }
