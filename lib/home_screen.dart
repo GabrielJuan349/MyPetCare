@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lis_project/the_drawer.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'main.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -7,9 +10,27 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
+
+
 class _HomeScreenState extends State<HomeScreen> {
   double iconSize = 70;
+  bool _listenersStarted = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _initListenersIfNeeded();
+  }
+
+  void _initListenersIfNeeded() async {
+    if (_listenersStarted) return;
+
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      startFirestoreListeners(user.uid);
+      _listenersStarted = true;
+    }
+  }
   @override
   Widget build(BuildContext context) {
     final appBarColor = Color(0xfff59249);
