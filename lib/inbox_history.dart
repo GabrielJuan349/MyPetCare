@@ -21,7 +21,7 @@ class _InboxHistoryState extends State<InboxHistory> {
     try {
       final snapshot = await _firestore
           .collection('inbox')
-          .where('owner', isEqualTo: user.uid)
+          .where('userId', isEqualTo: user.uid)
           .where('read', isEqualTo: true)
           .get();
 
@@ -71,7 +71,7 @@ class _InboxHistoryState extends State<InboxHistory> {
       body: StreamBuilder<QuerySnapshot>(
         stream: _firestore
             .collection('inbox')
-            .where('owner', isEqualTo: currentUser.uid)
+            .where('userId', isEqualTo: currentUser.uid)
             .where('read', isEqualTo: true)
             .snapshots(),
         builder: (context, snapshot) {

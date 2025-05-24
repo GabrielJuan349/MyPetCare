@@ -47,7 +47,7 @@ class InboxMessageDetail extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Mensaje: ${message.message}", style: TextStyle(fontSize: 18)),
+            Text("Mensaje: ${message.title}", style: TextStyle(fontSize: 18)),
             SizedBox(height: 16),
             Text("Tipo: ${message.type}", style: TextStyle(fontSize: 18)),
             SizedBox(height: 16),

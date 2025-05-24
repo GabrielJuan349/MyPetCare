@@ -72,7 +72,7 @@ class _NewAppointmentScreenState extends State<NewAppointmentScreen> {
         child: Column(
           children: [
             buildDropdown("Pet", petNames, petController),
-            buildDropdown("Type of Appointment", petNames, typeController),
+            buildDropdown("Type of Appointment", appointmentTypes, typeController),
             buildField("Reason", reasonController),
             buildDropdown("Clinic", clinicNames, clinicController),
             buildDateSelector("Day of the appointment", dateController),

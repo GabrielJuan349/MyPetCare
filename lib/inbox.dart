@@ -60,6 +60,7 @@ class _InboxState extends State<Inbox> {
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
+            print(snapshot.error);
             return Center(child: Text("Error al cargar mensajes."));
           }
 
@@ -88,6 +89,7 @@ class _InboxState extends State<Inbox> {
                   onTap: () {
                     setState(() {
                       msg.read = true;
+                      print(localUnreadMessages);
                     });
                     Navigator.push(
                       context,
@@ -148,7 +150,7 @@ class _InboxState extends State<Inbox> {
                     return InkWell(
                       onTap: () async {
                         await markAsRead(doc.id);
-
+                        print(doc.id);
                         Navigator.push(
                           context,
                           MaterialPageRoute(
