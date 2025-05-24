@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -23,7 +22,8 @@ class _PrescriptionDetailsScreenState extends State<PrescriptionDetailsScreen> {
   bool _isEditing = false;
 
   late TextEditingController _nameController;
-  late String _archivo;
+  late TextEditingController _milligramsController;
+  late TextEditingController _textController;
   DateTime? _createdAt;
 
   final Color _backgroundColor = Colors.white;
@@ -33,7 +33,8 @@ class _PrescriptionDetailsScreenState extends State<PrescriptionDetailsScreen> {
   void initState() {
     super.initState();
     _nameController = TextEditingController();
-    _archivo = '';
+    _milligramsController = TextEditingController();
+    _textController = TextEditingController();
     _loadPrescription();
   }
 
@@ -47,7 +48,8 @@ class _PrescriptionDetailsScreenState extends State<PrescriptionDetailsScreen> {
       final data = doc.data()!;
       setState(() {
         _nameController.text = data['name'] ?? '';
-        _archivo = data['archivo'] ?? '';
+        _milligramsController.text = data['milligrams']?.toString() ?? '';
+        _textController.text = data['text'] ?? '';
         _createdAt = (data['createdAt'] as Timestamp).toDate();
         _loading = false;
       });
@@ -64,7 +66,8 @@ class _PrescriptionDetailsScreenState extends State<PrescriptionDetailsScreen> {
         .doc(widget.prescriptionId)
         .update({
       'name': _nameController.text.trim(),
-      'archivo': _archivo,
+      'milligrams': int.tryParse(_milligramsController.text.trim()) ?? 0,
+      'text': _textController.text.trim(),
     });
 
     setState(() => _isEditing = false);
@@ -114,19 +117,11 @@ class _PrescriptionDetailsScreenState extends State<PrescriptionDetailsScreen> {
     }
   }
 
-  Future<void> _pickFile() async {
-    final result = await FilePicker.platform.pickFiles();
-
-    if (result != null && result.files.single.name.isNotEmpty) {
-      setState(() {
-        _archivo = result.files.single.name;
-      });
-    }
-  }
-
   @override
   void dispose() {
     _nameController.dispose();
+    _milligramsController.dispose();
+    _textController.dispose();
     super.dispose();
   }
 
@@ -179,56 +174,33 @@ class _PrescriptionDetailsScreenState extends State<PrescriptionDetailsScreen> {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: _highlightColor.withOpacity(0.3)),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildTextField(
-                  label: 'Nombre de la receta',
-                  controller: _nameController,
-                ),
-                const SizedBox(height: 16),
-                Text('Archivo', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-                const SizedBox(height: 6),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: _highlightColor.withOpacity(0.5)),
-                    borderRadius: BorderRadius.circular(12),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildTextField(label: 'Nombre de la receta', controller: _nameController),
+                  const SizedBox(height: 16),
+                  _buildTextField(
+                    label: 'Miligramos',
+                    controller: _milligramsController,
+                    keyboardType: TextInputType.number,
                   ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          _archivo.isNotEmpty ? _archivo : 'Ningún archivo seleccionado',
-                          style: GoogleFonts.inter(color: Colors.black87),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      if (_isEditing)
-                        IconButton(
-                          icon: const Icon(Icons.upload_file, color: Colors.orange),
-                          onPressed: _pickFile,
-                        ),
-                    ],
+                  const SizedBox(height: 16),
+                  _buildTextField(label: 'Texto', controller: _textController, maxLines: 3),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Fecha de creación:',
+                    style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
                   ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Fecha de creación:',
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
+                  const SizedBox(height: 6),
+                  Text(
+                    _createdAt != null
+                        ? '${_createdAt!.day}/${_createdAt!.month}/${_createdAt!.year}, ${_createdAt!.hour}:${_createdAt!.minute.toString().padLeft(2, '0')}'
+                        : 'Desconocida',
+                    style: GoogleFonts.inter(color: Colors.black54),
                   ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  _createdAt != null
-                      ? '${_createdAt!.day}/${_createdAt!.month}/${_createdAt!.year}'
-                      : 'Desconocida',
-                  style: GoogleFonts.inter(color: Colors.black54),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -239,6 +211,8 @@ class _PrescriptionDetailsScreenState extends State<PrescriptionDetailsScreen> {
   Widget _buildTextField({
     required String label,
     required TextEditingController controller,
+    TextInputType keyboardType = TextInputType.text,
+    int maxLines = 1,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -248,6 +222,8 @@ class _PrescriptionDetailsScreenState extends State<PrescriptionDetailsScreen> {
         TextFormField(
           controller: controller,
           readOnly: !_isEditing,
+          maxLines: maxLines,
+          keyboardType: keyboardType,
           decoration: InputDecoration(
             filled: true,
             fillColor: Colors.white,

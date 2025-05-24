@@ -74,7 +74,6 @@ class PrescriptionListScreen extends StatelessWidget {
                 final data = doc.data() as Map<String, dynamic>;
                 final name = data['name'] ?? 'Sin nombre';
                 final createdAt = (data['createdAt'] as Timestamp).toDate();
-                final archivo = data['archivo'] ?? 'Archivo PDF';
 
                 return Card(
                   color: cardColor,
@@ -87,10 +86,9 @@ class PrescriptionListScreen extends StatelessWidget {
                     leading: const Icon(Icons.description, color: Colors.orange),
                     title: Text(name, style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
                     subtitle: Text(
-                      'Archivo: $archivo\nFecha: ${createdAt.day}/${createdAt.month}/${createdAt.year}',
+                      'Fecha: ${createdAt.day}/${createdAt.month}/${createdAt.year}',
                       style: GoogleFonts.inter(fontSize: 13),
                     ),
-                    isThreeLine: true,
                     trailing: IconButton(
                       icon: const Icon(Icons.delete, color: Colors.orange),
                       tooltip: 'Eliminar receta',
@@ -130,9 +128,9 @@ class PrescriptionListScreen extends StatelessWidget {
                     },
                   ),
                 );
-
               },
             );
+
           },
         ),
       ),
