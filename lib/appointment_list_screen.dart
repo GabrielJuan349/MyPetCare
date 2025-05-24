@@ -43,12 +43,15 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
           ),
         ],
       ),
-      body: _buildAppointmentList(user),
+      body: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+        child: _buildAppointmentList(user),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pushNamed(
             context,
-            '/',
+            '/newAppointment',
           );
         },
         backgroundColor: appBarColor,
@@ -97,6 +100,9 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
               final petName = appointment['pet'];
 
               return Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                color: const Color(0xFFE9EFFF),
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
                   leading: const Icon(Icons.pets),

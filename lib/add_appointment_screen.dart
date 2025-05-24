@@ -26,12 +26,16 @@ class _NewAppointmentScreenState extends State<NewAppointmentScreen> {
 
   List<String> appointmentTypes = ['Sick visit', 'Vaccination', 'General checkup', 'Test (blood, urine, etc)',  'Treatment', 'Other'];
   late List<String> clinicNames;
-  
+
+  @override
+  void initState() {
+    super.initState();
+    loadClinics();
+  }
 
   @override
   Widget build(BuildContext context) {
     List<String> petNames = Provider.of<OwnerModel>(context).getPetNames();
-    loadClinics();
     List<String> timeList = ['9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
     List<String> vetNames = ['Vet 1', 'Vet 2', 'Vet 3', 'Vet 4', 'Vet 5'];
     

@@ -18,6 +18,7 @@ import 'package:lis_project/reset_password_screen.dart';
 import 'package:lis_project/news.dart';
 import 'package:lis_project/map.dart';
 import 'appointment_list_screen.dart';
+import 'add_appointment_screen.dart';
 import 'dart:html' as html;
 import 'package:flutter/foundation.dart';
 
@@ -66,7 +67,8 @@ class MyApp extends StatelessWidget {
         '/map' : (context) => MapScreen(),
         '/help' : (context) => FAQScreen(),
         '/calendar' : (context) => CalendarScreen(),
-        '/appointmentList': (context) => const AppointmentListScreen()
+        '/appointmentList': (context) => const AppointmentListScreen(),
+        '/newAppointment': (context) => const NewAppointmentScreen(),
       },
     );
   }
