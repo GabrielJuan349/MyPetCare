@@ -10,14 +10,15 @@ const FireStoreUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PR
 async function saveUserToFirestore(user: User) {
   const firestoreData = {
     fields: {
-      email: user.email,
-      firstName: user.firstName ,
-      lastName: user.lastName,
-      phone: user.phone,
-      accountType: user.accountType,
-      locality: user.locality,
-      clinicInfo: user.clinicInfo 
-        ? user.clinicInfo: { nullValue: null },
+      email: { stringValue: user.email },
+      firstName: { stringValue: user.firstName },
+      lastName: { stringValue: user.lastName },
+      phone: { stringValue: user.phone },
+      accountType: { stringValue: user.accountType },
+      locality: { stringValue: user.locality },
+      clinicInfo: user.clinicInfo
+        ? { stringValue: user.clinicInfo }
+        : { nullValue: null },
     },
   };
 
