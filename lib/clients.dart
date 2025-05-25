@@ -69,6 +69,7 @@ class _ClientsState extends State<Clients> {
         if (snapshot.hasError) {
           return const Center(child: Text('Error loading clients'));
         }
+
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
@@ -80,7 +81,7 @@ class _ClientsState extends State<Clients> {
 
         final filteredOwners = owners.where((doc) {
           final data = doc.data() as Map<String, dynamic>;
-          final userId = (data['userId'] ?? '').toString().toLowerCase();
+          final userId = (doc.id ?? '').toString().toLowerCase();
           final firstName = (data['firstName'] ?? '').toString().toLowerCase();
           final lastName = (data['lastName'] ?? '').toString().toLowerCase();
 
@@ -128,7 +129,7 @@ class _ClientsState extends State<Clients> {
                   return DataRow(
                     cells: [
                       DataCell(Text(name, style: GoogleFonts.inter())),
-                      DataCell(Text(data['userId'] ?? '', style: GoogleFonts.inter())),
+                      DataCell(Text(doc.id ?? '', style: GoogleFonts.inter())),
                       DataCell(Text(data['clinicInfo'] ?? '', style: GoogleFonts.inter())),
                       DataCell(Text(data['email'] ?? '', style: GoogleFonts.inter())),
                       DataCell(Text(data['phone'] ?? '', style: GoogleFonts.inter())),

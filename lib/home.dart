@@ -7,6 +7,7 @@ import 'clients.dart';
 import 'patients.dart';
 import 'schedule.dart';
 import 'login.dart';
+import 'appointment.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -73,7 +74,8 @@ class _HomePageState extends State<HomePage> {
             children: [
               const TextSpan(text: 'My', style: TextStyle(color: Colors.black)),
               TextSpan(text: 'Pet', style: TextStyle(color: highlightColor)),
-              const TextSpan(text: 'Care', style: TextStyle(color: Colors.black)),
+              const TextSpan(
+                  text: 'Care', style: TextStyle(color: Colors.black)),
             ],
           ),
         ),
@@ -88,18 +90,24 @@ class _HomePageState extends State<HomePage> {
       ],
     );
   }
+
   Widget _buildProfileMenu() {
     final currentUser = FirebaseAuth.instance.currentUser;
 
     if (currentUser == null) return const SizedBox();
 
     return FutureBuilder<DocumentSnapshot>(
-      future: FirebaseFirestore.instance.collection('users').doc(currentUser.uid).get(),
+      future: FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser.uid)
+          .get(),
       builder: (context, snapshot) {
-        final nameOrEmail = snapshot.data?.get('firstName') ?? currentUser.email ?? 'Perfil';
+        final nameOrEmail =
+            snapshot.data?.get('firstName') ?? currentUser.email ?? 'Perfil';
 
         return PopupMenuButton<String>(
-          icon: const Icon(Icons.account_circle, color: Colors.orange, size: 30),
+          icon:
+              const Icon(Icons.account_circle, color: Colors.orange, size: 30),
           onSelected: (value) async {
             if (value == 'logout') {
               await FirebaseAuth.instance.signOut();
@@ -176,7 +184,7 @@ class HomeContent extends StatelessWidget {
     );
   }
 
-  Widget _buildCardHome(String text) {
+  Widget _buildCardHome(String text, {Widget? body}) {
     return Card(
       color: Colors.white70,
       shadowColor: Colors.blueAccent,
@@ -185,7 +193,6 @@ class HomeContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               color: Colors.orange.shade300,
@@ -197,13 +204,11 @@ class HomeContent extends StatelessWidget {
                 ),
               ),
             ),
-
-
             Container(
               height: 400,
               color: Colors.grey.shade100,
               child: Center(
-                child: Text('No $text yet'),
+                child: body ?? Text('No $text yet'),
               ),
             ),
           ],
@@ -218,14 +223,104 @@ class HomeContent extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Expanded(child: _buildCardHome('appointments')),
+          Expanded(
+              child: _buildCardHome('appointments',
+                  // Default value - TODO: Make changes in the db
+                  body: Builder(
+                      builder: (context) => _buildTodaysAppointmentList()))),
           const SizedBox(width: 20),
-          Expanded(child: _buildCardHome('Arrivals')),
+          Expanded(
+              child: _buildCardHome(
+            'arrivals',
+          )),
         ],
       ),
     );
   }
 
+  // Build appointment list
+  Widget _buildTodaysAppointmentList() {
+    return FutureBuilder(
+        future: getAppointmentsClinicFromFirestore(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const Center(
+                child: Text("We had an error loading "
+                    "your appointments, please retry after"));
+          }
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final appointments = snapshot.data ?? [];
+
+          print(appointments);
+
+          if (appointments.isEmpty) {
+            return const Center(
+                child: Text("You have no "
+                    "appointments programmed yet"));
+          }
+
+          return ListView.builder(
+            itemCount: appointments.length,
+            itemBuilder: (context, index) {
+              final appointment = appointments[index];
+
+              // If you return a map from Firestore, access fields like this:
+              final date = appointment.date;
+              final time = appointment.time;
+              final reason = appointment.reason;
+              final type = appointment.type;
+              final petName = appointment.petName;
+
+              return Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                color: const Color(0xFFE9EFFF),
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: ListTile(
+                  leading: const Icon(Icons.pets),
+                  title: Text("$date at $time"),
+                  subtitle: Text("$petName • $type\n$reason"),
+                ),
+              );
+            },
+          );
+        });
+  }
+
+  Future<List<dynamic>> getAppointmentsClinicFromFirestore() async {
+    try {
+      // Get clinic name from vet
+      final currentUser = FirebaseAuth.instance.currentUser;
+      final vetInfo = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser?.uid)
+          .get();
+
+      String clinicName = vetInfo.data()?['clinicInfo'];
+      print("Clinic info: $clinicName");
+      DateTime today = DateTime.now();
+      final appointmentSnapshot = await FirebaseFirestore.instance
+          .collection('appointments')
+          .where('clinicName', isEqualTo: clinicName)
+          .where('date', isGreaterThan: today)
+          .orderBy('date')
+          .orderBy('time')
+          .get();
+      return appointmentSnapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id; // Useful to cancel/delete after the appointment
+        return Appointment.fromJson(data);
+      }).toList();
+    } catch (e) {
+      print("Error loading appointments $e");
+      return [];
+    }
+  }
 }
 
 class HeaderImage extends StatelessWidget {

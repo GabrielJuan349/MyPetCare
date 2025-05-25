@@ -1,26 +1,44 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 class AssignAppointmentScreen extends StatefulWidget {
   final String date;
-  final int slot;
+  final String time;
   final String? petId;
 
   const AssignAppointmentScreen({
     Key? key,
     required this.date,
-    required this.slot,
+    required this.time,
     this.petId,
   }) : super(key: key);
 
   @override
-  State<AssignAppointmentScreen> createState() => _AssignAppointmentScreenState();
+  State<AssignAppointmentScreen> createState() =>
+      _AssignAppointmentScreenState();
 }
 
 class _AssignAppointmentScreenState extends State<AssignAppointmentScreen> {
   String? selectedPetId;
   List<DocumentSnapshot> pets = [];
+  final TextEditingController typeController = TextEditingController();
+  final TextEditingController reasonController = TextEditingController();
+  final TextEditingController dateController = TextEditingController();
+  final TextEditingController timeController = TextEditingController();
+  final primaryOrange = Colors.orange;
+  late final lightOrange, borderOrange;
+
+  List<String> appointmentTypes = [
+    'Sick visit',
+    'Vaccination',
+    'General checkup',
+    'Test (blood, urine, etc)',
+    'Treatment',
+    'Other'
+  ];
 
   @override
   void initState() {
@@ -34,16 +52,39 @@ class _AssignAppointmentScreenState extends State<AssignAppointmentScreen> {
         }
       });
     });
+
+    lightOrange = primaryOrange.withOpacity(0.1);
+    borderOrange = primaryOrange.withOpacity(0.2);
+
+    dateController.text = widget.date;
+    timeController.text = widget.time;
   }
 
   void assignAppointment() async {
-    if (selectedPetId == null) return;
+    if (selectedPetId == null ||
+        typeController.text.isEmpty ||
+        reasonController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Porfavor rellena los campos')));
+      return;
+    }
+
+    final currentUser = FirebaseAuth.instance.currentUser;
+    final vetInfo = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser?.uid)
+        .get();
+
+    final clinicName = vetInfo.data()?['clinicInfo'];
+    final vetName = vetInfo.data()?['firstName'];
 
     final existing = await FirebaseFirestore.instance
         .collection('appointments')
         .where('date', isEqualTo: widget.date)
-        .where('id', isEqualTo: widget.slot)
+        .where('time', isEqualTo: widget.time)
         .get();
+
+    print("Widget slot: ${widget.time}");
 
     if (existing.docs.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -52,11 +93,25 @@ class _AssignAppointmentScreenState extends State<AssignAppointmentScreen> {
       return;
     }
 
+    // getOwnerId
+    final owner = await FirebaseFirestore.instance
+        .collection('pets')
+        .doc(selectedPetId)
+        .get();
+
+    final ownerId = owner.data()?['owner'];
+    final petName = owner.data()?['name'];
+
+    final DateTime parsedDate = DateFormat('dd/MM/yyyy').parse(widget.date);
     await FirebaseFirestore.instance.collection('appointments').add({
-      'id': widget.slot,
-      'petId': selectedPetId,
-      'date': widget.date,
-      'createdAt': Timestamp.now(),
+      'clinicName': clinicName,
+      'date': parsedDate,
+      'ownerId': ownerId,
+      'petName': petName,
+      'reason': reasonController.text,
+      'type': typeController.text,
+      'time': widget.time,
+      'vetName': vetName,
     });
 
     Navigator.pop(context);
@@ -64,10 +119,6 @@ class _AssignAppointmentScreenState extends State<AssignAppointmentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final primaryOrange = Colors.orange;
-    final lightOrange = primaryOrange.withOpacity(0.1);
-    final borderOrange = primaryOrange.withOpacity(0.2);
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -127,12 +178,17 @@ class _AssignAppointmentScreenState extends State<AssignAppointmentScreen> {
               ),
             ),
             const SizedBox(height: 32),
+            buildField('Fecha', dateController, true),
+            buildField('Hora', timeController, true),
+            buildField('Razón', reasonController, false),
+            buildDropdown('Tipo', appointmentTypes, typeController),
             Center(
               child: ElevatedButton(
                 onPressed: assignAppointment,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryOrange,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -149,6 +205,72 @@ class _AssignAppointmentScreenState extends State<AssignAppointmentScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget buildField(
+      String label, TextEditingController controller, bool isReadOnly) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label,
+              style:
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+          const SizedBox(height: 4),
+          TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: lightOrange,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+            ),
+            readOnly: isReadOnly,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildDropdown(
+      String label, List<String> items, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label,
+              style:
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+          const SizedBox(height: 4),
+          DropdownButtonFormField<String>(
+            value: controller.text.isNotEmpty ? controller.text : null,
+            items: items.map((String item) {
+              return DropdownMenuItem<String>(
+                value: item,
+                child: Text(item),
+              );
+            }).toList(),
+            onChanged: (value) {
+              if (value != null) {
+                controller.text = value;
+              }
+            },
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: lightOrange,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

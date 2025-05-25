@@ -36,7 +36,8 @@ class ScheduleScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           final date = today.add(Duration(days: index));
           final weekday = _weekdayName(date.weekday);
-          final formatted = '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}';
+          final formatted =
+              '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}';
 
           return InkWell(
             onTap: () {
@@ -99,7 +100,8 @@ class ScheduleScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.black38),
+                  const Icon(Icons.arrow_forward_ios_rounded,
+                      size: 16, color: Colors.black38),
                 ],
               ),
             ),
@@ -110,7 +112,15 @@ class ScheduleScreen extends StatelessWidget {
   }
 
   String _weekdayName(int weekday) {
-    const names = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    const names = [
+      'Lunes',
+      'Martes',
+      'Miércoles',
+      'Jueves',
+      'Viernes',
+      'Sábado',
+      'Domingo'
+    ];
     return names[weekday - 1];
   }
 }

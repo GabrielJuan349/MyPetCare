@@ -60,7 +60,8 @@ class _LoginState extends State<Login> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => ClinicHomeScreen(clinicName: clinicName, clinicId: clinicId),
+            builder: (context) =>
+                ClinicHomeScreen(clinicName: clinicName, clinicId: clinicId),
           ),
         );
       } else if (accountType == 'vet') {
@@ -79,7 +80,6 @@ class _LoginState extends State<Login> {
       setState(() => _errorMessage = 'Error inesperado: $e');
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -150,7 +150,8 @@ class _LoginState extends State<Login> {
                   onPressed: _handleLogin,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF627ECB),
-                    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 50, vertical: 15),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -167,10 +168,13 @@ class _LoginState extends State<Login> {
                   children: [
                     const Text("¿Eres una clínica sin cuenta?"),
                     InkWell(
-                      onTap: () => Navigator.pushNamed(context, '/clinic-register'),
+                      onTap: () =>
+                          Navigator.pushNamed(context, '/clinic-register'),
                       child: const Text(
                         "Regístrate",
-                        style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
+                        style: TextStyle(
+                            color: Colors.blue,
+                            decoration: TextDecoration.underline),
                       ),
                     ),
                   ],

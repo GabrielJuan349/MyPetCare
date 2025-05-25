@@ -58,8 +58,8 @@ class _ClinicRegisterScreenState extends State<ClinicRegisterScreen> {
         'email': _emailController.text.trim(),
         'phone': _phoneController.text.trim(),
         'website': _websiteController.text.trim(),
-        'latitude': latitude,       // como número
-        'longitude': longitude,     // como número
+        'latitude': latitude, // como número
+        'longitude': longitude, // como número
       };
 
       await FirebaseFirestore.instance.collection('clinic').add(clinicData);
@@ -72,14 +72,12 @@ class _ClinicRegisterScreenState extends State<ClinicRegisterScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => ClinicUserRegisterScreen(
-            email: _emailController.text.trim(),
-            phone: _phoneController.text.trim(),
-            locality: _cityController.text.trim(),
-            clinicName: _nameController.text.trim()
-          ),
+              email: _emailController.text.trim(),
+              phone: _phoneController.text.trim(),
+              locality: _cityController.text.trim(),
+              clinicName: _nameController.text.trim()),
         ),
       );
-
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: ${e.toString()}')),
@@ -103,7 +101,7 @@ class _ClinicRegisterScreenState extends State<ClinicRegisterScreen> {
         controller: controller,
         keyboardType: keyboardType,
         validator: validator ??
-                (value) {
+            (value) {
               if (value == null || value.trim().isEmpty) {
                 return 'Please enter $label';
               }
@@ -126,8 +124,19 @@ class _ClinicRegisterScreenState extends State<ClinicRegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Clinic'),
+        title: const Text(
+          'Create Clinic',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: const Color(0xfff59249),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+            )),
       ),
       body: SafeArea(
         child: Padding(
@@ -137,22 +146,26 @@ class _ClinicRegisterScreenState extends State<ClinicRegisterScreen> {
             child: ListView(
               children: [
                 _buildTextField(label: 'Name', controller: _nameController),
-                _buildTextField(label: 'Address', controller: _addressController),
+                _buildTextField(
+                    label: 'Address', controller: _addressController),
                 _buildTextField(
                   label: 'Categories (comma separated)',
                   controller: _categoriesController,
                   keyboardType: TextInputType.text,
                 ),
                 _buildTextField(label: 'City', controller: _cityController),
-                _buildTextField(label: 'Postal Code (CP)', controller: _cpController),
+                _buildTextField(
+                    label: 'Postal Code (CP)', controller: _cpController),
                 _buildTextField(
                   label: 'Email',
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
-                    if (value == null || value.trim().isEmpty) return 'Please enter Email';
+                    if (value == null || value.trim().isEmpty)
+                      return 'Please enter Email';
                     final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-                    if (!emailRegex.hasMatch(value)) return 'Enter a valid email';
+                    if (!emailRegex.hasMatch(value))
+                      return 'Enter a valid email';
                     return null;
                   },
                 ),
@@ -180,14 +193,17 @@ class _ClinicRegisterScreenState extends State<ClinicRegisterScreen> {
                 _isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : ElevatedButton(
-                  onPressed: _submit,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF627ECB),
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    textStyle: const TextStyle(fontSize: 18),
-                  ),
-                  child: const Text('Create Clinic'),
-                )
+                        onPressed: _submit,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF627ECB),
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          textStyle: const TextStyle(fontSize: 18),
+                        ),
+                        child: const Text(
+                          'Create Clinic',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      )
               ],
             ),
           ),
