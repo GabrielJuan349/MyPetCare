@@ -24,6 +24,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
         foregroundColor: Colors.white,
         centerTitle: true,
         backgroundColor: const Color(0xfff59249),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.white),
+            onPressed: () {
+              setState(() {}); // Rebuild all the widget?
+            },
+            tooltip: 'Refresh calendar',
+          ),
+        ],
       ),
       body: Column(
         children: [
