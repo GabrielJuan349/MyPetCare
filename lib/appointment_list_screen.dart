@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'appointment.dart';
@@ -68,7 +69,7 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
   Widget _buildAppointmentList(Owner user) {
     return FutureBuilder(
         future: //getAppointmentsByUserId(user.firebaseUser.uid),
-            getAppointmentsUserFromFirestore(user.firebaseUser.uid),
+            getFutureAppointmentsUserFromFirestore(user.firebaseUser.uid),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Center(
@@ -178,4 +179,37 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
       return [];
     }
   }
+
+  Future<List<Appointment>> getFutureAppointmentsUserFromFirestore(String userId) async {
+    try {
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('appointments')
+          .where('ownerId', isEqualTo: userId)
+          .get();
+
+      final now = DateTime.now();
+      final dateFormat = DateFormat('dd/MM/yyyy');
+
+      final appointments = querySnapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return Appointment.fromJson(data);
+      }).where((appointment) {
+        try {
+          final dateString = appointment.date; // es un String como "25/05/2025"
+          final appointmentDate = dateFormat.parse(dateString);
+          return (appointmentDate.isAfter(now) || appointmentDate.isAtSameMomentAs(now) );
+        } catch (e) {
+          print('Error parsing appointment date: $e');
+          return false;
+        }
+      }).toList();
+
+      return appointments;
+    } catch (e) {
+      print('Error fetching appointments: $e');
+      return [];
+    }
+  }
+
 }
