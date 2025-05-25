@@ -7,7 +7,7 @@ import 'login.dart';
 import 'home.dart';
 import 'clinic_register.dart';
 
-
+String? globalVetName;
 String? globalVetId;
 String? globalClinicInfo;
 void main() async {

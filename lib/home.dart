@@ -8,6 +8,25 @@ import 'clients.dart';
 import 'patients.dart';
 import 'schedule.dart';
 import 'login.dart';
+import 'main.dart';
+
+class InboxAppointment {
+  final String id;
+  final String vetName;
+  final DateTime date;
+  final String petName;
+  bool read;
+
+  InboxAppointment({
+    required this.id,
+    required this.vetName,
+    required this.date,
+    required this.petName,
+    this.read = false,
+  });
+}
+
+List<InboxAppointment> inboxAppointments = [];
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,14 +40,42 @@ class _HomePageState extends State<HomePage> {
   final Color highlightColor = Colors.orange;
 
   int selectedIndex = 0;
-
   final List<String> labels = ['HOME', 'CLIENTS', 'PATIENTS', 'SCHEDULE'];
+
   final List<Widget> pages = const [
     HomeContent(),
     Clients(),
     Patients(),
     ScheduleScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _listenToAppointments();
+  }
+
+  void _listenToAppointments() {
+    FirebaseFirestore.instance
+        .collection('appointments')
+        .where('vetName', isEqualTo: globalVetName)
+        .where('date', isGreaterThan: Timestamp.now())
+        .snapshots()
+        .listen((snapshot) {
+      setState(() {
+        inboxAppointments = snapshot.docs.map((doc) {
+          final data = doc.data();
+          return InboxAppointment(
+            id: doc.id,
+            vetName: data['vetName'],
+            date: (data['date'] as Timestamp).toDate(),
+            petName: data['petName'] ?? 'Unknown Pet',
+          );
+        }).toList();
+      });
+    });
+  }
+
 
   void onMenuTap(int index) => setState(() => selectedIndex = index);
 
@@ -37,7 +84,11 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: _buildAppBar(),
-      body: pages[selectedIndex],
+      body: selectedIndex == 0
+          ? HomeContent(
+        onInboxUpdate: () => setState(() {}),
+      )
+          : pages[selectedIndex],
     );
   }
 
@@ -89,16 +140,15 @@ class _HomePageState extends State<HomePage> {
       ],
     );
   }
+
   Widget _buildProfileMenu() {
     final currentUser = FirebaseAuth.instance.currentUser;
-
     if (currentUser == null) return const SizedBox();
 
     return FutureBuilder<DocumentSnapshot>(
       future: FirebaseFirestore.instance.collection('users').doc(currentUser.uid).get(),
       builder: (context, snapshot) {
         final nameOrEmail = snapshot.data?.get('firstName') ?? currentUser.email ?? 'Perfil';
-
         return PopupMenuButton<String>(
           icon: const Icon(Icons.account_circle, color: Colors.orange, size: 30),
           onSelected: (value) async {
@@ -113,9 +163,7 @@ class _HomePageState extends State<HomePage> {
               if (!context.mounted) return;
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const Login(),
-                ),
+                MaterialPageRoute(builder: (_) => const Login()),
               );
             }
           },
@@ -127,14 +175,8 @@ class _HomePageState extends State<HomePage> {
                   style: const TextStyle(fontWeight: FontWeight.w500)),
             ),
             const PopupMenuDivider(),
-            const PopupMenuItem<String>(
-              value: 'edit',
-              child: Text('Editar usuario'),
-            ),
-            const PopupMenuItem<String>(
-              value: 'logout',
-              child: Text('Cerrar sesión'),
-            ),
+            const PopupMenuItem<String>(value: 'edit', child: Text('Editar usuario')),
+            const PopupMenuItem<String>(value: 'logout', child: Text('Cerrar sesión')),
           ],
         );
       },
@@ -145,7 +187,6 @@ class _HomePageState extends State<HomePage> {
     return Row(
       children: List.generate(labels.length, (index) {
         final bool isSelected = selectedIndex == index;
-
         return GestureDetector(
           onTap: () => onMenuTap(index),
           child: Container(
@@ -173,9 +214,45 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class HomeContent extends StatelessWidget {
-  const HomeContent({super.key});
+class HomeContent extends StatefulWidget {
+  final VoidCallback? onInboxUpdate;
+  const HomeContent({super.key, this.onInboxUpdate});
 
+  @override
+  State<HomeContent> createState() => _HomeContentState();
+}
+
+class _HomeContentState extends State<HomeContent> {
+  List<InboxAppointment> inboxAppointments = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _listenToAppointments();
+  }
+
+  void _listenToAppointments() {
+    FirebaseFirestore.instance
+        .collection('appointments')
+        .where('vetName', isEqualTo: globalVetName)
+        .where('date', isGreaterThan: Timestamp.now())
+        .snapshots()
+        .listen((snapshot) {
+      setState(() {
+        inboxAppointments = snapshot.docs.map((doc) {
+          final data = doc.data();
+          return InboxAppointment(
+            id: doc.id,
+            vetName: data['vetName'],
+            date: (data['date'] as Timestamp).toDate(),
+            petName: data['petName'] ?? 'Unknown',
+          );
+        }).toList();
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
@@ -187,7 +264,21 @@ class HomeContent extends StatelessWidget {
     );
   }
 
-  Widget _buildCardHome(String text) {
+  Widget _buildHomeLayout() {
+    return Padding(
+      padding: const EdgeInsets.all(40.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(child: _buildAppointmentsCard()),
+          const SizedBox(width: 20),
+          Expanded(child: _buildInboxCard()),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAppointmentsCard() {
     return Card(
       color: Colors.white70,
       shadowColor: Colors.blueAccent,
@@ -196,25 +287,22 @@ class HomeContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               color: Colors.orange.shade300,
-              child: Text(
-                "Today's $text",
-                style: const TextStyle(
+              child: const Text(
+                "Today's appointments",
+                style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
-
-
             Container(
               height: 400,
               color: Colors.grey.shade100,
-              child: Center(
-                child: Text('No $text yet'),
+              child: const Center(
+                child: Text('No appointments yet'),
               ),
             ),
           ],
@@ -223,21 +311,60 @@ class HomeContent extends StatelessWidget {
     );
   }
 
-  Widget _buildHomeLayout() {
-    return Padding(
-      padding: const EdgeInsets.all(40.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(child: _buildCardHome('appointments')),
-          const SizedBox(width: 20),
-          Expanded(child: _buildCardHome('Arrivals')),
-        ],
+  Widget _buildInboxCard() {
+    final unreadAppointments = inboxAppointments.where((a) => !a.read).toList();
+
+    return Card(
+      color: Colors.white70,
+      shadowColor: Colors.blueAccent,
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              color: Colors.orange.shade300,
+              child: const Text(
+                "Inbox",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Container(
+              height: 400,
+              color: Colors.grey.shade100,
+              child: unreadAppointments.isEmpty
+                  ? const Center(child: Text('No messages'))
+                  : ListView.builder(
+                itemCount: unreadAppointments.length,
+                itemBuilder: (context, index) {
+                  final appointment = unreadAppointments[index];
+
+                  return ListTile(
+                    title: Text('Appointment with ${appointment.petName}'),
+                    subtitle: Text('Date: ${appointment.date}'),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.check_circle, color: Colors.green),
+                      onPressed: () {
+                        setState(() {
+                          appointment.read = true;
+                        });
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
-
 }
+
 
 class HeaderImage extends StatelessWidget {
   const HeaderImage({super.key});
@@ -255,19 +382,13 @@ class HeaderImage extends StatelessWidget {
             alignment: const Alignment(0, -0.5),
           ),
         ),
-        Container(
-          height: 400,
-          width: double.infinity,
-          color: Colors.black.withOpacity(0.35),
-        ),
+        Container(height: 400, width: double.infinity, color: Colors.black.withOpacity(0.35)),
         Positioned(
           left: 20,
           top: 120,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.orange.withOpacity(0.75),
-            ),
+            decoration: BoxDecoration(color: Colors.orange.withOpacity(0.75)),
             child: Text(
               'WELCOME TO MYPETCARE!',
               style: GoogleFonts.playfairDisplay(

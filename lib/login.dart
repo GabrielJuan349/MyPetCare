@@ -68,6 +68,7 @@ class _LoginState extends State<Login> {
       } else if (accountType == 'vet') {
         globalClinicInfo = userData['clinicInfo'];
         globalVetId = FirebaseAuth.instance.currentUser?.uid;
+        globalVetName = userData['First Name'];
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
