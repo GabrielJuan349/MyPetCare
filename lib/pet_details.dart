@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:lis_project/pet.dart';
 import 'package:lis_project/edit_pet.dart';
+import 'package:open_file/open_file.dart';
 
 class PetDetails extends StatefulWidget {
   Pet myPet;
@@ -101,6 +102,30 @@ class _PetDetailsState extends State<PetDetails> {
             buildStarRow("Friendly", myPet.friendly),
             const SizedBox(height: 10),
             buildStarRow("Playful", myPet.playful),*/
+
+            if (myPet.cartilla != null && myPet.cartilla!.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    final filePath = myPet.cartilla!;
+                    if (await File(filePath).exists()) {
+                      await OpenFile.open(filePath);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("This file does not exist")),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  ),
+                  icon: const Icon(Icons.picture_as_pdf),
+                  label: const Text("Open Cartilla"),
+                ),
+              ),
           ],
         ),
       ),

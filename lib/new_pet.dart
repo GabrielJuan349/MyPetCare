@@ -263,6 +263,7 @@ class _NewPetScreenState extends State<NewPetScreen> {
         id: nameController.text.trim(),
         name: nameController.text.trim(),
         image: fotoFileName ?? "",
+        cartilla: cartillaFileName ?? "",
         gender: genderController.text.trim(),
         age: _calculateAge(birthDateController.text.trim()).toString(),
         weight: double.tryParse(weightController.text.trim()) ?? 0.0,
@@ -294,15 +295,20 @@ class _NewPetScreenState extends State<NewPetScreen> {
     );
 
     if (result != null && result.files.isNotEmpty) {
-      setState(() {
+      final String? filePath = result.files.single.path;
+
+      if (filePath != null) {
+        setState(() {
         if (label == "Cartilla") {
-          cartillaFileName = result.files.single.name;
+          cartillaFileName = filePath;
         } else {
-          fotoFileName = result.files.single.name;
-        }
-      });
+          fotoFileName = filePath;
+        }});
+      }
     }
+      
   }
+  
 
   Future<String> pickImageFile() async {
     final picker = ImagePicker();
