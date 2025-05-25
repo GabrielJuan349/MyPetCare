@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'edit_user.dart';
 import 'clients.dart';
 import 'patients.dart';
 import 'schedule.dart';
@@ -101,6 +102,12 @@ class _HomePageState extends State<HomePage> {
         return PopupMenuButton<String>(
           icon: const Icon(Icons.account_circle, color: Colors.orange, size: 30),
           onSelected: (value) async {
+            if (value == 'edit') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const EditUserScreen()),
+              );
+            }
             if (value == 'logout') {
               await FirebaseAuth.instance.signOut();
               if (!context.mounted) return;
@@ -120,6 +127,10 @@ class _HomePageState extends State<HomePage> {
                   style: const TextStyle(fontWeight: FontWeight.w500)),
             ),
             const PopupMenuDivider(),
+            const PopupMenuItem<String>(
+              value: 'edit',
+              child: Text('Editar usuario'),
+            ),
             const PopupMenuItem<String>(
               value: 'logout',
               child: Text('Cerrar sesión'),

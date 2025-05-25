@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'clinic_home.dart';
 import 'home.dart';
+import 'main.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -53,6 +54,7 @@ class _LoginState extends State<Login> {
 
       // Redirección según el tipo de cuenta
       if (accountType == 'clinic') {
+        globalClinicInfo = userData['clinicInfo'];
         final clinicInfo = userData['clinicInfo'];
         final clinicName = clinicInfo is Map ? clinicInfo['name'] : clinicInfo;
         final clinicId = clinicInfo is Map ? clinicInfo['id'] : clinicInfo;
@@ -64,6 +66,8 @@ class _LoginState extends State<Login> {
           ),
         );
       } else if (accountType == 'vet') {
+        globalClinicInfo = userData['clinicInfo'];
+        globalVetId = FirebaseAuth.instance.currentUser?.uid;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(

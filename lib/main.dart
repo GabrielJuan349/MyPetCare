@@ -7,6 +7,9 @@ import 'login.dart';
 import 'home.dart';
 import 'clinic_register.dart';
 
+
+String? globalVetId;
+String? globalClinicInfo;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
