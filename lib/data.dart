@@ -146,27 +146,27 @@ class Clinic {
   });
 
   factory Clinic.fromJson(Map<String, dynamic> json) {
-    return Clinic(
-      id: json['id'],
-      name: json['name'],
-      address: json['address'],
-      city: json['city'],
-      cp: json['cp'],
-      email: json['email'],
-      phone: json['phone'],
-      website: json['website'],
-      categories: (json['categories']?['values'] as List<dynamic>?)
-              ?.map((e) => e['stringValue'] as String)
-              .toList() ??
-          [],
-      latitude: (json['latitude'] is double)
-          ? json['latitude']
-          : double.tryParse(json['latitude'].toString()) ?? 0.0,
-      longitude: (json['longitude'] is double)
-          ? json['longitude']
-          : double.tryParse(json['longitude'].toString()) ?? 0.0,
-    );
-  }
+  return Clinic(
+    id: json['id'] ?? '',
+    name: json['name'] ?? '',
+    address: json['address'] ?? '',
+    city: json['city'] ?? '',
+    cp: json['cp'] ?? '',
+    email: json['email'] ?? '',
+    phone: json['phone'] ?? '',
+    website: json['website'] ?? '',
+    categories: (json['categories']?['values'] as List<dynamic>?)
+            ?.map((e) => e['stringValue'] as String? ?? '')
+            .toList() ??
+        [],
+    latitude: (json['latitude'] is double)
+        ? json['latitude']
+        : double.tryParse(json['latitude'].toString()) ?? 0.0,
+    longitude: (json['longitude'] is double)
+        ? json['longitude']
+        : double.tryParse(json['longitude'].toString()) ?? 0.0,
+  );
+}
 }
 
 class Vet{

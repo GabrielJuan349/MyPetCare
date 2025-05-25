@@ -37,10 +37,11 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
             )),
         actions: [
           IconButton(
-            icon: const Icon(Icons.person, color: Colors.white),
+            icon: const Icon(Icons.refresh, color: Colors.white),
             onPressed: () {
-              Navigator.pushNamed(context, 'profile');
+              setState(() {}); // Rebuild all the widget?
             },
+            tooltip: 'Refresh appointments',
           ),
         ],
       ),

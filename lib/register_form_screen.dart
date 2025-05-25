@@ -29,7 +29,7 @@ String? _selectedClinic;
   @override
 void initState() {
   super.initState();
-  _selectedValue = 'Pet  owner';
+  _selectedValue = 'Pet owner';
   _loadClinics();
 }
 

@@ -8,14 +8,20 @@ class Prescription {
   final String name;
   final String archivo;
   final String id;
+  final String miligrams;
 
-  Prescription({required this.name, required this.archivo, required this.id});
+  Prescription(
+      {required this.name,
+      required this.archivo,
+      required this.id,
+      required this.miligrams});
 
   factory Prescription.fromJson(Map<String, dynamic> json) {
     return Prescription(
       name: json['name'],
-      archivo: json['archivo'],
+      archivo: json['text'],
       id: json['id'],
+      miligrams: json['milligrams'] ?? '',
     );
   }
 }
@@ -75,7 +81,8 @@ class _PrescriptionListPageState extends State<PrescriptionListPage> {
         future: prescriptionsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: appBarColor));
+            return const Center(
+                child: CircularProgressIndicator(color: appBarColor));
           } else if (snapshot.hasError) {
             return Center(
               child: Text(
@@ -117,9 +124,21 @@ class _PrescriptionListPageState extends State<PrescriptionListPage> {
                     ),
                   ),
                   subtitle: showText
-                      ? Text(
-                          prescription.archivo,
-                          style: const TextStyle(color: textColor),
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              prescription.archivo,
+                              style: const TextStyle(color: textColor),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Miligrams: ${prescription.miligrams}',
+                              style: const TextStyle(
+                                  color: textColor,
+                                  fontStyle: FontStyle.italic),
+                            ),
+                          ],
                         )
                       : null,
                   onTap: () => toggleShowText(prescription.id),
