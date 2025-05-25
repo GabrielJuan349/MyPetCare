@@ -19,8 +19,8 @@ import 'package:lis_project/news.dart';
 import 'package:lis_project/map.dart';
 import 'appointment_list_screen.dart';
 import 'add_appointment_screen.dart';
-import 'dart:html' as html;
-import 'package:flutter/foundation.dart';
+// import 'dart:html' as html;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:lis_project/firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:lis_project/inbox.dart';
@@ -34,10 +34,10 @@ IconData inboxIcon = Icons.inbox;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if(kIsWeb){
+  /*if(kIsWeb){
     await html.window.navigator.serviceWorker
         ?.register('firebase-messaging-sw.js');
-  }
+  }*/
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -214,7 +214,6 @@ class MyApp extends StatelessWidget {
         '/news': (context) => const NewsScreen(),
         '/map' : (context) => MapScreen(),
         '/help' : (context) => FAQScreen(),
-        '/calendar' : (context) => CalendarScreen(),
         '/appointmentList': (context) => const AppointmentListScreen(),
       },
     );

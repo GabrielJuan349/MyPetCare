@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:lis_project/calendar_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'appointment.dart';
@@ -52,9 +53,14 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(
+          Navigator.push(
             context,
-            '/calendar',
+            MaterialPageRoute(
+              builder: (context) => CalendarScreen(
+                appointment: null,
+                newAppointment: true,
+              ),
+            ),
           );
         },
         backgroundColor: appBarColor,
@@ -113,12 +119,32 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
                   leading: const Icon(Icons.pets),
                   title: Text("$date at $time"),
                   subtitle: Text("$petName • $type\n$reason"),
-                  trailing: IconButton(
-                    onPressed: () {
-                      _confirmCancelAppointment(context, appointment.id);
-                    },
-                    icon: const Icon(Icons.free_cancellation),
-                    tooltip: "Cancel Appointment",
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min, 
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CalendarScreen(
+                                appointment: appointment,
+                                newAppointment: false,
+                              ),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.edit_calendar), 
+                        tooltip: "Edit Appointment",
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          _confirmCancelAppointment(context, appointment.id);
+                        },
+                        icon: const Icon(Icons.cancel_outlined),
+                        tooltip: "Cancel Appointment",
+                      ),
+                    ],
                   ),
                 ),
               );

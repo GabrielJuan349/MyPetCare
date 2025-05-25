@@ -1,12 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:lis_project/appointment.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'data.dart';
 import 'add_appointment_screen.dart';
 
 class CalendarScreen extends StatefulWidget {
-  const CalendarScreen({super.key});
+  bool newAppointment;
+  Appointment? appointment;
+  CalendarScreen({super.key, required this.newAppointment, this.appointment});
 
   @override
   State<CalendarScreen> createState() => _CalendarScreenState();
@@ -15,6 +19,19 @@ class CalendarScreen extends StatefulWidget {
 class _CalendarScreenState extends State<CalendarScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
+
+  late bool newAppointment;
+  late Appointment? appointment;
+
+  @override
+  void initState() {
+    super.initState();
+    newAppointment = widget.newAppointment;
+    if (!newAppointment)
+    {
+      appointment = widget.appointment;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -202,26 +219,35 @@ class _CalendarScreenState extends State<CalendarScreen> {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 5),
                 child: GestureDetector(
-                  onTap: isAvailable
-                      ? () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Hora seleccionada: $time")),
-                          );
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => NewAppointmentScreen(
-                                    selectedDate: _selectedDay!,
-                                    selectedTime: time),
-                              ));
-                        }
-                      : () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                                content: Text("La hora seleccionada: $time "
-                                    "no está disponible")),
-                          );
-                        },
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Hora seleccionada: $time")),
+                    );
+
+                    if (isAvailable) {
+                      if (newAppointment) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => NewAppointmentScreen(
+                              selectedDate: _selectedDay!,
+                              selectedTime: time,
+                            ),
+                          ),
+                        );
+                      } else {
+                        _modifyAppointment(time);
+                        Navigator.pop(context);
+                      }
+                    
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("La hora seleccionada: $time no está disponible"),
+                        ),
+                      );
+                    }
+                  },
                   child: Container(
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
@@ -248,5 +274,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
             },
           );
         });
+  }
+
+  Future<void> _modifyAppointment(String time) async {
+    if (appointment != null) {
+      appointment!.time = time;
+      appointment!.date = DateFormat('dd/MM/yyyy').format(_selectedDay!).toString();
+      // Update the appointment in Firestore
+      await FirebaseFirestore.instance
+          .collection('appointments')
+          .doc(appointment!.id)
+          .set(appointment!.toJson());
+    }
   }
 }
