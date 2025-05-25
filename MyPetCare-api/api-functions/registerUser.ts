@@ -16,9 +16,7 @@ async function saveUserToFirestore(user: User) {
       phone: { stringValue: user.phone },
       accountType: { stringValue: user.accountType },
       locality: { stringValue: user.locality },
-      clinicInfo: user.clinicInfo
-        ? { stringValue: user.clinicInfo }
-        : { nullValue: null },
+      clinicInfo:  { stringValue: user.clinicInfo },
     },
   };
 
