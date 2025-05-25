@@ -22,6 +22,8 @@ class _ClinicRegisterScreenState extends State<ClinicRegisterScreen> {
   final _websiteController = TextEditingController();
   final _latitudeController = TextEditingController();
   final _longitudeController = TextEditingController();
+  final _startHourController = TextEditingController();
+  final _endHourController = TextEditingController();
 
   bool _isLoading = false;
 
@@ -58,8 +60,10 @@ class _ClinicRegisterScreenState extends State<ClinicRegisterScreen> {
         'email': _emailController.text.trim(),
         'phone': _phoneController.text.trim(),
         'website': _websiteController.text.trim(),
-        'latitude': latitude, // como número
-        'longitude': longitude, // como número
+        'latitude': latitude,
+        'longitude': longitude,
+        'startHour': _startHourController.text.trim(),
+        'endHour': _endHourController.text.trim(),
       };
 
       await FirebaseFirestore.instance.collection('clinic').add(clinicData);
@@ -72,12 +76,14 @@ class _ClinicRegisterScreenState extends State<ClinicRegisterScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => ClinicUserRegisterScreen(
-              email: _emailController.text.trim(),
-              phone: _phoneController.text.trim(),
-              locality: _cityController.text.trim(),
-              clinicName: _nameController.text.trim()),
+            email: _emailController.text.trim(),
+            phone: _phoneController.text.trim(),
+            locality: _cityController.text.trim(),
+            clinicName: _nameController.text.trim()
+          ),
         ),
       );
+
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: ${e.toString()}')),
@@ -101,7 +107,7 @@ class _ClinicRegisterScreenState extends State<ClinicRegisterScreen> {
         controller: controller,
         keyboardType: keyboardType,
         validator: validator ??
-            (value) {
+                (value) {
               if (value == null || value.trim().isEmpty) {
                 return 'Please enter $label';
               }
@@ -146,26 +152,22 @@ class _ClinicRegisterScreenState extends State<ClinicRegisterScreen> {
             child: ListView(
               children: [
                 _buildTextField(label: 'Name', controller: _nameController),
-                _buildTextField(
-                    label: 'Address', controller: _addressController),
+                _buildTextField(label: 'Address', controller: _addressController),
                 _buildTextField(
                   label: 'Categories (comma separated)',
                   controller: _categoriesController,
                   keyboardType: TextInputType.text,
                 ),
                 _buildTextField(label: 'City', controller: _cityController),
-                _buildTextField(
-                    label: 'Postal Code (CP)', controller: _cpController),
+                _buildTextField(label: 'Postal Code (CP)', controller: _cpController),
                 _buildTextField(
                   label: 'Email',
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
-                    if (value == null || value.trim().isEmpty)
-                      return 'Please enter Email';
+                    if (value == null || value.trim().isEmpty) return 'Please enter Email';
                     final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-                    if (!emailRegex.hasMatch(value))
-                      return 'Enter a valid email';
+                    if (!emailRegex.hasMatch(value)) return 'Enter a valid email';
                     return null;
                   },
                 ),
@@ -178,6 +180,28 @@ class _ClinicRegisterScreenState extends State<ClinicRegisterScreen> {
                   label: 'Website',
                   controller: _websiteController,
                   keyboardType: TextInputType.url,
+                ),
+                _buildTextField(
+                  label: 'Start Hour (hh:mm)',
+                  controller: _startHourController,
+                  keyboardType: TextInputType.datetime,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) return 'Please enter Start Hour';
+                    final timeRegex = RegExp(r'^([0-1]\d|2[0-3]):([0-5]\d)$');
+                    if (!timeRegex.hasMatch(value)) return 'Invalid time format (hh:mm)';
+                    return null;
+                  },
+                ),
+                _buildTextField(
+                  label: 'End Hour (hh:mm)',
+                  controller: _endHourController,
+                  keyboardType: TextInputType.datetime,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) return 'Please enter End Hour';
+                    final timeRegex = RegExp(r'^([0-1]\d|2[0-3]):([0-5]\d)$');
+                    if (!timeRegex.hasMatch(value)) return 'Invalid time format (hh:mm)';
+                    return null;
+                  },
                 ),
                 _buildTextField(
                   label: 'Latitude',
@@ -193,17 +217,14 @@ class _ClinicRegisterScreenState extends State<ClinicRegisterScreen> {
                 _isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : ElevatedButton(
-                        onPressed: _submit,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF627ECB),
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          textStyle: const TextStyle(fontSize: 18),
-                        ),
-                        child: const Text(
-                          'Create Clinic',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      )
+                  onPressed: _submit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF627ECB),
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    textStyle: const TextStyle(fontSize: 18),
+                  ),
+                  child: const Text('Create Clinic'),
+                )
               ],
             ),
           ),

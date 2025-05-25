@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'main.dart';
 
 class Clients extends StatefulWidget {
   const Clients({super.key});
@@ -63,6 +64,9 @@ class _ClientsState extends State<Clients> {
 
 
   Widget _buildClientsDataTable() {
+    if (globalClinicInfo == null) {
+    return const Center(child: Text('Error: no se ha podido cargar la información de la clínica.'));
+  }
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('users').snapshots(),
       builder: (context, snapshot) {
@@ -75,8 +79,16 @@ class _ClientsState extends State<Clients> {
         }
 
         final owners = snapshot.data!.docs.where((doc) {
+
           final data = doc.data() as Map<String, dynamic>;
-          return data['accountType'] == 'owner'|| data['accountType'] =='Pet owner''cliente';
+
+          final isClient = data['accountType'] == 'owner' ||
+              data['accountType'] == 'Pet owner' ||
+              data['accountType'] == 'cliente';
+
+          final sameClinic = data['clinicInfo'] == globalClinicInfo;
+
+          return isClient && sameClinic;
         }).toList();
 
         final filteredOwners = owners.where((doc) {

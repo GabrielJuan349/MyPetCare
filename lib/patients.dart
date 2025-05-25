@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'pet_details.dart';
+import 'main.dart';
 
 class Patients extends StatefulWidget {
   const Patients({super.key});
@@ -161,6 +162,11 @@ class _PatientsPageState extends State<Patients> {
   }
 
   Future<List<Map<String, dynamic>>> _loadPetsWithOwners() async {
+    if (globalClinicInfo == null) {
+      print('Error: globalClinicInfo es null');
+      return [];
+    }
+
     try {
       final usersSnapshot = await FirebaseFirestore.instance.collection('users').get();
       final petsSnapshot = await FirebaseFirestore.instance.collection('pets').get();
@@ -168,11 +174,21 @@ class _PatientsPageState extends State<Patients> {
       final usersByDocId = <String, String>{};
       for (var userDoc in usersSnapshot.docs) {
         final data = userDoc.data();
-        final fullName = '${data['firstName'] ?? ''} ${data['lastName'] ?? ''}'.trim();
-        usersByDocId[userDoc.id] = fullName;
+        final clinic = data['clinicInfo'];
+        final accountType = data['accountType'];
+
+        final isClient = accountType == 'owner' || accountType == 'Pet owner' || accountType == 'cliente';
+        final sameClinic = clinic == globalClinicInfo;
+
+        if (isClient && sameClinic) {
+          final fullName = '${data['firstName'] ?? ''} ${data['lastName'] ?? ''}'.trim();
+          usersByDocId[userDoc.id] = fullName;
+        }
       }
 
-      final petsWithOwners = petsSnapshot.docs.map((petDoc) {
+      final petsWithOwners = petsSnapshot.docs
+          .where((petDoc) => usersByDocId.containsKey(petDoc.data()['owner']))
+          .map((petDoc) {
         final data = petDoc.data();
         final ownerId = data['owner'];
         final ownerName = usersByDocId[ownerId] ?? 'Unknown';
@@ -188,8 +204,9 @@ class _PatientsPageState extends State<Patients> {
 
       return petsWithOwners;
     } catch (e) {
-      print('Error loading data: $e');
+      print('Error loading pets or users: $e');
       return [];
     }
   }
+
 }
