@@ -9,6 +9,7 @@ import 'package:lis_project/pet.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 //import 'package:lis_project/scanAllModule.dart';
 
 class NewPetScreen extends StatefulWidget {
@@ -73,6 +74,7 @@ class _NewPetScreenState extends State<NewPetScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            buildFileGetter("Cartilla", cartillaFileName),
             buildField("Name", nameController),
             buildDropdown("Type of Pet", petTypes, typeController),
             buildField("Breed", breedController),
@@ -80,7 +82,6 @@ class _NewPetScreenState extends State<NewPetScreen> {
             buildDateSelector("Date of Birth", birthDateController),
             buildField("Weight", weightController),
             buildField("Chip Number", chipController),
-            buildFileGetter("Cartilla", cartillaFileName),
             buildFileGetter("Foto", fotoFileName),
             
             const SizedBox(height: 24),
@@ -300,6 +301,7 @@ class _NewPetScreenState extends State<NewPetScreen> {
             cartillaFileName = savedPath; // Ruta local
             print("Cartilla file name: $cartillaFileName");
         });
+        _showAutofillPopup(savedPath);
       }
     }
     return cartillaFileName ?? ""; // Devuelve la ruta local o null
@@ -334,6 +336,88 @@ class _NewPetScreenState extends State<NewPetScreen> {
       print("Error saving image locally: $e");
       return null;
     }
+  }
+
+  //-----------------------AUTORELLENAR CON DATOS DE LA CARTILLA-----------------------
+  Future<Map<String, String>> extractDataFromImage(String imagePath) async {
+    final inputImage = InputImage.fromFilePath(imagePath);
+    final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+    final recognizedText = await textRecognizer.processImage(inputImage);
+
+    List<String> lines = recognizedText.text.split('\n');
+
+    print("Recognized text lines: $lines");
+    print("Recognized text: ${recognizedText.text}");
+
+    final text = recognizedText.text;
+    final Map<String, String> data = {};
+
+    for (int i = 0; i < lines.length - 1; i++) {
+      if (lines[i].toLowerCase().contains("gender")) {
+        String genderValue = lines[i + 1];
+        print("Valor de Gender: $genderValue");
+        data['gender']=genderValue.toLowerCase();
+      }
+      if(lines[i].toLowerCase().contains("name")) {
+        String nameValue = lines[i + 1];
+        print("Valor de Name: $nameValue");
+        data['name'] = nameValue;
+      }
+      if (lines[i].toLowerCase().contains("type")) {
+        String typeValue = lines[i + 1];
+        print("Valor de Type: $typeValue");
+        data['type'] = typeValue.toLowerCase();
+      }
+      if (lines[i].toLowerCase().contains("breed")) {
+        String breedValue = lines[i + 1];
+        print("Valor de Breed: $breedValue");
+        data['breed'] = breedValue;
+      }
+      if (lines[i].toLowerCase().contains("birth")) {
+        String birthDateValue = lines[i + 1];
+        print("Valor de Birth Date: $birthDateValue");
+        data['birthDate'] = birthDateValue;
+      }
+      if (lines[i].toLowerCase().contains("chip")) {
+        String chipValue = lines[i + 1];
+        print("Valor de Chip Number: $chipValue");
+        data['chip'] = chipValue;
+      }
+
+    }
+
+    return data;
+  }
+
+  Future<void> _showAutofillPopup(String imagePath) async {
+    final shouldAutofill = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text("Automatic Form Filling"),
+        content: Text("Cartilla detected. Would you like the form to be filled out automatically?"),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text("No")),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: Text("Yes")),
+        ],
+      ),
+    );
+
+    if (shouldAutofill == true) {
+      await _rellenarFormularioDesdeCartilla(imagePath);
+    }
+  }
+
+  Future<void> _rellenarFormularioDesdeCartilla(String imagePath) async {
+    final data = await extractDataFromImage(imagePath);
+
+    setState(() {
+      nameController.text = data['name'] ?? '';
+      typeController.text = data['type']?.toLowerCase() ?? '';
+      breedController.text = data['breed'] ?? '';
+      birthDateController.text = data['birthDate'] ?? '';
+      genderController.text = data['gender']?.toLowerCase() ?? '';
+      chipController.text = data['chip'] ?? '';
+    });
   }
 
   int _calculateAge(String birthDate) {

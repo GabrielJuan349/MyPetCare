@@ -122,7 +122,7 @@ class _PetDetailsState extends State<PetDetails> {
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   ),
-                  icon: const Icon(Icons.picture_as_pdf),
+                  icon: const Icon(Icons.image),
                   label: const Text("Open Cartilla"),
                 ),
               ),
