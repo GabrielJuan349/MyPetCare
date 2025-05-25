@@ -154,7 +154,7 @@ class _NewPetScreenState extends State<NewPetScreen> {
               backgroundColor: const Color(0xFF627ECB),
               foregroundColor: Colors.white,
             ),
-            child: Text(fileName ?? "Upload PDF"),
+            child: Text(fileName ?? "Upload"),
           )
         ],
       ),
@@ -263,6 +263,7 @@ class _NewPetScreenState extends State<NewPetScreen> {
         id: nameController.text.trim(),
         name: nameController.text.trim(),
         image: fotoFileName ?? "",
+        cartilla: cartillaFileName ?? "",
         gender: genderController.text.trim(),
         age: _calculateAge(birthDateController.text.trim()).toString(),
         weight: double.tryParse(weightController.text.trim()) ?? 0.0,
@@ -287,23 +288,23 @@ class _NewPetScreenState extends State<NewPetScreen> {
     }
   }
 
-  Future<void> pickPdfFile(String label) async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf', 'jpg', 'png'],
-    );
+  Future<String> pickPdfFile(String label) async {
+    final picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-    if (result != null && result.files.isNotEmpty) {
-      setState(() {
-        if (label == "Cartilla") {
-          cartillaFileName = result.files.single.name;
-        } else {
-          fotoFileName = result.files.single.name;
-        }
-      });
+    if (pickedFile != null) {
+      final savedPath = await saveImageLocally(pickedFile);
+
+      if (savedPath != null) {
+          setState(() {
+            cartillaFileName = savedPath; // Ruta local
+            print("Cartilla file name: $cartillaFileName");
+        });
+      }
     }
+    return cartillaFileName ?? ""; // Devuelve la ruta local o null
   }
-
+  
   Future<String> pickImageFile() async {
     final picker = ImagePicker();
     final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);

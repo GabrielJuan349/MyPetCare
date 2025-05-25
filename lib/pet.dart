@@ -2,7 +2,7 @@ class Pet {
   late String name, id, gender, breed, type, owner, age;
   late double weight;
 
-  String? image, chip, birthDate;
+  String? image, cartilla, chip, birthDate;
   int? playful, friendly;
 
   Pet({
@@ -13,6 +13,7 @@ class Pet {
       required this.breed,
       required this.type,
       this.image,
+      this.cartilla,
       required this.weight,
       required this.owner,
       this.chip,
@@ -30,6 +31,7 @@ class Pet {
       breed: json['breed'].toString() ?? "",
       type: json['type'].toString() ?? "",
       image: json['photoUrls'].toString() ?? "",
+      cartilla: json['cartilla'].toString() ?? "",
       chip: json['chip'].toString() ?? "",
       weight: double.tryParse(json['weight']?.toString() ?? "") ?? 0.0,
       owner: json['owner'].toString() ?? "",
