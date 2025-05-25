@@ -33,6 +33,7 @@ export async function createPet(ctx: RouterContext<"/api/pet">) {
         type: { stringValue: Pet.type },
         weight: { doubleValue: Pet.weight },
         photoUrls: { stringValue: Pet.image },
+        cartilla: { stringValue: Pet.cartilla },
         chip: { stringValue: Pet.chip },
         gender: { stringValue: Pet.gender },
       }

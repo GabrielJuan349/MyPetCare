@@ -12,6 +12,7 @@ export interface Pet {
   chip: string;
   owner: DocumentReference;
   photoUrls: string[];
+  cartilla: string;
   createdAt: Date;
   lastUpdated: Date;
 }
