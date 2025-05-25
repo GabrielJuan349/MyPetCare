@@ -22,6 +22,8 @@ class _ClinicRegisterScreenState extends State<ClinicRegisterScreen> {
   final _websiteController = TextEditingController();
   final _latitudeController = TextEditingController();
   final _longitudeController = TextEditingController();
+  final _startHourController = TextEditingController();
+  final _endHourController = TextEditingController();
 
   bool _isLoading = false;
 
@@ -58,8 +60,10 @@ class _ClinicRegisterScreenState extends State<ClinicRegisterScreen> {
         'email': _emailController.text.trim(),
         'phone': _phoneController.text.trim(),
         'website': _websiteController.text.trim(),
-        'latitude': latitude,       // como número
-        'longitude': longitude,     // como número
+        'latitude': latitude,
+        'longitude': longitude,
+        'startHour': _startHourController.text.trim(),
+        'endHour': _endHourController.text.trim(),
       };
 
       await FirebaseFirestore.instance.collection('clinic').add(clinicData);
@@ -165,6 +169,28 @@ class _ClinicRegisterScreenState extends State<ClinicRegisterScreen> {
                   label: 'Website',
                   controller: _websiteController,
                   keyboardType: TextInputType.url,
+                ),
+                _buildTextField(
+                  label: 'Start Hour (hh:mm)',
+                  controller: _startHourController,
+                  keyboardType: TextInputType.datetime,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) return 'Please enter Start Hour';
+                    final timeRegex = RegExp(r'^([0-1]\d|2[0-3]):([0-5]\d)$');
+                    if (!timeRegex.hasMatch(value)) return 'Invalid time format (hh:mm)';
+                    return null;
+                  },
+                ),
+                _buildTextField(
+                  label: 'End Hour (hh:mm)',
+                  controller: _endHourController,
+                  keyboardType: TextInputType.datetime,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) return 'Please enter End Hour';
+                    final timeRegex = RegExp(r'^([0-1]\d|2[0-3]):([0-5]\d)$');
+                    if (!timeRegex.hasMatch(value)) return 'Invalid time format (hh:mm)';
+                    return null;
+                  },
                 ),
                 _buildTextField(
                   label: 'Latitude',
