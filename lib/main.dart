@@ -89,26 +89,32 @@ Future<void> startFirestoreListeners(String userId) async {
 
           final docId = change.doc.id;
 
-          // Obtener el ID de la mascota según la colección
+          // Obtener el ID o name de la mascota según la colección
           String? petId;
+          String? petName;
           if (collection == 'appointments') {
-            petId = docData['petId'];
+            petName = docData['petName'];
           } else {
             petId = docData['id_pet'];
           }
 
           // Si petId es null o vacío, ignoramos ese documento
-          if (petId == null || petId.isEmpty) continue;
+          if (petId == null || petId.isEmpty) {
+            if (petName == null || petName.isEmpty) continue;
+          }
 
           // Verificamos si el doc pertenece a alguna mascota del usuario
-          final matchingPet = userPets.firstWhere(
-                (pet) => pet['id'] == petId,
-            orElse: () => {},
-          );
+          if (collection != 'appointments') {
+            final matchingPet = userPets.firstWhere(
+                  (pet) => pet['id'] == petId,
+              orElse: () => {},
+            );
 
-          if (matchingPet.isEmpty) continue;
+            if (matchingPet.isEmpty) continue;
 
-          final petName = matchingPet['name'] ?? 'Mascota desconocida';
+            petName = matchingPet['name'] ?? 'Mascota desconocida';
+          }
+          
           final title = _getTitle(change.type, collection);
           final message = _getMessage(change.type, collection);
 
