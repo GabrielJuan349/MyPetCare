@@ -1,12 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'schedule_screen.dart';
+import 'data.dart';
 import 'add_appointment_screen.dart';
-import 'requests.dart';
 
 class CalendarScreen extends StatefulWidget {
+  const CalendarScreen({super.key});
+
   @override
-  _CalendarScreenState createState() => _CalendarScreenState();
+  State<CalendarScreen> createState() => _CalendarScreenState();
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
@@ -20,7 +23,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         title: const Text("Calendario"),
         foregroundColor: Colors.white,
         centerTitle: true,
-        backgroundColor: Color(0xfff59249),
+        backgroundColor: const Color(0xfff59249),
       ),
       body: Column(
         children: [
@@ -65,8 +68,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ),
           _selectedDay != null
               ? Expanded(
-                  //TODO: Use here real data
-                  child: _buildTimeSlots("clinic_123", _selectedDay!),
+                  child: _buildTimeSlots(_selectedDay!),
                 )
               : const Expanded(
                   child: Center(
@@ -79,35 +81,83 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  List<String> getTimeSlots(int startHour, int endHour) {
+  List<String> getTimeSlots(String startTime, String endTime) {
     List<String> timeSlots = [];
-    // https://stackoverflow.com/questions/15193983/is-there-a-built-in-method-to-pad-a-string
-    for (int hour = startHour; hour < endHour; hour++) {
-      for (int minute = 0; minute < 60; minute += 15) {
-        final h = hour.toString().padLeft(2, '0');
-        final m = minute.toString().padLeft(2, '0');
-        timeSlots.add('$h:$m');
-      }
+
+    final startParts = startTime.split(':').map(int.parse).toList();
+    final endParts = endTime.split(':').map(int.parse).toList();
+
+    // 09:00 => [0] = 09, [1] = 00
+    // https://api.dart.dev/dart-core/DateTime/DateTime.html
+    DateTime start = DateTime(0, 1, 1, startParts[0], startParts[1]);
+    final end = DateTime(0, 1, 1, endParts[0], endParts[1]);
+
+    // 10:02 => (15 - (02%15) % 15) = 13 --> 13 + 02 = 15
+    int minutesToAdd = (15 - (start.minute % 15)) % 15;
+    if (minutesToAdd > 0) {
+      start = start.add(Duration(minutes: minutesToAdd));
     }
+
+    // https://stackoverflow.com/questions/15193983/is-there-a-built-in-method-to-pad-a-string
+    while(start.isBefore(end)){
+      final h = start.hour.toString().padLeft(2, '0');
+      final m = start.minute.toString().padLeft(2, '0');
+      timeSlots.add('$h:$m');
+      start = start.add(const Duration(minutes: 15));
+    }
+
     return timeSlots;
   }
 
-  Future<List<bool>> getAvailabilityList(
-      List<String> allSlots, clinicId, date) async {
-    final bookedSlots = await getAppointmentsByClinicId(clinicId, date);
-    // true = available, false = booked
-    return allSlots.map((slot) => !bookedSlots.contains(slot)).toList();
+
+  Future<Map<String, List>> getAvailabilityList( DateTime date) async {
+    final user = Provider.of<OwnerModel>(context, listen: false).owner!;
+    final startOfDay = DateTime(date.year, date.month, date.day);
+    final endOfDay = startOfDay.add(const Duration(days: 1));
+    // final bookedSlots = await getAppointmentsByClinicId(clinicId, date);
+    try{
+      // Get clinic start and end hour
+      print("name is ${user.clinicInfo}");
+      final clinicQuery = await FirebaseFirestore.instance
+          .collection('clinic')
+          .where('name', isEqualTo: user.clinicInfo)
+          .get();
+      // If sure that name is unique and only will return one doc
+      final data = clinicQuery.docs.first.data();
+      final startHour = data['startHour'];
+      final endHour = data['endHour'];
+      List<String> allSlots = getTimeSlots(startHour, endHour);
+      final appointmentSnapshot = await FirebaseFirestore.instance
+          .collection('appointments')
+          .where('clinicName', isEqualTo: user.clinicInfo)
+          .where('date', isGreaterThanOrEqualTo: startOfDay)
+          .where('date', isLessThan: endOfDay)
+          .get();
+
+      final bookedSlots = appointmentSnapshot.docs
+          .map((doc) => doc['time'] as String)
+          .toList();
+      // true = available, false = booked
+      final availability =  allSlots.map((slot) => !bookedSlots.contains(slot)).toList();
+      return {
+        'allSlots': allSlots,
+        'availability': availability,
+      };
+    }catch(e){
+      print("Error getting time slots: $e");
+    }
+
+    return {
+      'allSlots': [],
+      'availability': [],
+    };
   }
 
   // Show time slots, according the clinic working hours
-  Widget _buildTimeSlots(String clinicId, DateTime date) {
-    // TODO: Make this dynamic
-    final startHour = 9;
-    final endHour = 17;
-    List<String> allSlots = getTimeSlots(startHour, endHour);
+  Widget _buildTimeSlots(DateTime date) {
 
     return FutureBuilder(
-        future: getAvailabilityList(allSlots, clinicId, date),
+        future: getAvailabilityList(date),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Center(
@@ -119,9 +169,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final availableSlots = snapshot.data ?? [];
+          final availableSlots = snapshot.data?['availability'] ?? [];
+          final allSlots = snapshot.data?['allSlots'] ?? [];
 
-          if (availableSlots.isEmpty) {}
+          if (availableSlots.isEmpty) {
+            return const  Center(
+                child: Text("The clinic has not set time slots"));
+          }
 
           return GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -131,7 +185,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               childAspectRatio: 3.5,
             ),
             padding: const EdgeInsets.all(8),
-            itemCount: allSlots.length,
+            itemCount: availableSlots.length,
             itemBuilder: (context, index) {
               final time = allSlots[index];
               final isAvailable = availableSlots[index];
@@ -144,7 +198,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text("Hora seleccionada: $time")),
                           );
-                          // TODO: Navigate to open form
                           Navigator.push(
                               context,
                               MaterialPageRoute(
