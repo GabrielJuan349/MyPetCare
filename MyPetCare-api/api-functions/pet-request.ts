@@ -85,18 +85,26 @@ export async function updatePet(ctx: RouterContext<"/api/pet/:id">) {
   const { value } = await ctx.request.body({ type: "json" });
   const pet = await value;
 
-  const fields: any = {
-    breed: { stringValue: pet.breed },
-    name: { stringValue: pet.name },
-    weight: { doubleValue: pet.weight },
-    gender: { stringValue: pet.gender },
-  };
+  const fields: Record<string, any> = {};
+  const updateMask: string[] = [];
 
-  const updateMask = [
-    "age", "birthDate", "breed", "name", "owner", "type", "weight"
-  ];
-
-  if (pet.photoUrls && Array.isArray(pet.photoUrls)) {
+  if (typeof pet.breed === "string") {
+    fields.breed = { stringValue: pet.breed };
+    updateMask.push("breed");
+  }
+  if (typeof pet.name === "string") {
+    fields.name = { stringValue: pet.name };
+    updateMask.push("name");
+  }
+  if (typeof pet.weight === "number") {
+    fields.weight = { doubleValue: pet.weight };
+    updateMask.push("weight");
+  }
+  if (typeof pet.gender === "string") {
+    fields.gender = { stringValue: pet.gender };
+    updateMask.push("gender");
+  }
+  if (Array.isArray(pet.photoUrls)) {
     fields.photoUrls = {
       arrayValue: {
         values: pet.photoUrls.map((url: string) => ({ stringValue: url }))
@@ -105,13 +113,19 @@ export async function updatePet(ctx: RouterContext<"/api/pet/:id">) {
     updateMask.push("photoUrls");
   }
 
+  if (updateMask.length === 0) {
+    ctx.response.status = 400;
+    ctx.response.body = { error: "No se proporcionaron campos válidos para actualizar" };
+    return;
+  }
+
   const updateUrl = `${FireStoreUrl}/${id}?` +
     updateMask.map((field) => `updateMask.fieldPaths=${field}`).join("&");
 
   const response = await fetch(updateUrl, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ fields })
+    body: JSON.stringify({ fields }),
   });
 
   const rawText = await response.text();
