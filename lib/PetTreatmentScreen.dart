@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lis_project/requests.dart';
+import 'package:intl/intl.dart';
 
 class PetTreatmentsScreen extends StatelessWidget {
   final String petId;
@@ -41,7 +42,9 @@ class PetTreatmentsScreen extends StatelessWidget {
               final treatment = treatments[index];
               return ListTile(
                 title: Text(treatment['name'] ?? 'No name'),
-                subtitle: Text('From ${treatment['date_start']} to ${treatment['date_end']}'),
+                subtitle: Text(
+                  'From ${_formatDate(treatment['date_start'])} to ${_formatDate(treatment['date_end'])}',
+                ),
               );
             },
           );
@@ -49,4 +52,9 @@ class PetTreatmentsScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+String _formatDate(String isoString) {
+  final date = DateTime.parse(isoString);
+  return DateFormat('yyyy-MM-dd').format(date);
 }
