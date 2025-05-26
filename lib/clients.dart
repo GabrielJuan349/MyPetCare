@@ -42,33 +42,42 @@ class _ClientsState extends State<Clients> {
           child: TextField(
             decoration: InputDecoration(
               labelText: 'Search clients',
-              labelStyle: GoogleFonts.inter(color: Colors.black54, fontSize: 13),
+              labelStyle:
+                  GoogleFonts.inter(color: Colors.black54, fontSize: 13),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: BorderSide(color: _highlightColor.withOpacity(0.6), width: 1),
+                borderSide: BorderSide(
+                    color: _highlightColor.withOpacity(0.6), width: 1),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
                 borderSide: BorderSide(color: _highlightColor, width: 1.5),
               ),
               prefixIcon: Icon(Icons.search, color: _highlightColor),
-              contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
             ),
             style: GoogleFonts.inter(color: Colors.black87, fontSize: 14),
-            onChanged: (value) => setState(() => _searchQuery = value.toLowerCase()),
+            onChanged: (value) =>
+                setState(() => _searchQuery = value.toLowerCase()),
           ),
         ),
       ),
     );
   }
 
-
   Widget _buildClientsDataTable() {
     if (globalClinicInfo == null) {
-    return const Center(child: Text('Error: no se ha podido cargar la información de la clínica.'));
-  }
+      return const Center(
+          child: Text(
+              'Error: no se ha podido cargar la información de la clínica.'));
+    }
+    print("The global clinic info is: $globalClinicInfo");
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('users').snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .where('clinicInfo', isEqualTo: globalClinicInfo)
+          .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return const Center(child: Text('Error loading clients'));
@@ -78,31 +87,22 @@ class _ClientsState extends State<Clients> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        final owners = snapshot.data!.docs.where((doc) {
+        final docs = snapshot.data!.docs;
 
+        if (docs.isEmpty) {
+          return const Center(child: Text('No clients found'));
+        }
+
+        final owners = snapshot.data!.docs.where((doc) {
           final data = doc.data() as Map<String, dynamic>;
 
           final isClient = data['accountType'] == 'owner' ||
               data['accountType'] == 'Pet owner' ||
               data['accountType'] == 'cliente';
-
-          final sameClinic = data['clinicInfo'] == globalClinicInfo;
-
-          return isClient && sameClinic;
+          return isClient;
         }).toList();
 
-        final filteredOwners = owners.where((doc) {
-          final data = doc.data() as Map<String, dynamic>;
-          final userId = (doc.id ?? '').toString().toLowerCase();
-          final firstName = (data['firstName'] ?? '').toString().toLowerCase();
-          final lastName = (data['lastName'] ?? '').toString().toLowerCase();
-
-          return userId.contains(_searchQuery) ||
-              firstName.contains(_searchQuery) ||
-              lastName.contains(_searchQuery);
-        }).toList();
-
-        if (filteredOwners.isEmpty) {
+        if (owners.isEmpty) {
           return const Center(child: Text('No clients found'));
         }
 
@@ -115,36 +115,44 @@ class _ClientsState extends State<Clients> {
             child: Container(
               width: screenWidth,
               child: DataTable(
-                headingRowColor: WidgetStateProperty.all(
-                    _highlightColor),
+                headingRowColor: WidgetStateProperty.all(_highlightColor),
                 columns: [
                   DataColumn(
-                    label: Text('Name', style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+                    label: Text('Name',
+                        style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
                   ),
                   DataColumn(
-                    label: Text('User ID', style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+                    label: Text('User ID',
+                        style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
                   ),
                   DataColumn(
-                    label: Text('Clinic', style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+                    label: Text('Clinic',
+                        style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
                   ),
                   DataColumn(
-                    label: Text('Email', style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+                    label: Text('Email',
+                        style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
                   ),
                   DataColumn(
-                    label: Text('Phone', style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+                    label: Text('Phone',
+                        style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
                   ),
                 ],
-                rows: filteredOwners.map((doc) {
+                rows: owners.map((doc) {
                   final data = doc.data() as Map<String, dynamic>;
-                  final name = '${data['firstName'] ?? ''} ${data['lastName'] ?? ''}';
+                  final name =
+                      '${data['firstName'] ?? ''} ${data['lastName'] ?? ''}';
 
                   return DataRow(
                     cells: [
                       DataCell(Text(name, style: GoogleFonts.inter())),
                       DataCell(Text(doc.id ?? '', style: GoogleFonts.inter())),
-                      DataCell(Text(data['clinicInfo'] ?? '', style: GoogleFonts.inter())),
-                      DataCell(Text(data['email'] ?? '', style: GoogleFonts.inter())),
-                      DataCell(Text(data['phone'] ?? '', style: GoogleFonts.inter())),
+                      DataCell(Text(data['clinicInfo'] ?? '',
+                          style: GoogleFonts.inter())),
+                      DataCell(Text(data['email'] ?? '',
+                          style: GoogleFonts.inter())),
+                      DataCell(Text(data['phone'] ?? '',
+                          style: GoogleFonts.inter())),
                     ],
                   );
                 }).toList(),
