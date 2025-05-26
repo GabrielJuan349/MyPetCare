@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'main.dart';
 
 class CreateAdoptionScreen extends StatefulWidget {
   final String? clinicId;  // Recibimos el clinicId al crear la pantalla
@@ -25,7 +26,7 @@ class _CreateAdoptionScreenState extends State<CreateAdoptionScreen> {
   void initState() {
     super.initState();
     // Inicializamos el controller con el clinicId recibido
-    clinicIdController = TextEditingController(text: widget.clinicId);
+    clinicIdController = TextEditingController(text: globalClinicId);
   }
 
   @override
