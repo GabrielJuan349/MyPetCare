@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'login.dart';
 import 'adoption.dart';
+import 'main.dart';
 
 class ClinicHomeScreen extends StatefulWidget {
   final String clinicName;
@@ -239,7 +240,7 @@ class _ClinicHomeScreenState extends State<ClinicHomeScreen> {
     onPressed: () {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => CreateAdoptionScreen(clinicId: widget.clinicName)),
+        MaterialPageRoute(builder: (_) => CreateAdoptionScreen(clinicId: globalClinicId)),
       );
     },
     tooltip: 'Crear nueva adopción',

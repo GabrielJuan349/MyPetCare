@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CreateAdoptionScreen extends StatefulWidget {
-  final String clinicId;  // Recibimos el clinicId al crear la pantalla
+  final String? clinicId;  // Recibimos el clinicId al crear la pantalla
 
   CreateAdoptionScreen({required this.clinicId});
 

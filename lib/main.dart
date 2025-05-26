@@ -7,7 +7,7 @@ import 'firebase_options.dart';
 import 'login.dart';
 import 'home.dart';
 import 'clinic_register.dart';
-
+String? globalClinicId;
 String? globalVetName;
 String? globalVetId;
 String? globalClinicInfo;

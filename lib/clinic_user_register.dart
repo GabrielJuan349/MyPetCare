@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:lis_web/clinic_home.dart';
+import 'package:lis_web/main.dart';
 
 class ClinicUserRegisterScreen extends StatefulWidget {
   final String email;
@@ -42,6 +43,7 @@ class _ClinicUserRegisterScreenState extends State<ClinicUserRegisterScreen> {
       );
 
       final userId = userCredential.user!.uid;
+      globalClinicInfo = userCredential.user!.uid;
 
       // Guardar info extra en Firestore en colección "users"
       await FirebaseFirestore.instance.collection('users').doc(userId).set({

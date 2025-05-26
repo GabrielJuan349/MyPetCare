@@ -58,6 +58,7 @@ class _LoginState extends State<Login> {
         final clinicInfo = userData['clinicInfo'];
         final clinicName = clinicInfo is Map ? clinicInfo['name'] : clinicInfo;
         final clinicId = clinicInfo is Map ? clinicInfo['id'] : clinicInfo;
+        globalClinicId = FirebaseAuth.instance.currentUser?.uid;
 
         Navigator.pushReplacement(
           context,
