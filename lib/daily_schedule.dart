@@ -4,22 +4,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lis_web/appointment_info.dart';
-import 'pet_details.dart';
 import 'assign_appointment.dart';
 
-class DayScheduleScreen extends StatelessWidget {
+class DayScheduleScreen extends StatefulWidget {
   final DateTime date;
   final String? petId;
+  final String? appointmentId;
 
-  const DayScheduleScreen({required this.date, this.petId, Key? key})
+  const DayScheduleScreen(
+      {required this.date, this.petId, Key? key, this.appointmentId})
       : super(key: key);
 
   @override
+  State<DayScheduleScreen> createState() => _DayScheduleScreenState();
+}
+
+class _DayScheduleScreenState extends State<DayScheduleScreen> {
+  @override
   Widget build(BuildContext context) {
-    final displayDate = DateFormat('dd/MM/yyyy').format(date);
+    final displayDate = DateFormat('dd/MM/yyyy').format(widget.date);
     final primaryOrange = Colors.orange;
-    final lightOrange = primaryOrange.withOpacity(0.1);
-    final borderOrange = primaryOrange.withOpacity(0.1);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -35,8 +39,17 @@ class DayScheduleScreen extends StatelessWidget {
             fontSize: 20,
           ),
         ),
+        actions: [
+          IconButton(
+              onPressed: () {
+                setState(() {
+                  // To refresh actual page
+                });
+              },
+              icon: Icon(Icons.refresh))
+        ],
       ),
-      body: _buildTimeSlots(date),
+      body: _buildTimeSlots(widget.date),
     );
   }
 
@@ -191,15 +204,24 @@ class DayScheduleScreen extends StatelessWidget {
                               ),
                               child: const Text('Asignar'),
                               onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => AssignAppointmentScreen(
-                                        date: DateFormat('dd/MM/yyyy')
-                                            .format(date),
-                                        time: time,
-                                      ),
-                                    ));
+                                if (widget.appointmentId != null) {
+                                  // Return time
+                                  print("appointmentId es: $time");
+                                  List<String> timeAndAppointmentId = [];
+                                  timeAndAppointmentId.add(time);
+                                  timeAndAppointmentId.add(widget.appointmentId!);
+                                  Navigator.pop(context, timeAndAppointmentId);
+                                } else {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => AssignAppointmentScreen(
+                                          date: DateFormat('dd/MM/yyyy')
+                                              .format(date),
+                                          time: time,
+                                        ),
+                                      ));
+                                }
                               },
                             )
                           : IconButton(
@@ -208,6 +230,7 @@ class DayScheduleScreen extends StatelessWidget {
                               onPressed: () {
                                 final displayDate =
                                     DateFormat('dd/MM/yyyy').format(date);
+
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(

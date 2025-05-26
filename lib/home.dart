@@ -389,10 +389,13 @@ class _HomeContentState extends State<HomeContent> {
       String clinicName = vetInfo.data()?['clinicInfo'];
       print("Clinic info: $clinicName");
       DateTime today = DateTime.now();
+      final startOfDay = DateTime(today.year, today.month, today.day);
+      final endOfDay = startOfDay.add(const Duration(days: 1));
       final appointmentSnapshot = await FirebaseFirestore.instance
           .collection('appointments')
           .where('clinicName', isEqualTo: clinicName)
-          .where('date', isGreaterThan: today)
+          .where('date', isGreaterThanOrEqualTo: startOfDay)
+          .where('date', isLessThan: endOfDay)
           .orderBy('date')
           .orderBy('time')
           .get();

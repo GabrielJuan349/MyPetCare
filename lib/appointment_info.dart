@@ -1,10 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:lis_web/schedule.dart';
-import 'package:table_calendar/table_calendar.dart';
 
 class AppointmentInfo extends StatefulWidget {
   final String date, time;
@@ -18,9 +16,6 @@ class AppointmentInfo extends StatefulWidget {
 class _AppointmentInfoState extends State<AppointmentInfo> {
   final primaryOrange = Colors.orange;
   late final lightOrange, borderOrange;
-
-  DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
 
   final TextEditingController timeController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
@@ -106,30 +101,67 @@ class _AppointmentInfoState extends State<AppointmentInfo> {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: Center(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ScheduleScreen()));
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryOrange,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 32, vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                        child: Column(
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => ScheduleScreen(
+                                              appointmentId: doc.id,
+                                            ))).then((dateAndTime) {
+                                  print(
+                                      "Datime values in info are: $dateAndTime");
+
+                                  if (dateAndTime != null &&
+                                      dateAndTime.length == 3) {
+                                    _reAssignAppointment(dateAndTime);
+                                    // Go back
+                                  } else {
+                                    print("No se guardo ningun valor");
+                                  }
+                                });
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: primaryOrange,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 32, vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                'Reasignar cita',
+                                style: GoogleFonts.inter(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
-                          ),
-                          child: Text(
-                            'Reasignar cita',
-                            style: GoogleFonts.inter(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                            ElevatedButton(
+                              onPressed: () {
+                                _confirmCancelAppointment(context, doc.id);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: primaryOrange,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 32, vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                'Cancelar cita',
+                                style: GoogleFonts.inter(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
                     )
@@ -141,6 +173,58 @@ class _AppointmentInfoState extends State<AppointmentInfo> {
         );
       },
     );
+  }
+
+  Future<void> _reAssignAppointment(data) async {
+    // Form date to Timestamp
+    final String appointmentId = data[1];
+    print("Inside reassign is: $appointmentId");
+    final DateTime parsedDate = DateFormat('dd/MM/yyyy').parse(data[2]);
+    print("Cita reasignada a: $parsedDate - ${data[0]}");
+    await FirebaseFirestore.instance
+        .collection('appointments')
+        .doc(appointmentId)
+        .update({
+      'date': parsedDate,
+      'time': data[0],
+    });
+    print("Cita reasignada a: $parsedDate - ${data[1]}");
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text("Cita reasignada a: $parsedDate - ${data[1]}"),
+    ));
+    Navigator.pop(context);
+  }
+
+  void _confirmCancelAppointment(BuildContext context, String appointmentId) {
+    print("Inside cancel appointment appointmentId is: $appointmentId");
+    showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              title: const Text('Cancel Appointment'),
+              content: const Text(
+                  'Are you sure you want to cancel this appointment?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: const Text('No'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                    _cancelAppointment(appointmentId);
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Yes'),
+                ),
+              ],
+            ));
+  }
+
+  Future<void> _cancelAppointment(String appointmentId) async {
+    await FirebaseFirestore.instance
+        .collection('appointments')
+        .doc(appointmentId)
+        .delete();
   }
 
   Widget _buildField(String label, String value, bool isReadOnly) {

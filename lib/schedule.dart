@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'daily_schedule.dart';
 
-class ScheduleScreen extends StatelessWidget {
+class ScheduleScreen extends StatefulWidget {
   final String? petId;
+  final String? appointmentId;
 
-  const ScheduleScreen({Key? key, this.petId}) : super(key: key);
+  const ScheduleScreen({Key? key, this.petId, this.appointmentId})
+      : super(key: key);
 
+  @override
+  State<ScheduleScreen> createState() => _ScheduleScreenState();
+}
+
+class _ScheduleScreenState extends State<ScheduleScreen> {
   @override
   Widget build(BuildContext context) {
     final today = DateTime.now();
@@ -44,9 +52,20 @@ class ScheduleScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => DayScheduleScreen(date: date, petId: petId),
+                  builder: (_) => DayScheduleScreen(
+                    date: date,
+                    petId: widget.petId,
+                    appointmentId: widget.appointmentId,
+                  ),
                 ),
-              );
+              ).then((timeAndAppointmentId) {
+                if (timeAndAppointmentId != null) {
+                  String displayDate = DateFormat('dd/MM/yyyy').format(date);
+                  timeAndAppointmentId.add(displayDate);
+                  print("Date and time values are: $timeAndAppointmentId");
+                  Navigator.pop(context, timeAndAppointmentId);
+                }
+              });
             },
             borderRadius: BorderRadius.circular(12),
             child: Container(
