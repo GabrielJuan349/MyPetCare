@@ -7,6 +7,7 @@ import 'package:lis_project/vaccine_screen.dart';
 import 'package:lis_project/prescription.dart';
 import 'package:lis_project/requests.dart';
 import 'package:provider/provider.dart'; 
+import 'PetTreatmentScreen.dart';
 
 class PetNumScreen extends StatefulWidget {
   Pet myPet;
@@ -101,6 +102,7 @@ class _PetNumScreenState extends State<PetNumScreen> {
                   _buildGridItem(context, Icons.receipt_long_outlined, 'Reports'),
                   _buildGridItem(context, Icons.medical_services_outlined, 'Medical prescriptions'),
                   _buildGridItem(context, Icons.vaccines, 'Vaccines'),
+                 _buildGridItem(context, Icons.healing_outlined, 'Treatments'),
                 ],
               ),
             ),
@@ -146,6 +148,12 @@ class _PetNumScreenState extends State<PetNumScreen> {
                 .push(MaterialPageRoute(builder: (_) => VaccineScreen(petId: myPet.id)))
                 .then((_) => setState(() {}));
           }
+          else if (label == "Treatments") {
+  Navigator.of(context)
+      .push(MaterialPageRoute(builder: (_) => PetTreatmentsScreen(petId: myPet.id)))
+      .then((_) => setState(() {}));
+}
+
         },
         borderRadius: BorderRadius.circular(10),
         child: Center(

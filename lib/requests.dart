@@ -307,3 +307,16 @@ Future<List> getVetsById(String clinicId) async{
   final List<dynamic> data = json.decode(response);
   return data.map((item) => Vet.fromJson(item)).toList();
 }
+
+Future<List<dynamic>> getTreatmentsByPet(String petId) async {
+  final url = Uri.parse('$BASE_URL/api/getTreatmentsByPet/pet/$petId'); 
+
+  final response = await http.get(url);
+
+  if (response.statusCode == 200) {
+    final List<dynamic> data = jsonDecode(response.body);
+    return data;
+  } else {
+    throw Exception('Failed to load treatments');
+  }
+}
