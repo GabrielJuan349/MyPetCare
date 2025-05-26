@@ -67,10 +67,6 @@ class _PetReportsState extends State<PetReports> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      report.reportName,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
                     const SizedBox(height: 4),
                     Text(
                       report.message,
