@@ -77,9 +77,11 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.person, color: Colors.white),
+            icon: const Icon(Icons.refresh, color: Colors.white),
             onPressed: () {
-              Navigator.pushNamed(context, '/profile');
+              setState(() {
+                // Recharge the page
+              });
             },
           ),
         ],

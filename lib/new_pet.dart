@@ -57,18 +57,6 @@ class _NewPetScreenState extends State<NewPetScreen> {
             Navigator.pop(context, true);
           },
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.person, color: Colors.white),
-            onPressed: () {
-              dispose();
-              Navigator.pushNamed(
-                    context,
-                    '/profile',
-                );
-            },
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
