@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:lis_project/data.dart';
+import 'package:lis_project/home_screen.dart';
 import 'package:lis_project/pet.dart';
-import 'package:lis_project/pet_details.dart';
 import 'package:lis_project/requests.dart';
 import 'package:provider/provider.dart';
-
+import 'requests.dart';
 class EditPet extends StatefulWidget {
-  Pet myPet;
+  final Pet myPet;
 
   EditPet({super.key, required this.myPet});
 
@@ -15,8 +15,6 @@ class EditPet extends StatefulWidget {
 }
 
 class _EditPetState extends State<EditPet> {
-  late Pet myPet;
-  //final TextEditingController _textControllerName = TextEditingController(text: 'Texto predeterminado');
   late TextEditingController _textControllerName;
   late TextEditingController _textControllerGender;
   late TextEditingController _textControllerBreed;
@@ -25,19 +23,20 @@ class _EditPetState extends State<EditPet> {
   @override
   void initState() {
     super.initState();
-    myPet = widget.myPet;
-    String name = myPet.name;
-    String gender = myPet.gender;
-    String breed = myPet.breed;
-    double weight = myPet.weight;
-    _textControllerName = TextEditingController(text: name);
-    _textControllerGender = TextEditingController(text: gender);
-    _textControllerBreed = TextEditingController(text: breed);
-    _textControllerWeight = TextEditingController(text: weight.toString());
-
+    _textControllerName = TextEditingController(text: widget.myPet.name);
+    _textControllerGender = TextEditingController(text: widget.myPet.gender);
+    _textControllerBreed = TextEditingController(text: widget.myPet.breed);
+    _textControllerWeight = TextEditingController(text: widget.myPet.weight.toString());
   }
 
-  _EditPetState();
+  @override
+  void dispose() {
+    _textControllerName.dispose();
+    _textControllerGender.dispose();
+    _textControllerBreed.dispose();
+    _textControllerWeight.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,46 +50,52 @@ class _EditPetState extends State<EditPet> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildTextField('Name'),
-                        _buildTextField('Gender'),
-                        _buildTextField('Breed'),
-                        _buildTextField('Weight'),
-                        _buildButton(),
-                      ],
-                    ),
-                  )
-              )
-            ],
-          ),
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildTextField('Name'),
+                    _buildTextField('Gender'),
+                    _buildTextField('Breed'),
+                    _buildTextField('Weight'),
+                    _buildButton(),
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildTextField(String label, {bool obscureText = false}) {
-    late TextEditingController textController;
-    if (label == "Name") {
-      textController = _textControllerName;
-    } else if (label == "Gender") {
-      textController = _textControllerGender;
-    } else if (label == "Breed") {
-      textController = _textControllerBreed;
-    } else if (label == "Weight") {
-      textController = _textControllerWeight;
+    TextEditingController textController;
+    switch (label) {
+      case 'Name':
+        textController = _textControllerName;
+        break;
+      case 'Gender':
+        textController = _textControllerGender;
+        break;
+      case 'Breed':
+        textController = _textControllerBreed;
+        break;
+      case 'Weight':
+        textController = _textControllerWeight;
+        break;
+      default:
+        textController = TextEditingController(); // fallback
     }
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
@@ -100,6 +105,7 @@ class _EditPetState extends State<EditPet> {
           TextField(
             controller: textController,
             obscureText: obscureText,
+            keyboardType: label == 'Weight' ? TextInputType.number : TextInputType.text,
             decoration: InputDecoration(
               filled: true,
               fillColor: const Color(0xFFE9EFFF),
@@ -119,15 +125,12 @@ class _EditPetState extends State<EditPet> {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: ElevatedButton(
-          onPressed: () async{
+          onPressed: () async {
             await editPet();
-            // Navigate back to the previous screen
-            Navigator.pop(context, true);
-            Navigator.push(
+            Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(
-                builder: (context) => PetDetails(myPet: myPet),
-              ),
+              MaterialPageRoute(builder: (context) => HomeScreen()),
+              (route) => false,
             );
           },
           style: ElevatedButton.styleFrom(
@@ -135,9 +138,8 @@ class _EditPetState extends State<EditPet> {
             textStyle: const TextStyle(fontSize: 18),
             backgroundColor: const Color(0xFF627ECB),
             foregroundColor: Colors.white,
-          
           ),
-          child: Text('Submit'),
+          child: const Text('Submit'),
         ),
       ),
     );
@@ -145,37 +147,45 @@ class _EditPetState extends State<EditPet> {
 
   Future<void> editPet() async {
     try {
-      
       final petData = {
-        "name": _textControllerName.text.trim(),
-        "gender": _textControllerGender.text.trim(),
-        "breed": _textControllerBreed.text.trim(),
-        "weight": double.tryParse(_textControllerWeight.text.trim()) ?? 0.0,
+        "name": _textControllerName.text.trim().isNotEmpty
+            ? _textControllerName.text.trim()
+            : widget.myPet.name,
+        "gender": _textControllerGender.text.trim().isNotEmpty
+            ? _textControllerGender.text.trim()
+            : widget.myPet.gender,
+        "breed": _textControllerBreed.text.trim().isNotEmpty
+            ? _textControllerBreed.text.trim()
+            : widget.myPet.breed,
+        "weight": double.tryParse(_textControllerWeight.text.trim()) ?? widget.myPet.weight,
+        "age": widget.myPet.age,
+        "image": widget.myPet.image,
+        "cartilla": widget.myPet.cartilla,
+        "owner_id": widget.myPet.owner,
       };
 
       print("Pet data: $petData");
 
-      final String petId = await updatePet(myPet.id,petData);
+      final String petId = await updatePet(widget.myPet.id, petData);
       print("Pet updated: $petId");
 
-      myPet.name = _textControllerName.text.trim();
-      myPet.breed = _textControllerBreed.text.trim();
-      myPet.weight = double.tryParse(_textControllerWeight.text.trim()) ?? 0.0;
-      myPet.gender = _textControllerGender.text.trim();
+      // Actualizar el objeto local
+      widget.myPet.name = petData['name'] as String;
+      widget.myPet.gender = petData['gender'] as String;
+      widget.myPet.breed = petData['breed'] as String;
+      widget.myPet.weight = petData['weight'] as double;
 
-      // Update the pet in the provider
-      Provider.of<OwnerModel>(context, listen: false).updatePet(myPet);
+      // Actualizar en el Provider
+      Provider.of<OwnerModel>(context, listen: false).updatePet(widget.myPet);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Mascota editada correctamente')),
       );
     } catch (e) {
       print("Error al editar mascota: $e");
-
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error al editar mascota')),
       );
     }
   }
-
 }

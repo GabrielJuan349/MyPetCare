@@ -55,6 +55,20 @@ class _PetDetailsState extends State<PetDetails> {
             Navigator.pop(context);
           },
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.white),
+            tooltip: 'Reload pet data',
+            onPressed: () {
+              setState(() {
+                myPet = widget.myPet;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Pet data reloaded")),
+              );
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -74,35 +88,20 @@ class _PetDetailsState extends State<PetDetails> {
                 borderRadius: BorderRadius.circular(12),
                 image: DecorationImage(
                   image: myPet.image != null && myPet.image!.isNotEmpty
-                    ? FileImage(File(myPet.image!)) as ImageProvider
-                    : AssetImage("assets/logo/LogoConFondo.png"),
+                      ? FileImage(File(myPet.image!)) as ImageProvider
+                      : const AssetImage("assets/logo/LogoConFondo.png"),
                   fit: BoxFit.cover,
                 ),
               ),
             ),
-          
-            
             const SizedBox(height: 5),
-            Text(
-              "Breed: ${myPet.breed}"
-            ),
+            Text("Breed: ${myPet.breed}"),
             const SizedBox(height: 20),
-            Text(
-                "Gender: ${myPet.gender}"
-            ),
+            Text("Gender: ${myPet.gender}"),
             const SizedBox(height: 10),
-            Text(
-                "Age: ${myPet.age}"
-            ),
+            Text("Age: ${myPet.age}"),
             const SizedBox(height: 10),
-            Text(
-                "Weight: ${myPet.weight} kg"
-            ),
-            /*const SizedBox(height: 20),
-            buildStarRow("Friendly", myPet.friendly),
-            const SizedBox(height: 10),
-            buildStarRow("Playful", myPet.playful),*/
-
+            Text("Weight: ${myPet.weight} kg"),
             if (myPet.cartilla != null && myPet.cartilla!.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),
