@@ -82,95 +82,81 @@ class _AppointmentInfoState extends State<AppointmentInfo> {
         timeController.text = data['time'];
         dateController.text = formattedDate;
 
-        return Padding(
+        return SingleChildScrollView(
           padding: const EdgeInsets.all(20),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                flex: 2,
+              _buildField('Mascota', data['petName'], true),
+              _buildField('Clínica', data['clinicName'], true),
+              _buildField('Veterinario', data['vetName'], true),
+              _buildChangableField('Fecha', dateController, true),
+              _buildChangableField('Hora', timeController, true),
+              _buildField('Tipo', data['type'], true),
+              _buildField('Razón', data['reason'], true),
+              const SizedBox(height: 20),
+              Center(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildField('Mascota', data['petName'], true),
-                    _buildField('Clínica', data['clinicName'], true),
-                    _buildField('Veterinario', data['vetName'], true),
-                    _buildChangableField('Fecha', dateController, true),
-                    _buildChangableField('Hora', timeController, true),
-                    _buildField('Tipo', data['type'], true),
-                    _buildField('Razón', data['reason'], true),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Center(
-                        child: Column(
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => ScheduleScreen(
-                                              appointmentId: doc.id,
-                                            ))).then((dateAndTime) {
-                                  print(
-                                      "Datime values in info are: $dateAndTime");
-
-                                  if (dateAndTime != null &&
-                                      dateAndTime.length == 3) {
-                                    _reAssignAppointment(dateAndTime);
-                                    // Go back
-                                  } else {
-                                    print("No se guardo ningun valor");
-                                  }
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: primaryOrange,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 32, vertical: 14),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              child: Text(
-                                'Reasignar cita',
-                                style: GoogleFonts.inter(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {
-                                _confirmCancelAppointment(context, doc.id);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: primaryOrange,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 32, vertical: 14),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              child: Text(
-                                'Cancelar cita',
-                                style: GoogleFonts.inter(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ],
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ScheduleScreen(appointmentId: doc.id),
+                          ),
+                        ).then((dateAndTime) {
+                          if (dateAndTime != null && dateAndTime.length == 3) {
+                            _reAssignAppointment(dateAndTime);
+                          } else {
+                            print("No se guardó ningún valor");
+                          }
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryOrange,
+                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                    )
+                      child: Text(
+                        'Reasignar cita',
+                        style: GoogleFonts.inter(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    ElevatedButton(
+                      onPressed: () {
+                        _confirmCancelAppointment(context, doc.id);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryOrange,
+                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        'Cancelar cita',
+                        style: GoogleFonts.inter(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
             ],
           ),
         );
+
       },
     );
   }

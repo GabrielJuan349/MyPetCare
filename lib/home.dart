@@ -314,7 +314,6 @@ class _HomeContentState extends State<HomeContent> {
         children: [
           Expanded(
               child: _buildCardHome('appointments',
-                  // Default value - TODO: Make changes in the db
                   body: Builder(
                       builder: (context) => _buildTodaysAppointmentList()))),
           const SizedBox(width: 20),
@@ -410,6 +409,24 @@ class _HomeContentState extends State<HomeContent> {
     }
   }
 
+  String _formatDate(dynamic date) {
+    DateTime dateTime;
+
+    if (date is String) {
+      dateTime = DateTime.parse(date);
+    } else if (date is Timestamp) {
+      dateTime = date.toDate();
+    } else if (date is DateTime) {
+      dateTime = date;
+    } else {
+      return 'Fecha inválida';
+    }
+
+    // Devuelve solo la fecha (ej. 2025-05-25)
+    return '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}';
+  }
+
+
   Widget _buildInboxCard() {
     final unreadAppointments = inboxAppointments.where((a) => !a.read).toList();
 
@@ -445,7 +462,7 @@ class _HomeContentState extends State<HomeContent> {
                         return ListTile(
                           title:
                               Text('Appointment with ${appointment.petName}'),
-                          subtitle: Text('Date: ${appointment.date}'),
+                          subtitle: Text('Date: ${_formatDate(appointment.date)}'),
                           trailing: IconButton(
                             icon: const Icon(Icons.check_circle,
                                 color: Colors.green),
