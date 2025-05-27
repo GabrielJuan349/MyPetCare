@@ -57,8 +57,23 @@ class _LoginState extends State<Login> {
         globalClinicInfo = userData['clinicInfo'];
         final clinicInfo = userData['clinicInfo'];
         final clinicName = clinicInfo is Map ? clinicInfo['name'] : clinicInfo;
-        final clinicId = clinicInfo is Map ? clinicInfo['id'] : clinicInfo;
-        globalClinicId = FirebaseAuth.instance.currentUser?.uid;
+
+// Buscar el ID del documento de la clínica por nombre
+        final clinicQuery = await FirebaseFirestore.instance
+            .collection('clinic')
+            .where('name', isEqualTo: clinicName)
+            .limit(1)
+            .get();
+
+        if (clinicQuery.docs.isEmpty) {
+          setState(() => _errorMessage = 'Clínica no encontrada.');
+          return;
+        }
+
+        final clinicDoc = clinicQuery.docs.first;
+        final clinicId = clinicDoc.id;
+        globalClinicId = clinicId;
+
 
         Navigator.pushReplacement(
           context,

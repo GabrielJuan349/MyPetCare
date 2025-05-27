@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'main.dart';
 
 class AssignAppointmentScreen extends StatefulWidget {
   final String date;
@@ -23,6 +24,7 @@ class AssignAppointmentScreen extends StatefulWidget {
 
 class _AssignAppointmentScreenState extends State<AssignAppointmentScreen> {
   String? selectedPetId;
+  List<Map<String, dynamic>> filteredPets = [];
   List<DocumentSnapshot> pets = [];
   final TextEditingController typeController = TextEditingController();
   final TextEditingController reasonController = TextEditingController();
@@ -44,21 +46,65 @@ class _AssignAppointmentScreenState extends State<AssignAppointmentScreen> {
   void initState() {
     super.initState();
 
-    FirebaseFirestore.instance.collection('pets').get().then((snapshot) {
-      setState(() {
-        pets = snapshot.docs;
-        if (widget.petId != null) {
-          selectedPetId = widget.petId;
-        }
-      });
-    });
 
     lightOrange = primaryOrange.withOpacity(0.1);
     borderOrange = primaryOrange.withOpacity(0.2);
 
     dateController.text = widget.date;
     timeController.text = widget.time;
+
+    _loadFilteredPets();
   }
+  Future<void> _loadFilteredPets() async {
+    if (globalClinicInfo == null) {
+      print('Error: globalClinicInfo es null');
+      return;
+    }
+
+    try {
+      final usersSnapshot = await FirebaseFirestore.instance.collection('users').get();
+      final petsSnapshot = await FirebaseFirestore.instance.collection('pets').get();
+
+      final usersByDocId = <String, String>{};
+      for (var userDoc in usersSnapshot.docs) {
+        final data = userDoc.data();
+        final clinic = data['clinicInfo'];
+        final accountType = data['accountType'];
+
+        final isClient = accountType == 'owner' || accountType == 'Pet owner' || accountType == 'cliente';
+        final sameClinic = clinic == globalClinicInfo;
+
+        if (isClient && sameClinic) {
+          final fullName = '${data['firstName'] ?? ''} ${data['lastName'] ?? ''}'.trim();
+          usersByDocId[userDoc.id] = fullName;
+        }
+      }
+
+      final petsResult = petsSnapshot.docs
+          .where((petDoc) => usersByDocId.containsKey(petDoc.data()['owner']))
+          .map((petDoc) {
+        final data = petDoc.data();
+        final ownerId = data['owner'];
+        final ownerName = usersByDocId[ownerId] ?? 'Desconocido';
+
+        return {
+          'petId': petDoc.id,
+          'name': data['name'],
+          'ownerName': ownerName,
+        };
+      }).toList();
+
+      setState(() {
+        filteredPets = petsResult;
+        if (widget.petId != null) {
+          selectedPetId = widget.petId;
+        }
+      });
+    } catch (e) {
+      print('Error cargando mascotas filtradas: $e');
+    }
+  }
+
 
   void assignAppointment() async {
     if (selectedPetId == null ||
@@ -163,12 +209,11 @@ class _AssignAppointmentScreenState extends State<AssignAppointmentScreen> {
                     style: GoogleFonts.inter(color: Colors.black54),
                   ),
                   isExpanded: true,
-                  items: pets.map((doc) {
-                    final data = doc.data() as Map<String, dynamic>;
-                    return DropdownMenuItem(
-                      value: doc.id,
+                  items: filteredPets.map((pet) {
+                    return DropdownMenuItem<String>(
+                      value: pet['petId'],
                       child: Text(
-                        data['name'] ?? 'Sin nombre',
+                        '${pet['name']} - ${pet['ownerName']}',
                         style: GoogleFonts.inter(fontSize: 14),
                       ),
                     );

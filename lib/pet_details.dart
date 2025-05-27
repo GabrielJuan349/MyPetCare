@@ -111,7 +111,7 @@ class PetDetailsScreen extends StatelessWidget {
                 ),
                 _buildStyledButton(
                   context,
-                  label: 'Reprogramar cita',
+                  label: 'Programar cita',
                   onPressed: () {
                     Navigator.push(
                       context,

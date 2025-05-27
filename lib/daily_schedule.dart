@@ -219,6 +219,7 @@ class _DayScheduleScreenState extends State<DayScheduleScreen> {
                                           date: DateFormat('dd/MM/yyyy')
                                               .format(date),
                                           time: time,
+                                          petId: widget.petId,
                                         ),
                                       ));
                                 }

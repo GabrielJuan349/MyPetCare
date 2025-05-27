@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'clinic_user_register.dart';
+import 'main.dart';
 
 class ClinicRegisterScreen extends StatefulWidget {
   const ClinicRegisterScreen({super.key});
@@ -66,8 +67,10 @@ class _ClinicRegisterScreenState extends State<ClinicRegisterScreen> {
         'endHour': _endHourController.text.trim(),
       };
 
-      await FirebaseFirestore.instance.collection('clinic').add(clinicData);
-
+      final docRef = await FirebaseFirestore.instance
+          .collection('clinic')
+          .add(clinicData);
+      globalClinicId = docRef.id;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Clinic created successfully!')),
       );
