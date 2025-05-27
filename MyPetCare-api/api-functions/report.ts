@@ -51,13 +51,14 @@ export async function getReportById(ctx: RouterContext<"/api/getReportById/:id">
 
 // Get by id_pet
 export async function getReportsByPet(ctx: RouterContext<"/api/getReportsByPet/pet/:id">) {
+  console.log("getReportsByPet called");
   const id = ctx.params.id;
   const res = await fetch(FirestoreReportURL);
   const data = await res.json();
 
   const filtered = (data.documents || [])
     .map(mapFirestore)
-    .filter((r) => r.id_pet === id);
+    .filter((r) => r.petId === id);
 
   ctx.response.body = filtered;
 }
