@@ -11,12 +11,12 @@ import 'treatment.dart';
 class PetDetailsScreen extends StatelessWidget {
   final String petId;
 
-  const PetDetailsScreen({required this.petId, Key? key}) : super(key: key);
+  const PetDetailsScreen({required this.petId, super.key});
 
   @override
   Widget build(BuildContext context) {
     final Color highlightColor = Colors.orange.withOpacity(0.5);
-    final Color backgroundColor = Colors.white;
+    const Color backgroundColor = Colors.white;
 
     return FutureBuilder<DocumentSnapshot>(
       future: FirebaseFirestore.instance.collection('pets').doc(petId).get(),
@@ -48,7 +48,7 @@ class PetDetailsScreen extends StatelessWidget {
         return Scaffold(
           backgroundColor: backgroundColor,
           appBar: AppBar(
-            backgroundColor: Color(0xFFF6F6F6),
+            backgroundColor: const Color(0xFFF6F6F6),
             iconTheme: const IconThemeData(color: Colors.black87),
             title: Text(
               data['name'] ?? 'Mascota',

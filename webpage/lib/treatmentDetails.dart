@@ -1,25 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
-class ReportDetailsScreen extends StatefulWidget {
-  final String reportId;
-  final String reportText;
-  final String createdAt;
+class TreatmentDetailsScreen extends StatefulWidget {
+  final String treatmentId;
+  final Map<String, dynamic> treatmentData;
 
-  const ReportDetailsScreen({
+  const TreatmentDetailsScreen({
     super.key,
-    required this.reportId,
-    required this.reportText,
-    required this.createdAt,
+    required this.treatmentId,
+    required this.treatmentData,
   });
 
   @override
-  State<ReportDetailsScreen> createState() => _ReportDetailsScreenState();
+  State<TreatmentDetailsScreen> createState() => _TreatmentDetailsScreenState();
 }
 
-class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
-  late TextEditingController _controller;
+class _TreatmentDetailsScreenState extends State<TreatmentDetailsScreen> {
+  late TextEditingController _nameController;
   bool _isEditing = false;
 
   final Color _backgroundColor = Colors.white;
@@ -28,35 +27,35 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.reportText);
+    _nameController = TextEditingController(text: widget.treatmentData['name']);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _nameController.dispose();
     super.dispose();
   }
 
-  Future<void> _updateReport() async {
+  Future<void> _updateTreatment() async {
     await FirebaseFirestore.instance
-        .collection('report')
-        .doc(widget.reportId)
-        .update({'reportText': _controller.text});
+        .collection('treatment')
+        .doc(widget.treatmentId)
+        .update({'name': _nameController.text});
     setState(() => _isEditing = false);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Informe actualizado', style: GoogleFonts.inter()),
+        content: Text('Tratamiento actualizado', style: GoogleFonts.inter()),
         backgroundColor: _highlightColor.withOpacity(0.7),
       ),
     );
   }
 
-  Future<void> _deleteReport() async {
+  Future<void> _deleteTreatment() async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Eliminar informe', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-        content: Text('¿Estás segura de que quieres eliminar este informe?', style: GoogleFonts.inter()),
+        title: Text('Eliminar tratamiento', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+        content: Text('¿Estás segura de que quieres eliminar este tratamiento?', style: GoogleFonts.inter()),
         actions: [
           TextButton(
             child: Text('Cancelar', style: GoogleFonts.inter(color: Colors.orange)),
@@ -71,13 +70,16 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
     );
 
     if (confirm == true) {
-      await FirebaseFirestore.instance.collection('report').doc(widget.reportId).delete();
+      await FirebaseFirestore.instance.collection('treatment').doc(widget.treatmentId).delete();
       if (mounted) Navigator.of(context).pop();
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final dateStart = (widget.treatmentData['date_start'] as Timestamp).toDate();
+    final dateEnd = (widget.treatmentData['date_end'] as Timestamp).toDate();
+
     return Scaffold(
       backgroundColor: _backgroundColor,
       appBar: AppBar(
@@ -85,23 +87,21 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
         backgroundColor: const Color(0xFFF6F6F6),
         iconTheme: const IconThemeData(color: Colors.black87),
         title: Text(
-          'Informe',
+          'Tratamiento',
           style: GoogleFonts.inter(
             fontWeight: FontWeight.w600,
             fontSize: 20,
             color: Colors.orange,
           ),
-
         ),
         elevation: 0,
-
         actions: [
           IconButton(
             icon: Icon(_isEditing ? Icons.save : Icons.edit, color: Colors.orange),
             tooltip: _isEditing ? 'Guardar' : 'Editar',
             onPressed: () {
               if (_isEditing) {
-                _updateReport();
+                _updateTreatment();
               } else {
                 setState(() => _isEditing = true);
               }
@@ -110,7 +110,7 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
           IconButton(
             icon: const Icon(Icons.delete, color: Colors.orange),
             tooltip: 'Eliminar',
-            onPressed: _deleteReport,
+            onPressed: _deleteTreatment,
           ),
         ],
       ),
@@ -127,7 +127,16 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Fecha: ${widget.createdAt}',
+                'Desde: ${DateFormat('dd/MM/yyyy').format(dateStart)}',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: Colors.black54,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Hasta: ${DateFormat('dd/MM/yyyy').format(dateEnd)}',
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   color: Colors.black54,
@@ -137,14 +146,14 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
               const SizedBox(height: 20),
               Expanded(
                 child: TextField(
-                  controller: _controller,
+                  controller: _nameController,
                   readOnly: !_isEditing,
                   maxLines: null,
                   cursorColor: Colors.orange,
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.white,
-                    labelText: 'Contenido del informe',
+                    labelText: 'Nombre del tratamiento',
                     labelStyle: GoogleFonts.inter(color: Colors.orange),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -156,7 +165,7 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.orange, width: 2),
+                      borderSide: const BorderSide(color: Colors.orange, width: 2),
                     ),
                   ),
                   style: GoogleFonts.inter(fontSize: 16, color: Colors.black87),

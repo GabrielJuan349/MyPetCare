@@ -59,9 +59,9 @@ class _PrescriptionUploadScreenState extends State<PrescriptionUploadScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final Color backgroundColor = Colors.white;
+    const Color backgroundColor = Colors.white;
     final Color highlightColor = Colors.orange.withOpacity(0.5);
-    final Color cardColor = const Color(0xFFF8F8F8);
+    const Color cardColor = Color(0xFFF8F8F8);
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -120,9 +120,6 @@ class _PrescriptionUploadScreenState extends State<PrescriptionUploadScreen> {
 
             ElevatedButton(
               onPressed: _isLoading ? null : _savePrescription,
-              child: _isLoading
-                  ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(strokeWidth: 2))
-                  : Text('Guardar receta', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: highlightColor,
                 foregroundColor: Colors.black87,
@@ -130,6 +127,9 @@ class _PrescriptionUploadScreenState extends State<PrescriptionUploadScreen> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 minimumSize: const Size.fromHeight(48),
               ),
+              child: _isLoading
+                  ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(strokeWidth: 2))
+                  : Text('Guardar receta', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
             ),
           ],
         ),
@@ -139,7 +139,7 @@ class _PrescriptionUploadScreenState extends State<PrescriptionUploadScreen> {
 
   InputDecoration _inputDecoration(String label) {
     final highlightColor = Colors.orange.withOpacity(0.5);
-    final cardColor = const Color(0xFFF8F8F8);
+    const cardColor = Color(0xFFF8F8F8);
     return InputDecoration(
       labelText: label,
       labelStyle: GoogleFonts.inter(color: Colors.black54),

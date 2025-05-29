@@ -12,9 +12,9 @@ class PrescriptionListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color backgroundColor = Colors.white;
+    const Color backgroundColor = Colors.white;
     final Color highlightColor = Colors.orange.withOpacity(0.5);
-    final Color cardColor = const Color(0xFFF6F6F6);
+    const Color cardColor = Color(0xFFF6F6F6);
 
     return Scaffold(
       backgroundColor: backgroundColor,

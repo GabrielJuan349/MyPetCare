@@ -29,7 +29,7 @@ class _AppointmentInfoState extends State<AppointmentInfo> {
 
   @override
   Widget build(BuildContext context) {
-    final Color backgroundColor = Colors.white;
+    const Color backgroundColor = Colors.white;
 
     return Scaffold(
         backgroundColor: backgroundColor,

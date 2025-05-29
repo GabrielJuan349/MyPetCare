@@ -5,7 +5,7 @@ import 'main.dart';
 class CreateAdoptionScreen extends StatefulWidget {
   final String? clinicId;  // Recibimos el clinicId al crear la pantalla
 
-  CreateAdoptionScreen({required this.clinicId});
+  const CreateAdoptionScreen({super.key, required this.clinicId});
 
   @override
   _CreateAdoptionScreenState createState() => _CreateAdoptionScreenState();
@@ -44,7 +44,7 @@ class _CreateAdoptionScreenState extends State<CreateAdoptionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Crear Adopción')),
+      appBar: AppBar(title: const Text('Crear Adopción')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -53,28 +53,28 @@ class _CreateAdoptionScreenState extends State<CreateAdoptionScreen> {
             children: [
               TextFormField(
                 controller: nameController,
-                decoration: InputDecoration(labelText: 'Nombre'),
+                decoration: const InputDecoration(labelText: 'Nombre'),
                 validator: (value) => value!.isEmpty ? 'Campo requerido' : null,
               ),
               TextFormField(
                 controller: ageController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Edad'),
+                decoration: const InputDecoration(labelText: 'Edad'),
                 validator: (value) => value!.isEmpty ? 'Campo requerido' : null,
               ),
               TextFormField(
                 controller: typeController,
-                decoration: InputDecoration(labelText: 'Tipo (Perro, Gato...)'),
+                decoration: const InputDecoration(labelText: 'Tipo (Perro, Gato...)'),
                 validator: (value) => value!.isEmpty ? 'Campo requerido' : null,
               ),
               TextFormField(
                 controller: descriptionController,
-                decoration: InputDecoration(labelText: 'Descripción'),
+                decoration: const InputDecoration(labelText: 'Descripción'),
                 maxLines: 3,
               ),
               TextFormField(
                 controller: emailController,
-                decoration: InputDecoration(labelText: 'Email'),
+                decoration: const InputDecoration(labelText: 'Email'),
                 validator: (value) => value!.isEmpty ? 'Campo requerido' : null,
               ),
               // Campo clinicId solo lectura
@@ -84,7 +84,7 @@ class _CreateAdoptionScreenState extends State<CreateAdoptionScreen> {
                       ? 'Fecha de hallazgo'
                       : 'Fecha: ${dateFound!.toLocal().toString().split(' ')[0]}',
                 ),
-                trailing: Icon(Icons.calendar_today),
+                trailing: const Icon(Icons.calendar_today),
                 onTap: () async {
                   final picked = await showDatePicker(
                     context: context,
@@ -99,7 +99,7 @@ class _CreateAdoptionScreenState extends State<CreateAdoptionScreen> {
                   }
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
@@ -115,7 +115,7 @@ class _CreateAdoptionScreenState extends State<CreateAdoptionScreen> {
                         'createdAt': Timestamp.now(),
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Adopción creada correctamente')),
+                        const SnackBar(content: Text('Adopción creada correctamente')),
                       );
                       Navigator.pop(context);
                     } catch (e) {
@@ -125,7 +125,7 @@ class _CreateAdoptionScreenState extends State<CreateAdoptionScreen> {
                     }
                   }
                 },
-                child: Text('Guardar adopción'),
+                child: const Text('Guardar adopción'),
               ),
             ],
           ),
@@ -138,12 +138,12 @@ class _CreateAdoptionScreenState extends State<CreateAdoptionScreen> {
 class AdoptionFormLauncher extends StatelessWidget {
   final String clinicId;
 
-  AdoptionFormLauncher({required this.clinicId});
+  const AdoptionFormLauncher({super.key, required this.clinicId});
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      child: Text('Crear nueva adopción'),
+      child: const Text('Crear nueva adopción'),
       onPressed: () {
         Navigator.push(
           context,

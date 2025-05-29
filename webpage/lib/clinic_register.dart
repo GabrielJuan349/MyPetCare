@@ -209,12 +209,12 @@ class _ClinicRegisterScreenState extends State<ClinicRegisterScreen> {
                 _buildTextField(
                   label: 'Latitude',
                   controller: _latitudeController,
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 ),
                 _buildTextField(
                   label: 'Longitude',
                   controller: _longitudeController,
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 ),
                 const SizedBox(height: 20),
                 _isLoading

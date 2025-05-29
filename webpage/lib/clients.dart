@@ -112,7 +112,7 @@ class _ClientsState extends State<Clients> {
           width: double.infinity,
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
-            child: Container(
+            child: SizedBox(
               width: screenWidth,
               child: DataTable(
                 headingRowColor: WidgetStateProperty.all(_highlightColor),

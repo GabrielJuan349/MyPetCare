@@ -125,7 +125,7 @@ class _PatientsPageState extends State<Patients> {
                   ],
                 ),
               );
-            }).toList(),
+            }),
           ],
         );
       },

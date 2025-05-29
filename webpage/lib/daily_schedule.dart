@@ -12,8 +12,7 @@ class DayScheduleScreen extends StatefulWidget {
   final String? appointmentId;
 
   const DayScheduleScreen(
-      {required this.date, this.petId, Key? key, this.appointmentId})
-      : super(key: key);
+      {required this.date, this.petId, super.key, this.appointmentId});
 
   @override
   State<DayScheduleScreen> createState() => _DayScheduleScreenState();
@@ -23,7 +22,7 @@ class _DayScheduleScreenState extends State<DayScheduleScreen> {
   @override
   Widget build(BuildContext context) {
     final displayDate = DateFormat('dd/MM/yyyy').format(widget.date);
-    final primaryOrange = Colors.orange;
+    const primaryOrange = Colors.orange;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -46,7 +45,7 @@ class _DayScheduleScreenState extends State<DayScheduleScreen> {
                   // To refresh actual page
                 });
               },
-              icon: Icon(Icons.refresh))
+              icon: const Icon(Icons.refresh))
         ],
       ),
       body: _buildTimeSlots(widget.date),
@@ -133,7 +132,7 @@ class _DayScheduleScreenState extends State<DayScheduleScreen> {
   }
 
   Widget _buildTimeSlots(DateTime date) {
-    final primaryOrange = Colors.orange;
+    const primaryOrange = Colors.orange;
     final lightOrange = primaryOrange.withOpacity(0.1);
     final borderOrange = primaryOrange.withOpacity(0.1);
 
@@ -176,7 +175,7 @@ class _DayScheduleScreenState extends State<DayScheduleScreen> {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.access_time, size: 20, color: primaryOrange),
+                      const Icon(Icons.access_time, size: 20, color: primaryOrange),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(

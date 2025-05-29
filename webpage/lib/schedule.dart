@@ -7,8 +7,7 @@ class ScheduleScreen extends StatefulWidget {
   final String? petId;
   final String? appointmentId;
 
-  const ScheduleScreen({Key? key, this.petId, this.appointmentId})
-      : super(key: key);
+  const ScheduleScreen({super.key, this.petId, this.appointmentId});
 
   @override
   State<ScheduleScreen> createState() => _ScheduleScreenState();
@@ -18,7 +17,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   @override
   Widget build(BuildContext context) {
     final today = DateTime.now();
-    final primaryOrange = Colors.orange;
+    const primaryOrange = Colors.orange;
     final lightOrange = primaryOrange.withOpacity(0.1);
     final borderOrange = primaryOrange.withOpacity(0.1);
 

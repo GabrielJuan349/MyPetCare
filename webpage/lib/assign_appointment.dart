@@ -11,11 +11,11 @@ class AssignAppointmentScreen extends StatefulWidget {
   final String? petId;
 
   const AssignAppointmentScreen({
-    Key? key,
+    super.key,
     required this.date,
     required this.time,
     this.petId,
-  }) : super(key: key);
+  });
 
   @override
   State<AssignAppointmentScreen> createState() =>

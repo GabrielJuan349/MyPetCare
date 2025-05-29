@@ -17,10 +17,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(MyPetCareApp());
+  runApp(const MyPetCareApp());
 }
 
 class MyPetCareApp extends StatelessWidget {
+  const MyPetCareApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -30,13 +32,15 @@ class MyPetCareApp extends StatelessWidget {
         '/login': (context) => const Login(),
         '/clinic-register': (context) => const ClinicRegisterScreen(),
       },
-      home: AuthLogic(),
+      home: const AuthLogic(),
     );
   }
 }
 
 class AuthLogic extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  const AuthLogic({super.key});
 
   @override
   Widget build(BuildContext context) {

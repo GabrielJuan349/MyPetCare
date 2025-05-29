@@ -16,7 +16,7 @@ class TreatmentFormScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color backgroundColor = Colors.white;
+    const Color backgroundColor = Colors.white;
 
     return Scaffold(
       backgroundColor: backgroundColor,

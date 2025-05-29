@@ -236,7 +236,6 @@ class _ClinicHomeScreenState extends State<ClinicHomeScreen> {
         ),
       ),
             floatingActionButton: FloatingActionButton(
-    child: Icon(Icons.add),
     onPressed: () {
       Navigator.push(
         context,
@@ -244,6 +243,7 @@ class _ClinicHomeScreenState extends State<ClinicHomeScreen> {
       );
     },
     tooltip: 'Crear nueva adopción',
+    child: const Icon(Icons.add),
   ),
     );
   }

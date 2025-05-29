@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 class ReportFormScreen extends StatefulWidget {
   final String petId;
 
-  const ReportFormScreen({required this.petId, Key? key}) : super(key: key);
+  const ReportFormScreen({required this.petId, super.key});
 
   @override
   State<ReportFormScreen> createState() => _ReportFormScreenState();
@@ -56,7 +56,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final Color backgroundColor = Colors.white;
+    const Color backgroundColor = Colors.white;
     final Color highlightColor = Colors.orange.withOpacity(0.6);
 
     return Scaffold(
