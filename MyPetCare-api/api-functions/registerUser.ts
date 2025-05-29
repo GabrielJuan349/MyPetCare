@@ -7,7 +7,7 @@ const FIREBASE_PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID"); // Asegúrate d
 
 const FireStoreUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/users`;
 
-async function saveUserToFirestore(user: any) {
+async function saveUserToFirestore(user: User) {
   const firestoreData = {
     fields: {
       email: { stringValue: user.email },
@@ -15,10 +15,8 @@ async function saveUserToFirestore(user: any) {
       lastName: { stringValue: user.lastName },
       phone: { stringValue: user.phone },
       accountType: { stringValue: user.accountType },
-      locality: {stringValue: user.locality},
-      clinicInfo: user.clinicInfo 
-        ? { stringValue: user.clinicInfo } 
-        : { nullValue: null },
+      locality: { stringValue: user.locality },
+      clinicInfo:  { stringValue: user.clinicInfo },
     },
   };
 

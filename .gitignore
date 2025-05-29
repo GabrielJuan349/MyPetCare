@@ -3,6 +3,7 @@
 **/.idea/
 **/.vscode/
 .DS_Store
+**/serviceAccountKey.json
 
 # Flutter/Dart specific
 .dart_tool/

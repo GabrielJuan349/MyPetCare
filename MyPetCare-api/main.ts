@@ -8,32 +8,47 @@ import { validateToken } from './api-functions/validateToken.ts';
 import { registerUser } from './api-functions/registerUser.ts';
 //import { getRecipeOnce } from "./api-functions/recetas.ts";
 import { createPet, deletePet, updatePet, getPetById, getPetsByOwner } from "./api-functions/pet-request.ts";
-import { createPrescription, getPrescription, updatePrescription, deletePrescription } from "./api-functions/prescription.ts"
+import { createPrescription, getPrescription, updatePrescription, deletePrescription, getPrescriptionByPet } from "./api-functions/prescription.ts"
 import { getClinics, createClinic, deleteClinic, getAllClinics } from "./api-functions/clinics.ts";
 import { createVet, deleteVet, getVetById , getVetsByClinic} from "./api-functions/vets.ts";
 import { createNews, getAllNews, deleteNews } from "./api-functions/news.ts";
 import { updateUser, deleteUser, getUserDataById } from "./api-functions/gestion.usuarios.ts";
-
+import { monthBlockedRequest } from './api-functions/blocked-request.ts';
+import { deleteAppointment, getCitasByVetId, newAppointment, getAppointmentById, getAllAppointmentsFromOwner } from './api-functions/appointments.ts';
+import { createReport, getReportById, getReportsByVet, getReportsByPet, deleteReport } from "./api-functions/report.ts";
+import { createTreatment, getTreatmentById, getTreatmentsByVet, getTreatmentsByPet, deleteTreatment } from "./api-functions/treatment.ts";
+import {getVaccineByPetID, createVaccine} from "./api-functions/vaccines.ts";
+import { createAdoption, getAllAdoptions, getAdoptionById, updateAdoption, deleteAdoption, getAdoptionsByClinic } from "./api-functions/adoption.ts";
 
 await load({ export: true });
 
 const app = new Application();
 const router = new Router();
+const port = Number(Deno.env.get("API_PORT")) || 4000;
+const url = Deno.env.get("API_URL") || "http://localhost:";
+const originURL = url+port.toString();
 
 app.use(oakCors({
-  origin: ["http://localhost:4200"],
+
+  origin: [originURL],
+  // origin: ["http://localhost:4200"],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
-  optionsSuccessStatus: 204
+  optionsSuccessStatus: 204,
 }));
 
 // ---- Endpoints de USERS ----
 router
+  .get('/', (ctx) => {
+    ctx.response.body = 'MyPetCare API Online✅';
+    ctx.response.status = 200;
+    ctx.response.headers.set('Content-Type', 'text/plain');
+    return ctx.response;
+  })
   .post("/api/authenticate", authenticate)
   .post("/api/validateToken", validateToken)
   .post("/api/registerUser", registerUser)
-
 
   // UPDATE user info
   .put("/user/:user_id", updateUser)
@@ -79,6 +94,8 @@ router
   // UPDATE prescription info
   .put("/api/putPrescription/:id", updatePrescription)
 
+  .get("/api/getPrescriptionByPet/pet/:id", getPrescriptionByPet)
+
 
 // ---- Endpoints de CLINICS ----
   // GET clinics info
@@ -112,15 +129,87 @@ router
   .get("/api/getAllNews", getAllNews)
   
   // DELETE news info
-  .delete("/api/deleteNews/:id", deleteNews);
+  .delete("/api/deleteNews/:id", deleteNews)
+
+
+// ---- Endpoints de NEWS ----
+  // CREATE news info
+  .post("/api/createNews", createNews)
+
+  // GET all news info
+  .get("/api/getAllNews", getAllNews)
+  
+  // DELETE news info
+  .delete("/api/deleteNews/:id", deleteNews)
+
+
+// ---- Endpoints de REPORT ----
+  // CREATE report info
+  .post("/api/createReport", createReport)
+
+  // GET report by ID
+  .get("/api/getReportById/:id", getReportById)
+
+  // GET reports by vet ID
+  .get("/api/getReportsByVet/vet/:id", getReportsByVet)
+
+  // GET reports by pet ID
+  .get("/api/getReportsByPet/pet/:id", getReportsByPet)
+
+  // DELETE report info
+  .delete("/api/deleteReport/:id", deleteReport)
+// ----- Endpoints de Appointments/Calendar  -----
+  // CREATE Appointments
+  .post("/api/appointment/:id", newAppointment)
+
+  // DELETE Appointments
+  .delete("/api/appointment/:id", deleteAppointment)
+
+  // GET Appointment by ID
+  .get("/api/getAppointment/:id", getAppointmentById)
+
+  .get("/api/appointment/owner/:id", getAllAppointmentsFromOwner)
+
+  // GET month blocked days from clinicId
+  .post("/api/calendar/:id", monthBlockedRequest)
+  // GET dates from vetId
+  .get("/api/appointment/vet/:vetId", getCitasByVetId)
+
+// ---- Endpoints de TREATMENT ----
+  // CREATE treatment info
+  .post("/api/createTreatment", createTreatment)
+
+  // GET treatment by ID
+  .get("/api/getTreatmentById/:id", getTreatmentById)
+
+  // GET treatments by vet ID
+  .get("/api/getTreatmentsByVet/vet/:id", getTreatmentsByVet)
+
+  // GET treatments by pet ID
+  .get("/api/getTreatmentsByPet/pet/:id", getTreatmentsByPet)
+
+  // DELETE treatment info
+  .delete("/api/deleteTreatment/:id", deleteTreatment)
+
+  //ENDPOINT VACCINES
+  .post("/api/vaccine", createVaccine)
+  .get("/api/getVaccineByPetID/pet/:id", getVaccineByPetID)
+
+// ---- Endpoints de ADOPTION ----
+  .post("/api/createAdoption", createAdoption)
+  .get("/api/getAllAdoptions", getAllAdoptions)
+  .get("/api/getAdoptionById/:id", getAdoptionById)
+  .put("/api/updateAdoption/:id", updateAdoption)
+  .delete("/api/deleteAdoption/:id", deleteAdoption)
+  .get("/api/getAdoptionsByClinic/:id", getAdoptionsByClinic)
 
 
 
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-const port = Number(Deno.env.get("API_PORT")) || 8000;
+
 app.listen({ port });
 console.log('PORT:', port);
-console.log(`Server running at http://localhost:${port}`);
+console.log(`Server running at ${originURL}`);
 
