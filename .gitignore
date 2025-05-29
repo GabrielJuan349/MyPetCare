@@ -3,7 +3,6 @@
 **/.idea/
 **/.vscode/
 .DS_Store
-**/serviceAccountKey.json
 
 # Flutter/Dart specific
 .dart_tool/
@@ -64,11 +63,6 @@ deno.lock
 .cache/deno/
 lock.json
 import_map.json
-
-# .gitignore firebase flutter connection
-lib/firebase_options.dart
-
-web/firebase-messaging-sw.js
 node_modules/
 
 # secret files
