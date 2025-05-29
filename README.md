@@ -101,6 +101,7 @@ Ruta: [`MyPetCare-web/README.md`](./MyPetCare-web/README.md)
 
 **Marc García**
 - GitHub: [MarcGarciaUAB](https://github.com/MarcGarciaUAB)
+- Linkedin: [Marc Garcia](https://www.linkedin.com/in/marc-garcia-7240a534b)
 
 **Laia Ubeda**
 - GitHub: [laiaubvi](https://github.com/laiaubvi)
