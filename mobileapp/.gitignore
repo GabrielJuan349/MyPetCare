@@ -68,7 +68,3 @@ import_map.json
 lib/firebase_options.dart
 
 web/firebase-messaging-sw.js
-node_modules/
-
-# secret files
-MyPetCare-api/firebaseconfig/secret.ts

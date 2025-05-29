@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/GabrielJuan349/MyPetCare">
-    <img alt="Logo" src="./logo/nombreLogoSinFondo.png" width=350 height=250>
+    <img alt="Logo" src="assets/logo/nombreLogoSinFondo.png" width=350 height=250>
   </a>
 
   <p align="center">
