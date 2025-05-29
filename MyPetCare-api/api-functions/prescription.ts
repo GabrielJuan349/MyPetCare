@@ -162,5 +162,3 @@ export async function deletePrescription(ctx: RouterContext<"/api/deletePrescrip
     ? { success: true }
     : { error: "Error eliminando receta" };
 }
-
-

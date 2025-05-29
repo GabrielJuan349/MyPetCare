@@ -151,6 +151,3 @@ export async function getAllClinics(ctx: RouterContext<"/api/getClinics">) {
   ctx.response.status = 200;
   ctx.response.body = clinics;
 }
-
-
-
