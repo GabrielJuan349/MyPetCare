@@ -1,0 +1,70 @@
+# General
+**/.env
+**/.idea/
+**/.vscode/
+.DS_Store
+
+# Flutter/Dart specific
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub/
+build/
+coverage/
+*.iml
+pubspec.lock
+.fvm/
+
+# iOS/XCode related
+ios/Pods/
+ios/*.mode1v3
+ios/*.mode2v3
+ios/*.moved-aside
+ios/*.pbxuser
+ios/*.perspectivev3
+ios/**/*sync/
+ios/.sconsign.dblite
+ios/.tags*
+ios/.vagrant/
+ios/DerivedData/
+ios/Icon?
+ios/Pods/
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Generated.xcconfig
+ios/Flutter/app.flx
+ios/Flutter/app.zip
+ios/Flutter/flutter_assets/
+ios/Flutter/flutter_export_environment.sh
+ios/ServiceDefinitions.json
+ios/.symlinks/
+ios/profile
+ios/xcuserdata
+
+# Android related
+android/gradlew
+android/gradlew.bat
+android/gradle/
+android/.gradle
+android/captures/
+android/local.properties
+android/key.properties
+android/app/debug
+android/app/profile
+android/app/release
+
+# Deno 2.0 specific
+.deno/
+deno.lock
+*-lock.json
+.deno_plugins/
+.vscode/.deno
+.cache/deno/
+lock.json
+import_map.json
+
+# .gitignore firebase flutter connection
+lib/firebase_options.dart
+
+web/firebase-messaging-sw.js
