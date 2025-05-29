@@ -1,116 +1,139 @@
 <p align="center">
   <a href="https://github.com/GabrielJuan349/MyPetCare">
-    <img alt="Logo" src="./logo/nombreLogoSinFondo.png" width=350 height=250>
+    <img alt="MyPetCare Logo" src="./logo/nombreLogoSinFondo.png" width="350" height="250">
   </a>
-
-  <p align="center">
-    Short description
-    <br>
-    <a href="https://github.com/GabrielJuan349/MyPetCare/issues/new?template=bug.md">Report bug</a>
-    ·
-    <a href="https://github.com/GabrielJuan349/MyPetCare/issues/new?template=feature.md&labels=feature">Request feature</a>
-  </p>
 </p>
 
+<p align="center">MyPetCare es una plataforma innovadora para el cuidado integral de mascotas, que integra un backend RESTful escalable con Deno y TypeScript, una aplicación móvil multiplataforma desarrollada en Flutter para propietarios, y un panel web optimizado para clínicas veterinarias. Con funcionalidades completas de gestión de perfiles de mascotas, programación de citas, seguimiento de tratamientos y vacunaciones, procesos de adopción y comunicación en tiempo real, MyPetCare ofrece una experiencia segura y eficiente tanto para usuarios finales como para profesionales veterinarios.</p>
 
-## Table of contents
+# MyPetCare 🐾
 
-- [Quick start](#quick-start)
-- [Status](#status)
-- [What's included](#whats-included)
-- [Bugs and feature requests](#bugs-and-feature-requests)
-- [Contributing](#contributing)
-- [Creators](#creators)
-- [Thanks](#thanks)
-- [Copyright and license](#copyright-and-license)
+**Plataforma integral de cuidado de mascotas** que combina:
 
+- Un **Backend API** con Deno y TypeScript
+- Una **Aplicación Móvil** multiplataforma con Flutter
+- Una **Aplicación Web** para clínicas veterinarias con Flutter Web
 
-## Quick start
+## 📋 Tabla de contenido
 
-Some text
+- [Visión General](#visión-general)
+- [Ecosistema de la Plataforma](#ecosistema-de-la-plataforma)
+  - [Backend API](#backend-api)
+  - [Aplicación Móvil](#aplicación-móvil)
+  - [Aplicación Web](#aplicación-web)
+- [Instalación y Configuración](#instalación-y-configuración)
+- [Contribución](#contribución)
+- [Licencia](#licencia)
 
-- Instruction 1
-- Instruction 2
-- Instruction 3
+## 🔍 Visión General
 
-## Status
+MyPetCare ofrece un sistema completo para gestionar mascotas, citas veterinarias, tratamientos, adopciones y comunicación entre propietarios y clínicas.
 
-Here goes all the budgets
+Cada componente está separado en carpetas:
 
-## What's included
-
-Some text
-
-```text
-folder1/
-└── folder2/
-    ├── folder3/
-    │   ├── file1
-    │   └── file2
-    └── folder4/
-        ├── file3
-        └── file4
+```
+MyPetCare/
+├── MyPetCare-api/      # Backend RESTful con Deno 2.0 y Swagger
+├── MyPetCare-App/      # App móvil Flutter para usuarios finales
+└── MyPetCare-web/      # App web Flutter para clínicas veterinarias
 ```
 
-## Bugs and feature requests
+## 🌐 Ecosistema de la Plataforma
 
-Have a bug or a feature request? Please first read the [issue guidelines](https://github.com/GabrielJuan349/MyPetCare/blob/master/CONTRIBUTING.md) and search for existing and closed issues. If your problem or idea is not addressed yet, [please open a new issue](https://github.com/GabrielJuan349/MyPetCare/issues/new).
+### 🔧 Backend API
+Ruta: [`MyPetCare-api/README.md`](./MyPetCare-api/README.md)
 
-## Contributing
+- Lenguaje: **TypeScript**, Deno 2.0
+- Framework: **Oak**
+- Autenticación: **JWT**, Firebase Auth
+- Base de datos: **Firebase Firestore**
+- Documentación: **Swagger UI** disponible en `/docs`
 
-Please read through our [contributing guidelines](https://github.com/GabrielJuan349/MyPetCare/blob/master/CONTRIBUTING.md). Included are directions for opening issues, coding standards, and notes on development.
+### 📱 Aplicación Móvil
+Ruta: [`MyPetCare-App/README.md`](./MyPetCare-App/README.md)
 
-Moreover, all HTML and CSS should conform to the [Code Guide](https://github.com/mdo/code-guide), maintained by [Main author](https://github.com/usernamemainauthor).
+- Framework: **Flutter 3.x**, Dart
+- Autenticación: Email/Password, Google Sign-In
+- Sincronización: **Cloud Firestore**, **Firebase Messaging**
+- Funcionalidades: Gestión de mascotas, citas, vacunas, recordatorios y adopciones
 
-Editor preferences are available in the [editor config](https://github.com/GabrielJuan349/MyPetCare/blob/master/.editorconfig) for easy use in common text editors. Read more and download plugins at <https://editorconfig.org/>.
+### 💻 Aplicación Web
+Ruta: [`MyPetCare-web/README.md`](./MyPetCare-web/README.md)
 
-## Creators
+- Framework: **Flutter Web**, Dart
+- Autenticación: Firebase Auth (Email)
+- Gestión: Clínicas, veterinarios, pacientes, citas, tratamientos y reportes
+- Hosting: **Firebase Hosting** o alternativa (Netlify, Vercel)
+
+## ⚙️ Instalación y Configuración
+
+### Requisitos Previos
+
+- **Git**  
+- **Deno 2.0** (para el backend)  
+- **Node.js & npm** (opcional para herramientas de Firebase CLI)  
+- **Flutter SDK** (para App móvil y web)  
+- **Firebase CLI**  
+
+### Pasos Generales
+
+1. Clona el repositorio:
+   ```powershell
+   git clone https://github.com/GabrielJuan349/MyPetCare.git
+   cd MyPetCare
+   ```
+2. Lee los README específicos en cada carpeta:
+   - `MyPetCare-api/README.md`
+   - `MyPetCare-App/README.md`
+   - `MyPetCare-web/README.md`
+3. Instala y configura cada componente según sus instrucciones.
+
+
+## 👥 Creadores
 
 **Yelennis Brissey Laura**
-
-- Github: [yelennislaura](https://github.com/yelennislaura)
-- [Linkedin](https://www.linkedin.com/in/yelennis-brissey-laura-rodriguez-548b94277/)
+- GitHub: [yelennislaura](https://github.com/yelennislaura)
+- LinkedIn: [Yelennis Brissey Laura](https://www.linkedin.com/in/yelennis-brissey-laura-rodriguez-548b94277/)
 
 **Gabriel Juan**
-
-- Github: [GabrielJuan349](https://github.com/GabrielJuan349)
-- [Linkedin](https://www.linkedin.com/in/gabi-juan)
-
+- GitHub: [GabrielJuan349](https://github.com/GabrielJuan349)
+- LinkedIn: [Gabriel Juan](https://www.linkedin.com/in/gabi-juan)
 
 **Marc García**
-
-- Github: [MarcGarciaUAB](https://github.com/MarcGarciaUAB)
-<!-- - [Linkedin](https://www.linkedin.com/in/) -->
+- GitHub: [MarcGarciaUAB](https://github.com/MarcGarciaUAB)
 
 **Laia Ubeda**
-
-- Github: [laiaubvi](https://github.com/laiaubvi)
-- [Linkedin](https://www.linkedin.com/in/laia-úbeda-vivet-1445b6354)
+- GitHub: [laiaubvi](https://github.com/laiaubvi)
+- LinkedIn: [Laia Úbeda Vivet](https://www.linkedin.com/in/laia-úbeda-vivet-1445b6354)
 
 **Eric Sánchez**
-
-- Github: [ericsiz](https://github.com/ericsiz)
-- [Linkedin](https://www.linkedin.com/in/eric-sánchez-ibañez-de-zuazo-70b747229)
+- GitHub: [ericsiz](https://github.com/ericsiz)
+- LinkedIn: [Eric Sánchez](https://www.linkedin.com/in/eric-sánchez-ibañez-de-zuazo-70b747229)
 
 **Xinyu Yu**
-
-- Github: [itsYu04](https://github.com/itsYu04)
-- [Linkedin](https://www.linkedin.com/in/x-yu)
+- GitHub: [itsYu04](https://github.com/itsYu04)
+- LinkedIn: [Xinyu Yu](https://www.linkedin.com/in/x-yu)
 
 **Daniel Bello**
-
-- Github: [DaBM17](https://github.com/DaBM17)
-<!-- - [Linkedin](https://www.linkedin.com/in/) -->
+- GitHub: [DaBM17](https://github.com/DaBM17)
 
 **Daniel Bermúdez**
+- GitHub: [DanielBG26](https://github.com/DanielBG26)
+- LinkedIn: [Daniel Bermúdez Galván](https://www.linkedin.com/in/daniel-bermudez-galvan-135702244/)
 
-- Github: [DanielBG26](https://github.com/DanielBG26)
-- [Linkedin](https://www.linkedin.com/in/daniel-bermudez-galvan-135702244/)
+## 🤝 Contribución
 
-## Thanks
+¡Toda ayuda es bienvenida! Lee las pautas de contribución en [CONTRIBUTING.md](./CONTRIBUTING.md) y sigue estos pasos:
 
-Some Text
+1. Haz **fork** del repositorio.
+2. Crea una rama para tu característica (`git checkout -b feature/nombre`).
+3. Realiza tus cambios y pruebas.
+4. Haz **commit** y **push**.
+5. Abre un **Pull Request** describiendo tus cambios.
 
-## Copyright and license
+## 📄 Licencia
 
-Code and documentation copyright 2023-2024 the authors. Code released under the [MIT License](https://github.com/GabrielJuan349/MyPetCare/blob/master/LICENSE).
+Este proyecto está bajo la **Licencia MIT**. Consulta [LICENSE.md](./LICENSE.md) para más detalles.
+<p align="center">
+  Desarrollado con ❤️ por el equipo de MyPetCare
+</p>
